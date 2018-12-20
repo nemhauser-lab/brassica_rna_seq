@@ -14,8 +14,13 @@ library(plotly)
 library(stats)
 library(VennDiagram)
 library(stringr)
+library(rprojroot)
 
-dirPath <- "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/analysis_v3_output"
+rootDir <- find_root(is_rstudio_project)
+dirPath <- file.path(rootDir, "results", "analysis_v3_output")
+# old dirPath:  "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/analysis_v3_output"
+
+file.exists(dirPath)
 
 ```
 
@@ -241,7 +246,8 @@ edinTests <- c("wt.24h_vs_wt.pre", "phyB.24h_vs_phyB.pre", "wt.sen_vs_wt.pre",
                "phyB.rec-sen_vs_wt.rec-sen")
 
 
-edinburghPath <- "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/Edinburgh_results"
+edinburghPath <- file.path(rootDir, "data", "Edinburgh_results")
+#old path: "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/Edinburgh_results"
 
 edinburghGenes <- data.frame()
 
@@ -265,8 +271,9 @@ The filter criteria is to remove rows(genes) that have less than 3 samples havin
 
 ```{r}
 
-counts <- read.csv("C:/Users/Morgan/Documents/Lab Stuff/RNA seq/raw_counts.csv",
-                   row.names="X")
+countsFile <- file.path(rootDir, "data", "raw_counts.csv")
+# old path: "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/raw_counts.csv"
+counts <- read.csv(countsFile, row.names="X")
 
 group <- factor(c(rep("WT.P",4), rep("WT.24", 4), rep("WT.S", 4), rep("WT.R", 4),
            rep("phyB.P", 3), rep("phyB.24", 3), rep("phyB.S", 3), 
@@ -1080,7 +1087,7 @@ nVenn(list("SvsP (WT+phyB)"=row.names(DEGsSvP), "S (WTvs.phyB)"=row.names(DEGsS)
 
 ```{r}
 
-cpmData <- cpm(senRecDGEdata)
+cpmData <- cpm(DGEdata)
 cpmData <- cpmData[, !grepl("24$", colnames(cpmData))]
 pcaData <- cpmData
   
@@ -1151,7 +1158,7 @@ ggplot() + geom_point(data=sdevData, aes(x=PC, y=sdev,
 ### do a PCA with only genes listed as "Yes" for Leaf_development
 
 ```{r}
-leafDevGenes <- subset(edinburghGeneInfo2, Leaf_development=="YES")$Gene_ID
+leafDevGenes <- subset(edinburghGeneInfo, Leaf_development=="YES")$Gene_ID
 leafDevGenes <- leafDevGenes[leafDevGenes %in% row.names(pcaData)]
 
 leafPcaData <- pcaData[leafDevGenes, ]
@@ -1177,9 +1184,9 @@ ggplot(plotData, aes(x=PC2, y=PC3, color=treatment, shape=genotype)) +
 ```
 
 ```{r}
-theta = -0.33*pi
+theta = -0.28*pi
 
-plotData$PC2.2 <- plotData$PC3*sin(theta) + plotData$PC2*cos(theta)
+plotData$PC2.3A <- plotData$PC3*sin(theta) + plotData$PC2*cos(theta)
 
 ggplot(plotData, aes(x=PC1, y=PC2.3A, color=treatment, shape=genotype)) + 
   geom_point(size=4) + scale_colour_manual(values=Palette)
@@ -1193,41 +1200,6 @@ ggplot(plotData, aes(x=PC1, y=PC2.3A, color=treatment, shape=genotype)) +
 ```{r}
 plot(x=1:length(pca$sdev), y=pca$sdev)
 ```
-
-
-```{r}
-
-
-testSdevs <- c(2.3782, 1.4429, 0.71008, 0.51481, 0.42797, 0.35184,
-               0.32413, 0.2419, 0.14896)
-
-sumDev <- sum(testSdevs)
-sumsquaredev <- sqrt(sum(testSdevs^2))
-
-```
-
-```{r}
-## S VS P
-write.csv(t(SvP_WT_Only$A._thaliana_best_hit), file="C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/GO_lists/SvP_WT_Only.csv", row.names = FALSE, quote=FALSE)
-
-write.csv(t(SvP_phyB_Only$A._thaliana_best_hit), file="C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/GO_lists/SvP_phyB_Only.csv", row.names = FALSE, quote=FALSE)
-
-write.csv(t(SvP_CommonGenes$A._thaliana_best_hit), file="C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/GO_lists/SvP_CommonGenes.csv", row.names = FALSE, quote=FALSE)
-
-
-## R VS S
-write.csv(t(RvS_WT_Only$A._thaliana_best_hit), file="C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/GO_lists/RvS_WT_Only.csv", row.names = FALSE, quote=FALSE)
-
-write.csv(t(RvS_phyB_Only$A._thaliana_best_hit), file="C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/GO_lists/RvS_phyB_Only.csv", row.names = FALSE, quote=FALSE)
-
-write.csv(t(RvS_CommonGenes$A._thaliana_best_hit), file="C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/GO_lists/RvS_CommonGenes.csv", row.names = FALSE, quote=FALSE)
-
-#
-
-
-
-```
-
 
 
 

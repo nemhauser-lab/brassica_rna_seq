@@ -1,0 +1,54 @@
+Group,Gene ID,Symbol,SAG symbol,Description/notes
+SAG,AT1G66580,RPL10C,SAG24,
+SAG,AT1G71190,,SAG18,
+SAG,AT2G29350,,SAG13,
+SAG,AT2G45210,SAUR36,SAG201,
+SAG,AT3G10985,ATWI-12,SAG20,
+SAG,AT4G02380,LEA5,SAG21,
+SAG,AT4G35770,DIN1,SEN1/SAG1,
+SAG,AT5G13170,SWEET15,SAG29,
+SAG,AT5G14930,,SAG101,
+SAG,AT5G20230,ATBCB,SAG14,
+SAG,AT5G45890,,SAG12,*
+SAG,AT5G51070,CLPD,SAG15,
+SAG,AT5G59220,HAI1,SAG113,
+SAG,AT5G60360,AALP,SAG2,*
+SA_,AT1G20780,APTUB44,SAUL1,SENESCENCE-ASSOCIATED E3 UBIQUITIN LIGASE
+SA_,AT1G64360,,SAQR,[S]ENESCENCE-ASSOCIATED AND QQS-RELATED
+SA_,AT2G19190,,SIRK,SE- NESCENCE-INDUCED RECEPTOR-LIKE KINASE
+SA_,AT3G14067,,SASP,SENESCENCE-ASSOCIATED SUBTILISIN PROTEASE
+SA_,AT4G30520,CIK3,SARK,SENESCENCE-ASSOCIATED RECEPTOR-LIKE KINASE
+SRG,AT1G17020,,SRG1,Encodes a novel member of the Fe(II)/ascorbate oxidase gene family;
+SRG,AT3G60140,DIN2,SRG2,"Encodes a protein similar to beta-glucosidase and is a member of glycoside hydrolase family 1. Expression is induced after 24 hours of dark treatment, in senescing leaves and treatment with exogenous photosynthesis inhibitor. Induction of gene expression was suppressed in excised leaves supplied with sugar. The authors suggest that the gene's expression pattern is responding to the level of sugar in the cell. The mRNA is cell-to-cell mobile."
+SRG,AT3G02040,GDPD1,SRG3,Encodes a member of the glycerophosphodiester phosphodiesterase (GDPD) family. Has glycerophosphodiester phosphodiesterase activity. Functions in maintaining cellular phosphate homeostasis under phosphate starvation. The mRNA is cell-to-cell mobile.
+SAGish,AT4G18980,ATS40-3,,Encodes a nuclear-targeted protein AtS40-3 that modulates senescence associated gene expression.
+SAGish,AT3G62080,CHMP7,,"Encodes a charged multi-vesicular body protein (CHMP7) homolog, that is an ESCRT-III-related protein and functions in the endosomal sorting pathway in humans. The Brassica homolog has been shown to be involved in plant growth and leaf senescence."
+SAGish,AT4G01250,WRKY22,,AtWRKY22 is a member of WRKY Transcription Factor; Group II-e. It is involved in regulation of dark induced leaf senescence
+SAGish,AT4G22920,NYE1,,"Similar to the tomato senescence-inducible chloroplast stay-green protein 1. It is upregulated during maximal senescence in the Arabidopsis life cycle, especially in senescent leaves. Acts antagonistically with SGR2 to balance chlorophyll catabolism in chloroplasts with the dismantling and remobilizing of other cellular components in senescing leaf cells."
+SAGish,AT5G27350,SFP1,,Encodes a sugar-porter family protein that is induced during leaf senescence. The increase in its gene expression during leaf senescence is paralleled by an accumulation of monosaccharides. The mRNA is cell-to-cell mobile.
+SAGish,AT5G51640,TBL17,,"Encodes leaf-senescence-related protein. A member of the TBL (TRICHOME BIREFRINGENCE-LIKE) gene family containing a plant-specific DUF231 (domain of unknown function) domain. TBL gene family has 46 members, two of which (TBR/AT5G06700 and TBL3/AT5G01360) have been shown to be involved in the synthesis and deposition of secondary wall cellulose, presumably by influencing the esterification state of pectic polymers. A nomenclature for this gene family has been proposed (Volker Bischoff & Wolf Scheible, 2010, personal communication)."
+SA_family,AT1G22160,,,senescence-associated family protein (DUF581)
+SA_family,AT2G44670,,,senescence-associated family protein (DUF581)
+SA_family,AT4G17670,,,senescence-associated family protein (DUF581)
+SA_family,AT5G20700,,,senescence-associated family protein (DUF581)
+SA_family,AT5G65040,IRM1,,senescence-associated family protein (DUF581)
+SA_family,AT1G66330,,,senescence-associated family protein
+SA_family,AT5G20700,,,"senescence-associated family protein, putative (DUF581)"
+SA_like,AT3G63230,,,senescence-associated-like protein (DUF581)
+SA_like,AT3G21590,,,Senescence/dehydration-associated protein-like protein
+SA_like,AT3G21600,,,Senescence/dehydration-associated protein-like protein
+SA_like,AT3G51250,,,Senescence/dehydration-associated protein-like protein
+SA_like,AT4G15450,,,Senescence/dehydration-associated protein-like protein
+SA_like,AT4G35985,,,Senescence/dehydration-associated protein-like protein
+sen_regulator,AT1G11700,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT1G29640,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT1G61930,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT2G28400,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT2G34340,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT3G15040,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT4G04630,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT4G21930,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT4G21970,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT4G26950,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT5G03230,,,"senescence regulator (Protein of unknown function, DUF584)"
+sen_regulator,AT5G45630,,,"senescence regulator (Protein of unknown function, DUF584)"

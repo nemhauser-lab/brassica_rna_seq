@@ -172,4 +172,3 @@ plotDEGs(fName, normCounts, saveDir=plotDir, fileType="jpeg")
 ```
 
 
-

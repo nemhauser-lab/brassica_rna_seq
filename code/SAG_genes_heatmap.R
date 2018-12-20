@@ -1,24 +1,12 @@
-subset(allGenesEdin, A._thaliana_best_hit %in% c("AT1G66580",
-                                                 "AT1G71190",
-                                                 "AT2G29350",
-                                                 "AT2G45210",
-                                                 "AT3G10985",
-                                                 "AT4G02380",
-                                                 "AT4G35770",
-                                                 "AT5G13170",
-                                                 "AT5G14930",
-                                                 "AT5G20230",
-                                                 "AT5G45890",
-                                                 "AT5G51070",
-                                                 "AT5G59220",
-                                                 "AT5G60360"))
+library(rprojroot)
 
+rootDir <- find_root(is_rstudio_project)
 
+# this assumes you ran the first part of DGE_analysis_v3.Rmd or equiv.
 DGEdata.no24 <- DGEdata[,-c(5:8,20:22)]
 
-
-tairGenes <- read.csv("C:/Users/Morgan/Documents/Lab Stuff/RNA seq/TAIR_SAG_Genes.csv",
-                      stringsAsFactors=FALSE)
+tairGenesFile <- file.path(rootDir, "data", "TAIR_SAG_Genes.csv")
+tairGenes <- read.csv(tairGenesFile, stringsAsFactors=FALSE)
 
 
 sagGenes <- subset(allGenesEdin, A._thaliana_best_hit %in% tairGenes$Gene.ID)

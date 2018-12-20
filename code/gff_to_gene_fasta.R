@@ -1,7 +1,9 @@
 library(Biostrings)
 library(GenomicRanges)
 
-dirPath <- "C:/Users/Morgan/Desktop/B_Rapa2.5"
+
+rootDir <- find_root(is_rstudio_project)
+dirPath <- file.path(rootDir, "data", "Brapa2.5")
 
 
 genomeFile <- file.path(dirPath, "BrapaV2.5_Chr.fa")
@@ -38,9 +40,6 @@ names(ourGenesDSS) <- names(ourGenesGR)
 
 writeXStringSet(ourGenesDSS, file.path(dirPath, "all_genes.fasta"))
 
-# --------------------------------------------------------------
-
-# try to make coding sequences from CDS entries
 
 
 
