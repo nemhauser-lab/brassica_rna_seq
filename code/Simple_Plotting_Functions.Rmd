@@ -1,0 +1,175 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+# IMPORTANT: Edit "directoryPath" in this block to match your computer's path to Andrej's cloud drive.
+
+Then run the block afterwards to 
+
+```{r}
+directoryPath <- "Z:/andrej/CloudStation/Drive/data/Senescence/RNAseq/Morgans R analysis"
+
+```
+
+
+# DO NOT RUN BLOCK BELOW. 
+
+This block generates the normCounts matrix from a raw counts file this has 
+arleady been done and saved to a .rds file that is loaded in the next code block.
+
+```{r}
+library(edgeR)
+
+rawCountsFile <- paste(directoryPath, "/data/raw_counts.csv", sep="")
+counts <- read.csv(rawCountsFile, row.names="X")
+
+group <- factor(c(rep("WT.P",4), rep("WT.24", 4), rep("WT.S", 4), rep("WT.R", 4),
+           rep("phyB.P", 3), rep("phyB.24", 3), rep("phyB.S", 3), 
+           rep("phyB.R", 3)))
+
+# create the DGEList object edgeR uses
+DGEdata <- DGEList(counts=counts, group=group)
+
+# filter out rows with CPM less than 2 in fewer than 3 samples
+keep <- rowSums(cpm(DGEdata)>2) >= 3
+DGEdata <- DGEdata[keep, , keep.lib.sizes=FALSE]
+
+#Normalize and get counts per million
+DGEdata <- calcNormFactors(DGEdata)
+normCounts <- as.data.frame(cpm(DGEdata))
+
+saveRDS(normCounts, file=file.path(directoryPath, "data", "normCounts.rds"))
+
+```
+
+
+# Run this block to load the normCounts matrix from the .rds file
+
+```{r}
+normCounts <- readRDS(file.path(directoryPath, "data", "normCounts.rds"))
+```
+
+# Run this block to load the plotting functions
+
+```{r}
+
+library(ggplot2)
+se <- function(x){
+  # calculate standard error of x
+  sd(x)/sqrt(length(x))
+} 
+
+plotDE <- function(geneId, normExpr, display=TRUE, save=FALSE, saveDir="", fileType="svg", title=NULL, ...){
+  group <- factor(c(rep("WT.P",4), rep("WT.24", 4), rep("WT.S", 4), rep("WT.R", 4),
+           rep("phyB.P", 3), rep("phyB.24", 3), rep("phyB.S", 3), 
+           rep("phyB.R", 3)))
+  
+  geneData <- as.data.frame(t(normExpr[geneId, ]))
+  geneData$group <- group
+  geneData <- dplyr::group_by(geneData, group)
+  dataSummary <- dplyr::summarise(geneData, mean=mean(!!rlang::sym(geneId)), SE=se(!!rlang::sym(geneId)))
+  dataSummary <- tidyr::separate(dataSummary, group, into=c("Genotype", "Timepoint"), sep="[.]", remove=FALSE)
+  dataSummary$Timepoint <- factor(dataSummary$Timepoint, levels=c("P", "24", "S", "R"))
+  dataSummary$line <- c(1,1,2,2,3,3,4,4)
+  
+  if (!is.null(title)){
+    plotTitle <- title
+  } else{
+    plotTitle <- geneId
+  }
+  
+  
+  # make plot
+  plot <- ggplot(dataSummary, aes(x=Timepoint, y=mean, color=Genotype)) + geom_point(size=2) + 
+    geom_errorbar(aes(ymin=mean-SE, ymax=mean+SE), width=0.2) + geom_line(aes(group=line)) + 
+    labs(title=plotTitle, y="Relative Expression")
+  
+  if (display) {
+    print(plot)
+  }
+  
+  if (save) {
+    if (!file.exists(saveDir)) {
+      stop("the save directory does not exist")
+    }
+    
+    saveFile <- file.path(saveDir, paste(geneId, " expression plot.", fileType, sep=""))
+    
+    if (file.exists(saveFile)) {
+      warning(paste(saveFile, "is being overwritten"))
+    }
+    
+    ggsave(saveFile, plot, device=fileType, ...)
+  }
+  
+}
+
+
+plotDEGs <- function(geneIds, normExpr, ...){
+  
+  if (file.exists(geneIds)){
+    data <- read.csv(geneIds, stringsAsFactors=FALSE, sep=",", strip.white=TRUE, header=FALSE)
+    geneIdList <- unique(unlist(data, use.names=FALSE))
+    geneIdList <- regmatches(geneIdList, regexpr("BraA\\d{8}", geneIdList))    
+  } 
+  
+  geneIdList[geneIdList %in% row.names(normExpr)]  
+    
+  if (length(geneIdList)==0){
+    stop("no genes found")
+  }
+  
+  for (geneId in geneIdList) {
+    plotDE(geneId, normExpr, display=FALSE, save=TRUE, ...)
+  }
+  
+}
+
+```
+
+
+# Example plotting single gene and saving that plot.
+
+Modify this code to plot a specific gene.
+
+##PlotDE() parameters:
+* geneId: character string of the single gene you want to plot ("BraA03004936" for example)
+* normExpr: normalized expression matrix, should always be normCounts from above
+* display=TRUE: Should the plot be displayed on the screen?
+* save=FALSE: should the plot be saved?
+* saveDir="":  The directory where the plot will be saved, plot will not be saved if directory doesn't exist.
+* fileType="svg": the file type to save the plot as. 
+* ...: other arguments can be added that will be passed to the ggsave() function
+
+```{r}
+plotDir <- file.path(directoryPath, "results", "plots")
+
+plotDE("BraA03004936", normCounts, save=TRUE, saveDir=plotDir, fileType="jpeg")
+
+```
+
+
+
+# Example saving multiple plots based on geneIDs in a .csv file
+
+Modify this code to plot a set of genes from a csv file. 
+
+```{r}
+# the name of the  .csv file with your genes to plot
+fName <- file.path(directoryPath, "testGeneIDs.csv")
+
+# directory to save the plot files
+plotDir <- file.path(directoryPath, "results", "plots")
+
+# you can also set the file type to "svg", "jpeg" and others. see help page for ggsave.
+plotDEGs(fName, normCounts, saveDir=plotDir, fileType="jpeg")
+
+```
+
+
+
