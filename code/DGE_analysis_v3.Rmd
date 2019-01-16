@@ -79,14 +79,14 @@ save_DEGs <- function(DEGList, folder, cont, FDRmax, logFCmin, dir){
   fname <- makeFname(folder=paste(folder, "/GO_lists", sep=""), cont=cont, 
                      change="_UP", dtype="_At_homologs", FDRmax=FDRmax, logFCmin=logFCmin)
   fPath <- file.path(dirPath, fname)
-  write.table(subset(DEGs, (logFC>0)&(!is.na(Symbol)), select="A._thaliana_best_hit"), fPath, 
-            row.names=FALSE, na="", col.names=FALSE, sep=",")
+  write.table(subset(DEGs, (logFC>0)&(!is.na(Symbol)), select="A._thaliana_best_hit"), 
+              fPath, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
   
   fname <- makeFname(folder=paste(folder, "/GO_lists", sep=""), cont=cont, 
                      change="_DOWN", dtype="_At_homologs", FDRmax=FDRmax, logFCmin=logFCmin)
   fPath <- file.path(dirPath, fname)
-  write.table(subset(DEGs, (logFC<0)&(!is.na(Symbol)), select="A._thaliana_best_hit"), fPath, 
-            row.names=FALSE, na="", col.names=FALSE, sep=",")
+  write.table(subset(DEGs, (logFC<0)&(!is.na(Symbol)), select="A._thaliana_best_hit"), 
+              fPath, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
 }
 
 addWoundCtrl <- function(DEGs, woundIDs){
