@@ -259,6 +259,8 @@ for (test in edinTests){
 
 edinburghGeneInfo <- unique(edinburghGenes[, 1:6])
 
+
+
 ```
 
 
@@ -305,7 +307,19 @@ allGenesEdin <- dplyr::left_join(data.frame(Gene_ID=allGeneIDs),
                                  edinburghGeneInfo, by="Gene_ID")
 
 
+# add the amaryllis file's info to this
+fname <- file.path(rootDir, "data", "All genes and identities.xlsx")
+df <- read.xlsx(xlsxFile=fname, sheet=1, skipEmptyRows=FALSE)
 
+# add some genes from the amarullis file
+dfNew <- df[!(df$gene.ID %in% edinburghGeneInfo$Gene_ID), c("gene.ID", "X9", "description")]
+colnames(dfNew) <- c("Gene_ID", "A._thaliana_best_hit", "Description")
+allGenesEdin <- data.table::rbindlist(list(allGenesEdin, dfNew), use.names=TRUE, fill=TRUE)
+
+
+fname <- file.path(dirPath, "allGeneA.tHomologs.csv")
+write.table(subset(allGenesEdin, select="A._thaliana_best_hit"), 
+            fname, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
 
 ```
 
@@ -340,6 +354,34 @@ colnames(design)[colnames(design) == "24"] <- "T24"
 
 ```
 
+### Modified design: ~gt + trt + gt:trt
+```{r}
+
+sampleCond <- data.frame(limma::strsplit2(colnames(counts), "_"))
+colnames(sampleCond) <- c("Genotype", "Plant", "Timepoint")
+
+# re order factor levels to ensure model intercept is correct
+sampleCond$Genotype <- factor(sampleCond$Genotype, c("WT", "phyB"))
+sampleCond$Plant <- factor(sampleCond$Plant, c("3", "4", "5", "6"))
+sampleCond$Timepoint <- factor(sampleCond$Timepoint, c("P", "24", "S", "R"))
+
+# create the model matrix used for the linear model
+design <- model.matrix( ~Genotype + Genotype:Timepoint, data=sampleCond)
+# remove column because there is no phyB plant #6
+design <- design[, !(colnames(design) %in% c("GenotypephyB:Plant6"))] 
+
+# simplify column names of design
+colnames(design) <- gsub("Genotype|Timepoint|Plant", "", colnames(design))
+colnames(design) <- gsub(":", ".", colnames(design))
+
+# rename intercept column to avoid warning further down
+colnames(design)[colnames(design) == "(Intercept)"] <- "Intercept" 
+colnames(design)[colnames(design) == "24"] <- "T24"
+
+```
+
+
+
 ### Contrasts
 
 ```{r}
@@ -349,16 +391,22 @@ fullContrasts <- makeContrasts("WT.24_vs_WT.P" = WT.24,
                                "phyB.S_vs_phyB.P" = phyB.S,
                                "WT.R_vs_WT.S" = (WT.R - WT.S),  
                                "phyB.R_vs_phyB.S" = phyB.R - phyB.S,
+                               "WT.R_vs_WT.P" = WT.R,
+                               "phyB.R_vs_phyB.P" = phyB.R,
                                
-                               "phyB.24_vs_WT.24" = phyB.24 - WT.24,
-                               "phyB.R_vs_WT.R" = phyB.R - WT.R,
-                               "phyB.S_vs_WT.S" = phyB.S - WT.S,
+                               
+                               "phyB.24_vs_WT.24" = phyB.24 + phyB - WT.24,
+                               "phyB.R_vs_WT.R" = phyB.R + phyB - WT.R,
+                               "phyB.S_vs_WT.S" = phyB.S +phyB - WT.S,
                              
                                "phyB.R-S_vs_WT.R-S" = (phyB.R - phyB.S) - (WT.R - WT.S),
                                "phyB.S-P_vs_WT.S-P" = phyB.S - WT.S,
+                               "phyB.R-P_vs_WT.R-P" = phyB.R - WT.R,
                              
-                               "phyB.P_vs_WT.P" = 2*phyB + WT.24 + WT.S + 
-                                 WT.R - phyB.24 - phyB.S - phyB.R,
+                               "phyB.P_vs_WT.P" = phyB,
+                               
+                               "phyB(PSR)_vs_WT(PSR)" = 3*phyB +  phyB.S + 
+                                 phyB.R -  WT.S - WT.R,
                              
                              levels = design)
 ```
@@ -366,7 +414,7 @@ fullContrasts <- makeContrasts("WT.24_vs_WT.P" = WT.24,
 ### linear model fit
 
 ```{r}
-woundDesign <- design[c(1:8,17:22), c(1:9)] 
+woundDesign <- design[c(1:8,17:22), c(1:4)] 
 woundDGEdata <- DGEdata[, c(1:8,17:22)]
 woundDGEdata <- calcNormFactors(woundDGEdata)
 # estimate dispersion
@@ -836,6 +884,11 @@ dev.off()
 ```
 
 
+
+
+
+
+
 ```{r}
 
 allGenes_RvS <- mergeGenes(allGenesWT_RvS, allGenesphyB_RvS)
@@ -1013,56 +1066,236 @@ DEGsR <- DEGs
 ```
 
 
+################################################################################
+
+## R vs. P
+
+
+### WT R vs. P
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint"
+cont <- "WT.R_vs_WT.P"
+FDRmax <- 0.01
+logFCmin <- 2
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin)
+figFile <- file.path(dirPath, figFile)
+dev.copy(png, figFile)
+dev.off()
+
+# -- specific --- # 
+allGenesWT_RvP <- allGenes
+DEGsWT_RvP <- DEGs
+
+head(DEGs, 20)
+
+```
+
+
+### phyB R vs. P
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint"
+cont <- "phyB.R_vs_phyB.P"
+FDRmax <- 0.01
+logFCmin <- 2
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin)
+figFile <- file.path(dirPath, figFile)
+dev.copy(png, figFile)
+dev.off()
+
+# -- specific --- # 
+allGenesphyB_RvP <- allGenes
+DEGsphyB_RvP <- DEGs
+
+head(DEGs, 20)
+
+```
+
+
+### phyB R-P vs WT R-P
+
+```{r}
+# --- inputs --- #
+folder <- "geno_x_timepoint"
+cont <- "phyB.R-P_vs_WT.R-P"
+FDRmax <- 0.1
+logFCmin <- 0
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin)
+figFile <- file.path(dirPath, figFile)
+dev.copy(png, figFile)
+dev.off()
+
+# --- specific --- #
+
+DEGs_RvP <- DEGs
+```
 
 
 
+### venn diagarm R vs. P
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint/RvP_venn"
+cont <- "RvP"
+FDRmax <- 0.01
+logFCmin <- 3
+# --- ------ --- #
 
 
+RvP_CommonGenes <- mergeGenes(DEGsphyB_RvP, DEGsWT_RvP) 
+colnames(RvP_CommonGenes) <- gsub("\\.x", "_phyB", colnames(RvP_CommonGenes))
+colnames(RvP_CommonGenes) <- gsub("\\.y", "_WT", colnames(RvP_CommonGenes))
+RvP_CommonGenes <- dplyr::left_join(RvP_CommonGenes, edinburghGeneInfo, by="Gene_ID")
+fname <- makeFname(folder=folder, cont="RvP_CommonGenes", FDRmax=FDRmax, logFCmin=logFCmin)
+fPath <- file.path(dirPath, fname)
+write.csv(RvP_CommonGenes, fPath, row.names=TRUE)
+
+RvP_WT_Only <- DEGsWT_RvP[!(row.names(DEGsWT_RvP) %in% RvP_CommonGenes$Gene_ID), ]
+save_DEGs(RvP_WT_Only, folder, "RvP_WT_only", FDRmax, logFCmin, dirPath)
+
+RvP_phyB_Only <- DEGsphyB_RvP[!(row.names(DEGsphyB_RvP) %in% RvP_CommonGenes$Gene_ID), ]
+save_DEGs(RvP_phyB_Only, folder, "RvP_phyB_only", FDRmax, logFCmin, dirPath)
+
+plot.new()
+temp <- draw.pairwise.venn(area1=nrow(RvP_WT_Only)+nrow(RvP_CommonGenes), 
+                           area2=nrow(RvP_phyB_Only)+nrow(RvP_CommonGenes), 
+                           cross.area=nrow(RvP_CommonGenes), 
+                   fill=c("blue", "red"), category=c("WT R vs. P", "phyB R vs. P"))
+grid.draw(temp)
+
+figFile <- makeFname(folder=folder, cont=cont, dtype="_Venn_diag", FDRmax=FDRmax, logFCmin=logFCmin)
+figFile <- file.path(dirPath, figFile)
+dev.copy(png, figFile)
+dev.off()
 
 
-### compare allGenes P and R:
+```
+
 
 ```{r}
 
 allGenes_RvP <- mergeGenes(allGenesWT_RvP, allGenesphyB_RvP)
-RvP_commonGenes <- commonGenes(DEGsWT_RvP, DEGsphyB_RvP)
 
-plot.new()
-temp <- draw.pairwise.venn(area1=nrow(DEGsWT_RvP), 
-                           area2=nrow(DEGsphyB_RvP), 
-                           cross.area=nrow(RvP_commonGenes), 
-                   fill=c("blue", "red"), category=c("WT R vs. P", "phyB R vs. P"))
+allGenes_RvP$group <- rep("Neither", nrow(allGenes_RvP))
+allGenes_RvP[row.names(RvP_WT_Only), ]$group <- "WT_Only"
+allGenes_RvP[row.names(RvP_phyB_Only), ]$group <- "phyB_Only"
+allGenes_RvP[RvP_CommonGenes$Gene_ID, ]$group <- "Both"
+# allGenes_RvP[row.names(DEGs_RvP), ]$group <- "WT(R-P) vs. phyB(R-P) FDR<0.1"
+allGenes_RvP_sig <- subset(allGenes_RvP, group != "Neither")
+
+cols <- c("Neither"="grey", "WT_Only"="blue", "phyB_Only"="red", 
+          "Both"="purple", "WT(R-S) vs. phyB(R-S) FDR<0.1"="green")
+
+ggplot(allGenes_RvP, aes(x=PValue.x, y=PValue.y, color=group)) +
+  geom_point(data=subset(allGenes_RvP, group=="Neither"), alpha=0.2) +
+  geom_point(data=subset(allGenes_RvP, group=="Both"), alpha=0.5) +
+  geom_point(data=subset(allGenes_RvP, group=="phyB_Only")) +  
+  geom_point(data=subset(allGenes_RvP, group=="WT_Only")) +  
+  # geom_point(data=subset(allGenes_RvP, group=="WT(R-S) vs. phyB(R-S) FDR<0.1")) +  
+  scale_color_manual(values=cols) +
+  scale_x_log10() + scale_y_log10() + 
+  labs(x = "WT p-value", y="phyB p-value", title="p-values R vs. P")
+
+figFile <- makeFname(folder=folder, cont=cont, dtype="_pval_plot", FDRmax=FDRmax, logFCmin=logFCmin)
+figFile <- file.path(dirPath, figFile)
+dev.copy(png, figFile)
+dev.off()
 
 
-allGenes_RvP$group <- rep("Neither", nrow(allGenesPandR))
-allGenes_RvP[row.names(DEGsWT_RvP), ]$group <- "WT_Only"
-allGenes_RvP[row.names(DEGsphyB_RvP), ]$group <- "phyB_Only"
-allGenes_RvP[row.names(RvP_commonGenes), ]$group <- "Both"
+ggplot(allGenes_RvP, aes(x=logFC.x, y=logFC.y, color=group)) +
+  geom_point(data=subset(allGenes_RvP, group=="Neither"), alpha=0.2) +
+  geom_point(data=subset(allGenes_RvP, group=="Both"), alpha=.5) +
+  geom_point(data=subset(allGenes_RvP, group=="phyB_Only")) +  
+  geom_point(data=subset(allGenes_RvP, group=="WT_Only")) +  
+  # geom_point(data=subset(allGenes_RvP, group=="WT(R-S) vs. phyB(R-S) FDR<0.1")) +  
+  scale_color_manual(values=cols) + 
+  labs(x = "WT Log2 Fold Change", y="phyB Log2 Fold Change", title="Log Fold Change R vs. P")
+
+figFile <- makeFname(folder=folder, cont=cont, dtype="_logFC_plot", FDRmax=FDRmax, logFCmin=logFCmin)
+figFile <- file.path(dirPath, figFile)
+dev.copy(png, figFile)
+dev.off()
+```
 
 
-ggplot(allGenes_RvP, aes(x=logFC.x, y=logFC.y)) + #geom_point() +
-  geom_point(data=subset(allGenes_RvP, group=="Neither"), alpha=0.2, color="grey") +
-  geom_point(data=subset(allGenes_RvP, group=="Both"), alpha=1, color="purple") +
-  geom_point(data=subset(allGenes_RvP, group=="phyB_Only"), color="red") +  
-  geom_point(data=subset(allGenes_RvP, group=="WT_Only"), color="blue") +  
-  #geom_point(data=subset(allGenes_PandR, group=="WT(R-S) vs. phyB(R-S) FDR<0.1")) +  
-  
-  # scale_x_log10() + scale_y_log10() +
-  labs(x = "WT logFC", y="phyB logFC", title="R-P logFC values WT vs. phyB")
 
 
-ggplot(allGenes_RvP, aes(x=PValue.x, y=PValue.y)) + #geom_point() +
-  geom_point(data=subset(allGenes_RvP, group=="Neither"), alpha=0.2, color="grey") +
-  geom_point(data=subset(allGenes_RvP, group=="Both"), alpha=1, color="purple") +
-  geom_point(data=subset(allGenes_RvP, group=="phyB_Only"), color="red") +  
-  geom_point(data=subset(allGenes_RvP, group=="WT_Only"), color="blue") +  
-  #geom_point(data=subset(allGenes_PandR, group=="WT(R-S) vs. phyB(R-S) FDR<0.1")) +  
-  
-  scale_x_log10() + scale_y_log10() +
-  labs(x = "WT p-value", y="phyB p-value", title="R-P p-values WT vs. phyB")
+
+
+
+### phyB vs WT at P,S,R
+
+```{r}
+# --- inputs --- #
+folder <- "test"
+cont <- "phyB(PSR)_vs_WT(PSR)"
+FDRmax <- 0.05
+logFCmin <- 0
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+#save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin)
+figFile <- file.path(dirPath, figFile)
+#dev.copy(png, figFile)
+#dev.off()
+
+# --- specific --- #
 
 
 ```
+
+
+
+
+
+
+
+
 
 
 
