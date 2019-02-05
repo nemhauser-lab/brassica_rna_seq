@@ -311,7 +311,50 @@ setGroup <- function(row, change="up", sigLvl=0.01, LFCutoff=1){
   return(group)
 }
 
+addAvgCpm <- function(geneList, DGEdata, groups=NULL){
+  
+  genes <- row.names(geneList)
+  
+  DEGCpm <- cpm(DGEdata[genes, ])
+  sampleOrder <- c(
+    "WT_3_P",   "WT_4_P",   "WT_5_P",   "WT_6_P",    
+    "phyB_3_P", "phyB_4_P", "phyB_5_P",
+    "WT_3_24",  "WT_4_24",  "WT_5_24",  "WT_6_24", 
+    "phyB_3_24","phyB_4_24","phyB_5_24",
+    "WT_3_S",   "WT_4_S",   "WT_5_S",   "WT_6_S",    
+    "phyB_3_S", "phyB_4_S", "phyB_5_S",
+    "WT_3_R",   "WT_4_R",   "WT_5_R",   "WT_6_R",
+    "phyB_3_R", "phyB_4_R", "phyB_5_R",
+    "WT.S_P",   "phyB.S_P", "WT.R_S",   "phyB.R_S") 
+  sampleOrder <- sampleOrder[sampleOrder %in% colnames(DEGCpm)]
+  DEGCpm <- DEGCpm[, sampleOrder]
 
+  if (class(DEGCpm)=="matrix") {
+    group <- gsub("_\\d_", ".", colnames(DEGCpm)) 
+    DEGCpm2 <- as.data.frame(t(DEGCpm))
+  }else {
+    group <- gsub("_\\d_", ".", names(DEGCpm)) 
+    DEGCpm2 <- as.data.frame(DEGCpm)
+    colnames(DEGCpm2) <- genes
+  }
+  DEGCpm2 <- stats::aggregate(DEGCpm2, by=list(group), FUN=mean)
+  row.names(DEGCpm2) <- DEGCpm2$Group.1
+  # DEGCpm2 <- DEGCpm2[, -1]
+  DEGCpm <- data.frame(t(DEGCpm2))
+  
+  # row.names(DEGCpm) <- colnames(DEGCpm2)
+  # colnames(DEGCpm) <- row.names(DEGCpm2)
+  
+  groupOrder <- c("WT.P", "phyB.P", "WT.24", "phyB.24", "WT.S", "phyB.S", "WT.R", "phyB.R")
+  groupOrder <- groupOrder[groupOrder %in% colnames(DEGCpm)]
+  DEGCpm <- DEGCpm[-1, groupOrder]
+  if (!is.null(groups)){
+    DEGCpm <- DEGCpm[, groups]
+  }
+  colnames(DEGCpm) <- paste(colnames(DEGCpm), "_Avg_CPM", sep="")
+  return(cbind(geneList, DEGCpm))
+  
+}
 
 ```
 
@@ -319,26 +362,12 @@ setGroup <- function(row, change="up", sigLvl=0.01, LFCutoff=1){
 
 ```{r}
 
-edinTests <- c("wt.24h_vs_wt.pre", "phyB.24h_vs_phyB.pre", "wt.sen_vs_wt.pre",
-               "phyB.sen_vs_phyB.pre", "phyB.sen-pre_vs_wt.sen-pre",
-               "wt.rec_vs_wt.sen", "phyB.rec_vs_phyB.sen", 
-               "phyB.rec-sen_vs_wt.rec-sen")
+edinburghPath <- file.path(rootDir, "data", "blast_top_hits.xlsx")
+df <- read.xlsx(xlsxFile=edinburghPath, sheet=2, skipEmptyRows=FALSE)
+colnames(df) <- gsub("(\\.)([a-z])", "_\\2", colnames(df))
+colnames(df)[1] <- "Gene_ID"
 
-
-edinburghPath <- file.path(rootDir, "data", "Edinburgh_results")
-#old path: "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/Edinburgh_results"
-
-edinburghGenes <- data.frame()
-
-for (test in edinTests){
-  fname <- list.files(edinburghPath, pattern=test, full.names=TRUE)
-  df <- read.xlsx(xlsxFile=fname, sheet=1, skipEmptyRows=FALSE)
-  edinburghGenes <- rbind(edinburghGenes, df)
-}
-
-edinburghGeneInfo <- unique(edinburghGenes[, 1:6])
-
-
+edinburghGeneInfo <- df
 
 ```
 
@@ -367,10 +396,8 @@ DGEdata <- DGEList(counts=counts, group=group)
 keep <- rowSums(cpm(DGEdata) > 10) >= 3
 DGEdata <- DGEdata[keep, , keep.lib.sizes=FALSE]
 
-
-# filter out rows with CPM less than 2 in fewer than 3 samples
-# keep <- rowSums(cpm(DGEdata)>2) >= 3
-# DGEdata <- DGEdata[keep, , keep.lib.sizes=FALSE]
+# woundDGEdata <- DGEdata[, c(1:8,17:22)]
+woundDGEdata <- DGEdata[, c(1:8,13:16,17:22,26:28)] # Excludes S timepoint
 
 ```
 
@@ -405,8 +432,8 @@ write.table(subset(allGenesEdin, select="A._thaliana_best_hit"),
 
 
 
-
-### Modified design: ~gt + trt + gt:trt
+ 
+### Modified design: ~gt + gt:trt  (no plant term)
 ```{r}
 
 sampleCond <- data.frame(limma::strsplit2(colnames(counts), "_"))
@@ -431,6 +458,89 @@ colnames(design)[colnames(design) == "(Intercept)"] <- "Intercept"
 colnames(design)[colnames(design) == "24"] <- "T24"
 
 ```
+
+### Modified design: ~gt + trt + gt:trt
+```{r}
+# 
+# sampleCond <- data.frame(limma::strsplit2(colnames(counts), "_"))
+# colnames(sampleCond) <- c("Genotype", "Plant", "Timepoint")
+# 
+# # re order factor levels to ensure model intercept is correct
+# sampleCond$Genotype <- factor(sampleCond$Genotype, c("WT", "phyB"))
+# sampleCond$Plant <- factor(sampleCond$Plant, c("3", "4", "5", "6"))
+# sampleCond$Timepoint <- factor(sampleCond$Timepoint, c("P", "24", "S", "R"))
+# 
+# # create the model matrix used for the linear model
+# design <- model.matrix( ~Genotype + Timepoint + Genotype:Timepoint, data=sampleCond)
+# # remove column because there is no phyB plant #6
+# design <- design[, !(colnames(design) %in% c("GenotypephyB:Plant6"))] 
+# 
+# # simplify column names of design
+# colnames(design) <- gsub("Genotype|Timepoint|Plant", "", colnames(design))
+# colnames(design) <- gsub(":", ".", colnames(design))
+# 
+# # rename intercept column to avoid warning further down
+# colnames(design)[colnames(design) == "(Intercept)"] <- "Intercept" 
+# colnames(design)[colnames(design) == "24"] <- "T24"
+
+```
+
+
+
+### design for calculating dispersion, account for gt:plant
+```{r}
+
+sampleCond <- data.frame(limma::strsplit2(colnames(counts), "_"))
+colnames(sampleCond) <- c("Genotype", "Plant", "Timepoint")
+
+# re order factor levels to ensure model intercept is correct
+sampleCond$Genotype <- factor(sampleCond$Genotype, c("WT", "phyB"))
+sampleCond$Plant <- factor(sampleCond$Plant, c("3", "4", "5", "6"))
+sampleCond$Timepoint <- factor(sampleCond$Timepoint, c("P", "24", "S", "R"))
+
+# create the model matrix used for the linear model
+dispDesign <- model.matrix( ~Genotype + Genotype:Timepoint + Genotype:Plant, data=sampleCond)
+# remove column because there is no phyB plant #6
+dispDesign <- dispDesign[, !(colnames(dispDesign) %in% c("GenotypephyB:Plant6"))] 
+
+# simplify column names of design
+colnames(dispDesign) <- gsub("Genotype|Timepoint|Plant", "", colnames(dispDesign))
+colnames(dispDesign) <- gsub(":", ".", colnames(dispDesign))
+
+# rename intercept column to avoid warning further down
+colnames(dispDesign)[colnames(dispDesign) == "(Intercept)"] <- "Intercept" 
+colnames(dispDesign)[colnames(dispDesign) == "24"] <- "T24"
+
+```
+
+
+
+### Wound design:
+```{r}
+
+sampleCond <- data.frame(limma::strsplit2(colnames(woundDGEdata$counts), "_"))
+colnames(sampleCond) <- c("Genotype", "Plant", "Timepoint")
+
+# re order factor levels to ensure model intercept is correct
+sampleCond$Genotype <- factor(sampleCond$Genotype, c("WT", "phyB"))
+sampleCond$Plant <- factor(sampleCond$Plant, c("3", "4", "5", "6"))
+sampleCond$Timepoint <- factor(sampleCond$Timepoint, c("P", "24", "R"))
+
+# create the model matrix used for the linear model
+woundDesign <- model.matrix( ~Genotype + Genotype:Timepoint + Genotype:Plant, data=sampleCond)
+# remove column because there is no phyB plant #6
+woundDesign <- woundDesign[, !(colnames(woundDesign) %in% c("GenotypephyB:Plant6"))] 
+
+# simplify column names of design
+colnames(woundDesign) <- gsub("Genotype|Timepoint|Plant", "", colnames(woundDesign))
+colnames(woundDesign) <- gsub(":", ".", colnames(woundDesign))
+
+# rename intercept column to avoid warning further down
+colnames(woundDesign)[colnames(woundDesign) == "(Intercept)"] <- "Intercept" 
+colnames(woundDesign)[colnames(woundDesign) == "24"] <- "T24"
+
+```
+
 
 
 
@@ -458,17 +568,49 @@ fullContrasts <- makeContrasts("WT.24_vs_WT.P" = WT.24,
                              
                                "phyB.P_vs_WT.P" = phyB,
                                
-                               "phyB(PSR)_vs_WT(PSR)" = 3*phyB +  phyB.S + 
+                               "phyB.PSR_vs_WT.PSR" = 3*phyB +  phyB.S + 
                                  phyB.R -  WT.S - WT.R,
                              
                              levels = design)
 ```
 
+### Contrasts for gt + trt + gt:trt
+```{r}
+# fullContrasts <- makeContrasts("WT.24_vs_WT.P" = T24,
+#                                "phyB.24_vs_phyB.P" = phyB.24 + T24,
+#                                "WT.S_vs_WT.P" = S,
+#                                "phyB.S_vs_phyB.P" = phyB.S + S,
+#                                "WT.R_vs_WT.S" = R - S,  
+#                                "phyB.R_vs_phyB.S" = phyB.R + R - phyB.S - S,
+#                                "WT.R_vs_WT.P" = R,
+#                                "phyB.R_vs_phyB.P" = phyB.R + R,
+#                                
+#                                
+#                                "phyB.24_vs_WT.24" = phyB + phyB.24,
+#                                "phyB.R_vs_WT.R" = phyB.R + phyB,
+#                                "phyB.S_vs_WT.S" = phyB.S +phyB,
+#                              
+#                                "phyB.R-S_vs_WT.R-S" = (phyB.R + phyB) - (phyB.S + phyB),
+#                                "phyB.S-P_vs_WT.S-P" = phyB.S + S - S,
+#                                "phyB.R-P_vs_WT.R-P" = phyB.R + R - R,
+#                                "phyB.24-P_vs_WT.24-P" = phyB.24 + T24 - T24,
+#                              
+#                                "phyB.P_vs_WT.P" = phyB,
+#                                
+#                                "phyB.PSR_vs_WT.PSR" = 3*phyB +  phyB.S + 
+#                                  phyB.R,
+#                              
+#                              levels = design)
+```
+
+
+
+
 ### linear model fit
 
 ```{r}
-woundDesign <- design[c(1:8,17:22), c(1:4)] 
-woundDGEdata <- DGEdata[, c(1:8,17:22)]
+# woundDesign <- design[c(1:8,17:22), c(1:4)] 
+# woundDGEdata <- DGEdata[, c(1:8,17:22)]
 woundDGEdata <- calcNormFactors(woundDGEdata)
 # estimate dispersion
 woundDGEdata <- estimateDisp(woundDGEdata, design=woundDesign)
@@ -499,12 +641,14 @@ LmFit <- glmQLFit(DGEdata, design)
 # --- inputs --- #
 folder <- "wound_control"
 cont <- "phyB.24-P_vs_WT.24-P"
+conds <- c("WT.P", "WT.24", "phyB.P", "phyB.24")
 FDRmax <- 0.05
-logFCmin <- 0
+logFCmin <- 1
 # ---        --- #
 qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addAvgCpm(DEGs, woundDGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 
@@ -536,12 +680,14 @@ To avoid our wound control gene lists being impacted by the S condition and the 
 # --- inputs --- #
 folder <- "wound_control"
 cont <- "WT.24_vs_WT.P_exact"
+conds <- c("WT.P", "WT.24")
 FDRmax <- 0.05
 logFCmin <- 1
 # --- ------ --- #
 exTest <- exactTest(woundDGEdata, pair=c("WT.24", "WT.P"))
 allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addAvgCpm(DEGs, woundDGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 woundDEGsWT <- DEGs
@@ -565,17 +711,19 @@ dev.off()
 # --- inputs --- #
 folder <- "wound_control"
 cont <- "phyB.24_vs_phyB.P_exact"
+conds <- c("phyB.P", "phyB.24")
 FDRmax <- 0.05
-logFCmin <- 2
+logFCmin <- 1
 # --- ------ --- #
 exTest <- exactTest(woundDGEdata, pair=c("phyB.24", "phyB.P"))
 allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addAvgCpm(DEGs, woundDGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 woundDEGsphyB <- DEGs
 
-hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+hist(subset(allGenes, !PValue==1)$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
          xlab = "p-value")
 
 figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
@@ -594,7 +742,7 @@ dev.off()
 folder <- "wound_control"
 cont <- "wound_ctrl_genes"
 FDRmax <- 0.05
-logFCmin <- 2
+logFCmin <- 1
 # --- ------ --- #
 woundIDs <- unique(c(row.names(woundDEGsWT), row.names(woundDEGsphyB)))
 
@@ -619,14 +767,16 @@ write.table(woundIDs, fPath, row.names=FALSE, na="", col.names=FALSE, sep=",")
 # --- inputs --- #
 folder <- "timepoint_v_timepoint"
 cont <- "WT.S_vs_WT.P"
+conds <- c("WT.P", "WT.S")
 FDRmax <- 0.01
-logFCmin <- 3
+logFCmin <- 1
 # --- ------ --- #
 
 qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -652,14 +802,16 @@ head(DEGs, 20)
 # --- inputs --- #
 folder <- "timepoint_v_timepoint"
 cont <- "phyB.S_vs_phyB.P"
+conds <- c("phyB.P", "phyB.S")
 FDRmax <- 0.01
-logFCmin <- 3
+logFCmin <- 1
 # --- ------ --- #
 
 qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -685,6 +837,7 @@ head(DEGs, 20)
 # --- inputs --- #
 folder <- "geno_x_timepoint"
 cont <- "phyB.S-P_vs_WT.S-P"
+conds <- c("WT.P", "phyB.P", "WT.S", "phyB.S")
 FDRmax <- 0.1
 logFCmin <- 0
 # --- ------ --- #
@@ -693,6 +846,7 @@ qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -715,12 +869,14 @@ DEGs_SvP <- DEGs
 # --- inputs --- #
 folder <- "timepoint_v_timepoint/SvP_venn"
 cont <- "SvP"
+conds <- c("WT.P", "phyB.P", "WT.S", "phyB.S")
 FDRmax <- 0.01
 logFCmin <- 1
 # --- ------ --- #
 
 
 allGenes_SvP <- mergeGenes(allGenesWT_SvP, allGenesphyB_SvP)
+allGenes_SvP <- addAvgCpm(allGenes_SvP, DGEdata, groups=conds)
 colnames(allGenes_SvP) <- gsub("\\.x", "_WT", colnames(allGenes_SvP))
 colnames(allGenes_SvP) <- gsub("\\.y", "_phyB", colnames(allGenes_SvP))
 
@@ -840,14 +996,16 @@ dev.off()
 # --- inputs --- #
 folder <- "timepoint_v_timepoint"
 cont <- "WT.R_vs_WT.S"
+conds <- c("WT.S", "WT.R")
 FDRmax <- 0.01
-logFCmin <- 3
+logFCmin <- 1
 # --- ------ --- #
 
 qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -873,14 +1031,16 @@ head(DEGs, 20)
 # --- inputs --- #
 folder <- "timepoint_v_timepoint"
 cont <- "phyB.R_vs_phyB.S"
+conds <- c("phyB.S", "phyB.R")
 FDRmax <- 0.01
-logFCmin <- 3
+logFCmin <- 1
 # --- ------ --- #
 
 qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -906,6 +1066,7 @@ head(DEGs, 20)
 # --- inputs --- #
 folder <- "geno_x_timepoint"
 cont <- "phyB.R-S_vs_WT.R-S"
+conds <- c("WT.S", "phyB.S", "WT.R", "phyB.R")
 FDRmax <- 0.1
 logFCmin <- 0
 # --- ------ --- #
@@ -914,6 +1075,7 @@ qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -936,12 +1098,14 @@ DEGs_RvS <- DEGs
 # --- inputs --- #
 folder <- "timepoint_v_timepoint/RvS_venn"
 cont <- "RvS"
+conds <- c("WT.S", "phyB.S", "WT.R", "phyB.R")
 FDRmax <- 0.01
 logFCmin <- 1
 # --- ------ --- #
 
 
 allGenes_RvS <- mergeGenes(allGenesWT_RvS, allGenesphyB_RvS)
+allGenes_RvS <- addAvgCpm(allGenes_RvS, DGEdata, groups=conds)
 colnames(allGenes_RvS) <- gsub("\\.x", "_WT", colnames(allGenes_RvS))
 colnames(allGenes_RvS) <- gsub("\\.y", "_phyB", colnames(allGenes_RvS))
 
@@ -1057,14 +1221,16 @@ dev.off()
 # --- inputs --- #
 folder <- "timepoint_v_timepoint"
 cont <- "WT.R_vs_WT.P"
+conds <- c("WT.P", "WT.R")
 FDRmax <- 0.01
-logFCmin <- 2
+logFCmin <- 1
 # --- ------ --- #
 
 qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -1090,14 +1256,16 @@ head(DEGs, 20)
 # --- inputs --- #
 folder <- "timepoint_v_timepoint"
 cont <- "phyB.R_vs_phyB.P"
+conds <- c("phyB.P", "phyB.R")
 FDRmax <- 0.01
-logFCmin <- 2
+logFCmin <- 1
 # --- ------ --- #
 
 qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -1123,6 +1291,7 @@ head(DEGs, 20)
 # --- inputs --- #
 folder <- "geno_x_timepoint"
 cont <- "phyB.R-P_vs_WT.R-P"
+conds <- c("WT.P", "phyB.P", "WT.R", "phyB.R")
 FDRmax <- 0.1
 logFCmin <- 0
 # --- ------ --- #
@@ -1131,6 +1300,7 @@ qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -1154,12 +1324,14 @@ DEGs_RvP <- DEGs
 # --- inputs --- #
 folder <- "timepoint_v_timepoint/RvP_venn"
 cont <- "RvP"
+conds <- c("WT.P", "phyB.P", "WT.R", "phyB.R")
 FDRmax <- 0.01
 logFCmin <- 1
 # --- ------ --- #
 
 
 allGenes_RvP <- mergeGenes(allGenesWT_RvP, allGenesphyB_RvP)
+allGenes_RvP <- addAvgCpm(allGenes_RvP, DGEdata, groups=conds)
 colnames(allGenes_RvP) <- gsub("\\.x", "_WT", colnames(allGenes_RvP))
 colnames(allGenes_RvP) <- gsub("\\.y", "_phyB", colnames(allGenes_RvP))
 
@@ -1280,11 +1452,13 @@ folder <- "phyB_v_WT_at_timepoint"
 cont <- "phyB.P_vs_WT.P_exact"
 conds <- c("phyB.P", "WT.P")
 FDRmax <- 0.05
-logFCmin <- 2
+logFCmin <- 1
 # --- ------ --- #
 exTest <- exactTest(woundDGEdata, pair=conds)
 allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -1313,11 +1487,13 @@ folder <- "phyB_v_WT_at_timepoint"
 cont <- "phyB.24_vs_WT.24_exact"
 conds <- c("phyB.24", "WT.24")
 FDRmax <- 0.05
-logFCmin <- 2
+logFCmin <- 1
 # --- ------ --- #
 exTest <- exactTest(woundDGEdata, pair=conds)
 allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -1344,11 +1520,13 @@ folder <- "phyB_v_WT_at_timepoint"
 cont <- "phyB.S_vs_WT.S_exact"
 conds <- c("phyB.S", "WT.S")
 FDRmax <- 0.05
-logFCmin <- 2
+logFCmin <- 1
 # --- ------ --- #
 exTest <- exactTest(DGEdata, pair=conds)
 allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -1375,11 +1553,13 @@ folder <- "phyB_v_WT_at_timepoint"
 cont <- "phyB.R_vs_WT.R_exact"
 conds <- c("phyB.R", "WT.R")
 FDRmax <- 0.05
-logFCmin <- 2
+logFCmin <- 1
 # --- ------ --- #
-exTest <- exactTest(DGEdata, pair=conds)
+exTest <- exactTest(woundDGEdata, pair=conds)
 allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
@@ -1398,223 +1578,35 @@ DEGsR <- DEGs
 ```
 
 
-################################################################################
 
-## R vs. P
-
-
-### WT R vs. P
-
-```{r}
-# --- inputs --- #
-folder <- "timepoint_v_timepoint"
-cont <- "WT.R_vs_WT.P"
-FDRmax <- 0.01
-logFCmin <- 2
-# --- ------ --- #
-
-qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
-allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
-DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
-DEGs <- addWoundCtrl(DEGs, woundIDs)
-save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
-
-hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
-         xlab = "p-value")
-figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
-                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin)
-figFile <- file.path(dirPath, figFile)
-dev.copy(png, figFile)
-dev.off()
-
-# -- specific --- # 
-allGenesWT_RvP <- allGenes
-DEGsWT_RvP <- DEGs
-
-head(DEGs, 20)
-
-```
-
-
-### phyB R vs. P
-
-```{r}
-# --- inputs --- #
-folder <- "timepoint_v_timepoint"
-cont <- "phyB.R_vs_phyB.P"
-FDRmax <- 0.01
-logFCmin <- 2
-# --- ------ --- #
-
-qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
-allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
-DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
-DEGs <- addWoundCtrl(DEGs, woundIDs)
-save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
-
-hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
-         xlab = "p-value")
-figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
-                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin)
-figFile <- file.path(dirPath, figFile)
-dev.copy(png, figFile)
-dev.off()
-
-# -- specific --- # 
-allGenesphyB_RvP <- allGenes
-DEGsphyB_RvP <- DEGs
-
-head(DEGs, 20)
-
-```
-
-
-### phyB R-P vs WT R-P
-
-```{r}
-# --- inputs --- #
-folder <- "geno_x_timepoint"
-cont <- "phyB.R-P_vs_WT.R-P"
-FDRmax <- 0.1
-logFCmin <- 0
-# --- ------ --- #
-
-qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
-allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
-DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
-DEGs <- addWoundCtrl(DEGs, woundIDs)
-save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
-
-hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
-         xlab = "p-value")
-figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
-                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin)
-figFile <- file.path(dirPath, figFile)
-dev.copy(png, figFile)
-dev.off()
-
-# --- specific --- #
-
-DEGs_RvP <- DEGs
-```
-
-
-
-### venn diagarm R vs. P
-
-```{r}
-# --- inputs --- #
-folder <- "timepoint_v_timepoint/RvP_venn"
-cont <- "RvP"
-FDRmax <- 0.01
-logFCmin <- 3
-# --- ------ --- #
-
-
-RvP_CommonGenes <- mergeGenes(DEGsphyB_RvP, DEGsWT_RvP) 
-colnames(RvP_CommonGenes) <- gsub("\\.x", "_phyB", colnames(RvP_CommonGenes))
-colnames(RvP_CommonGenes) <- gsub("\\.y", "_WT", colnames(RvP_CommonGenes))
-RvP_CommonGenes <- dplyr::left_join(RvP_CommonGenes, edinburghGeneInfo, by="Gene_ID")
-fname <- makeFname(folder=folder, cont="RvP_CommonGenes", FDRmax=FDRmax, logFCmin=logFCmin)
-fPath <- file.path(dirPath, fname)
-write.csv(RvP_CommonGenes, fPath, row.names=TRUE)
-
-RvP_WT_Only <- DEGsWT_RvP[!(row.names(DEGsWT_RvP) %in% RvP_CommonGenes$Gene_ID), ]
-save_DEGs(RvP_WT_Only, folder, "RvP_WT_only", FDRmax, logFCmin, dirPath)
-
-RvP_phyB_Only <- DEGsphyB_RvP[!(row.names(DEGsphyB_RvP) %in% RvP_CommonGenes$Gene_ID), ]
-save_DEGs(RvP_phyB_Only, folder, "RvP_phyB_only", FDRmax, logFCmin, dirPath)
-
-plot.new()
-temp <- draw.pairwise.venn(area1=nrow(RvP_WT_Only)+nrow(RvP_CommonGenes), 
-                           area2=nrow(RvP_phyB_Only)+nrow(RvP_CommonGenes), 
-                           cross.area=nrow(RvP_CommonGenes), 
-                   fill=c("blue", "red"), category=c("WT R vs. P", "phyB R vs. P"))
-grid.draw(temp)
-
-figFile <- makeFname(folder=folder, cont=cont, dtype="_Venn_diag", FDRmax=FDRmax, logFCmin=logFCmin)
-figFile <- file.path(dirPath, figFile)
-dev.copy(png, figFile)
-dev.off()
-
-
-```
-
-
-```{r}
-
-allGenes_RvP <- mergeGenes(allGenesWT_RvP, allGenesphyB_RvP)
-
-allGenes_RvP$group <- rep("Neither", nrow(allGenes_RvP))
-allGenes_RvP[row.names(RvP_WT_Only), ]$group <- "WT_Only"
-allGenes_RvP[row.names(RvP_phyB_Only), ]$group <- "phyB_Only"
-allGenes_RvP[RvP_CommonGenes$Gene_ID, ]$group <- "Both"
-# allGenes_RvP[row.names(DEGs_RvP), ]$group <- "WT(R-P) vs. phyB(R-P) FDR<0.1"
-allGenes_RvP_sig <- subset(allGenes_RvP, group != "Neither")
-
-cols <- c("Neither"="grey", "WT_Only"="blue", "phyB_Only"="red", 
-          "Both"="purple", "WT(R-S) vs. phyB(R-S) FDR<0.1"="green")
-
-ggplot(allGenes_RvP, aes(x=PValue.x, y=PValue.y, color=group)) +
-  geom_point(data=subset(allGenes_RvP, group=="Neither"), alpha=0.2) +
-  geom_point(data=subset(allGenes_RvP, group=="Both"), alpha=0.5) +
-  geom_point(data=subset(allGenes_RvP, group=="phyB_Only")) +  
-  geom_point(data=subset(allGenes_RvP, group=="WT_Only")) +  
-  # geom_point(data=subset(allGenes_RvP, group=="WT(R-S) vs. phyB(R-S) FDR<0.1")) +  
-  scale_color_manual(values=cols) +
-  scale_x_log10() + scale_y_log10() + 
-  labs(x = "WT p-value", y="phyB p-value", title="p-values R vs. P")
-
-figFile <- makeFname(folder=folder, cont=cont, dtype="_pval_plot", FDRmax=FDRmax, logFCmin=logFCmin)
-figFile <- file.path(dirPath, figFile)
-dev.copy(png, figFile)
-dev.off()
-
-
-ggplot(allGenes_RvP, aes(x=logFC.x, y=logFC.y, color=group)) +
-  geom_point(data=subset(allGenes_RvP, group=="Neither"), alpha=0.2) +
-  geom_point(data=subset(allGenes_RvP, group=="Both"), alpha=.5) +
-  geom_point(data=subset(allGenes_RvP, group=="phyB_Only")) +  
-  geom_point(data=subset(allGenes_RvP, group=="WT_Only")) +  
-  # geom_point(data=subset(allGenes_RvP, group=="WT(R-S) vs. phyB(R-S) FDR<0.1")) +  
-  scale_color_manual(values=cols) + 
-  labs(x = "WT Log2 Fold Change", y="phyB Log2 Fold Change", title="Log Fold Change R vs. P")
-
-figFile <- makeFname(folder=folder, cont=cont, dtype="_logFC_plot", FDRmax=FDRmax, logFCmin=logFCmin)
-figFile <- file.path(dirPath, figFile)
-dev.copy(png, figFile)
-dev.off()
-```
-
-
-
-
-
+## GT at all time points at once
 
 
 ### phyB vs WT at P,S,R
 
 ```{r}
 # --- inputs --- #
-folder <- "test"
-cont <- "phyB(PSR)_vs_WT(PSR)"
+folder <- "phyB_v_WT_at_timepoint"
+cont <- "phyB.PSR_vs_WT.PSR"
+conds <- c("WT.P", "phyB.P", "WT.S", "phyB.S", "WT.R", "phyB.R")
 FDRmax <- 0.05
-logFCmin <- 0
+logFCmin <- 1
 # --- ------ --- #
 
 qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
 allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
 DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
 DEGs <- addWoundCtrl(DEGs, woundIDs)
-#save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
          xlab = "p-value")
 figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
                      dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin)
 figFile <- file.path(dirPath, figFile)
-#dev.copy(png, figFile)
-#dev.off()
+dev.copy(png, figFile)
+dev.off()
 
 # --- specific --- #
 
@@ -1626,7 +1618,8 @@ figFile <- file.path(dirPath, figFile)
 
 
 
-
+--------------------------------------------------------------------------------
+# END MAIN ANALYSIS
 
 
 

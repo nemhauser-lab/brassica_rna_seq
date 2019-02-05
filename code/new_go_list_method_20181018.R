@@ -158,20 +158,26 @@ write.table(phyB_down_more_At, fname, quote=FALSE, row.names=FALSE, na="", col.n
 ################################################################################
 
 
-setGroup <- function(row){
+setGroup <- function(row, change="up", sigLvl=0.01, LFCutoff=1){
+  if (change=="up"){
+    subsetMask <- (row$FDR.x < sigLvl & row$logFC.x > LFCutoff) | (row$FDR.y < sigLvl & row$logFC.y > LFCutoff)
+  }
+  if (change=="down"){
+    subsetMask <- (row$FDR.x < sigLvl & row$logFC.x < -LFCutoff) | (row$FDR.y < sigLvl & row$logFC.y < -LFCutoff)
+  }
+  wtSigTest <-row$FDR.x < sigLvl & row$FDR.y > sigLvl
+  phyBSigTest <- row$FDR.y < sigLvl & row$FDR.x > sigLvl
   group <- "none"
-  if ((row$FDR.x < 0.01 & row$logFC.x > 1) | (row$FDR.y < 0.01 & row$logFC.y > 1)) {
+  if (subsetMask) {
     group <- "sig"
-    if (row$FDR.y > 0.01) {
+    if (wtSigTest) {
       group <- "WT_sig"
-    }else if (row$FDR.x > 0.01) {
+    }else if (phyBSigTest) {
       group <- "phyB_sig"
     } else {
       group <- "Both_sig"
     }
-
   }
-
   return(group)
 }
 
@@ -182,12 +188,12 @@ sum(allGenes_RvS$group == "phyB_sig")
 
 
 cols <- c("none"="grey50", "phyB_sig"="red", "WT_sig"="blue", "Both_sig"="purple")
-
-ggplot(allGenes_RvS, aes(x=logFC.x, y=logFC.y, color=group)) +
-  geom_point(data=subset(allGenes_RvS, group=="none"), alpha=0.2, stroke=0) +
-  geom_point(data=subset(allGenes_RvS, group=="Both_sig"), alpha=0.5, stroke=0) +
-  geom_point(data=subset(allGenes_RvS, group=="phyB_sig"), alpha=0.5, stroke=0) +
-  geom_point(data=subset(allGenes_RvS, group=="WT_sig"), alpha=0.5, stroke=0) +
+plotData <- allGenes_RvS
+ggplot(plotData, aes(x=logFC.x, y=logFC.y, color=group)) +
+  geom_point(data=subset(plotData, group=="none"), alpha=0.2, stroke=0) +
+  geom_point(data=subset(plotData, group=="Both_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="phyB_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="WT_sig"), alpha=0.5, stroke=0) +
   scale_color_manual(values=cols) +
   labs(x = "WT logFC", y="phyB logFC", title="logFC R vs. S")
 
@@ -212,7 +218,12 @@ write.table(All_up_At, fname, quote=FALSE, row.names=FALSE, na="", col.names=FAL
 
 
 #-------------------------------------------------------------------------------
-setGroup <- function(row){
+setGroup <- function(row, change="up"){
+  if (change=="up"){
+    subsetMask <- (row$FDR.x < 0.01 & row$logFC.x < -1) | (row$FDR.y < 0.01 & row$logFC.y < -1)
+
+  }
+
   group <- "none"
   if ((row$FDR.x < 0.01 & row$logFC.x < -1) | (row$FDR.y < 0.01 & row$logFC.y < -1)) {
     group <- "sig"
@@ -258,3 +269,8 @@ temp <- geneHeatmap(c(phyB_only_down),
                     rsOnly=FALSE)
 
 # _At_homologs_FDR01_LFC_01_20190125
+
+
+
+temp <- geneHeatmap(row.names(DEGs), DGEdata, rsOnly=FALSE)
+temp <- geneHeatmap(row.names(DEGs), woundDGEdata, rsOnly=FALSE)
