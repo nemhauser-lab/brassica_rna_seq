@@ -1,10 +1,11 @@
 library(Biostrings)
 library(GenomicRanges)
-
+library(rprojroot)
+library(plyr)
+library(BSgenome)
 
 rootDir <- find_root(is_rstudio_project)
 dirPath <- file.path(rootDir, "data", "Brapa2.5")
-
 
 genomeFile <- file.path(dirPath, "BrapaV2.5_Chr.fa")
 BrapaGenome <- readDNAStringSet(genomeFile)
@@ -29,17 +30,43 @@ geneData <- gffData[gffData$type %in% "gene", ]
 geneIDs <- read.table(file.path(dirPath, "all_gene_ids.csv"), stringsAsFactors=FALSE)
 ourGeneData <- subset(geneData, Gene_ID %in% geneIDs$V1)
 
-
+# gene sequences
 ourGenesGR <- GRanges(seqnames=ourGeneData$seqid,
                       ranges=IRanges(start=ourGeneData$start, end=ourGeneData$end,
                                      names=ourGeneData$Gene_ID),
                       strand=ourGeneData$strand)
 
-ourGenesDSS <- BrapaGenome[ourGenesGR]
-names(ourGenesDSS) <- names(ourGenesGR)
+ourGenesDSS <- getSeq(BrapaGenome, ourGenesGR)
+
 
 writeXStringSet(ourGenesDSS, file.path(dirPath, "all_genes.fasta"))
 
 
+# Promoters
+promoterLength <- 1000
+df <- adply(.data=ourGeneData,
+            .margins=1,
+            .fun=function(row){
+              strand <- as.character(row$strand)
+              if (strand=="+"){
+                promoterStart <- row$start - promoterLength
+                promoterEnd <- row$start -1
+              } else if(strand=="-"){
+                promoterStart <- row$end + 1
+                promoterEnd <- row$end + promoterLength
+              }
+              output <- cbind(row, data.frame(promoterStart, promoterEnd))
+            })
+
+ourPromoterGR <- GRanges(seqnames=df$seqid,
+                      ranges=IRanges(start=df$promoterStart, end=df$promoterEnd,
+                                     names=df$Gene_ID),
+                      strand=df$strand)
+
+ourPromoterDSS <- getSeq(BrapaGenome, ourPromoterGR)
+fname <- paste("all_genes_promoters_",
+               as.character(round(promoterLength/1000, 0)),
+               "k.fasta", sep="")
+writeXStringSet(ourPromoterDSS, file.path(dirPath, fname))
 
 
