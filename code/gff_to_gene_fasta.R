@@ -20,7 +20,7 @@ gffData$Parent <- stringr::str_match(gffData$attributes,
 gffData$Name <- stringr::str_match(gffData$attributes,
                                      "Name=(.*?)(;.*)?$")[,2]
 gffData$Gene_ID <- stringr::str_match(gffData$ID,
-                                      "BraA\\d{8}")
+                                      "BraA\\d{8}|BraSca\\d{6}")
 
 # process entries of the "gene" type
 geneData <- gffData[gffData$type %in% "gene", ]
@@ -28,7 +28,8 @@ geneData <- gffData[gffData$type %in% "gene", ]
 #                                        "ID=evm\\.TU\\.(.*?);")[,2]
 
 geneIDs <- read.table(file.path(dirPath, "all_gene_ids.csv"), stringsAsFactors=FALSE)
-ourGeneData <- subset(geneData, Gene_ID %in% geneIDs$V1)
+# ourGeneData <- subset(geneData, Gene_ID %in% geneIDs$V1)
+ourGeneData <- subset(geneData, !is.na(Gene_ID))
 
 # gene sequences
 ourGenesGR <- GRanges(seqnames=ourGeneData$seqid,
@@ -49,11 +50,11 @@ df <- adply(.data=ourGeneData,
             .fun=function(row){
               strand <- as.character(row$strand)
               if (strand=="+"){
-                promoterStart <- row$start - promoterLength
-                promoterEnd <- row$start -1
+                promoterStart <- max(row$start - promoterLength, 1)
+                promoterEnd <- max(row$start - 1, 1)
               } else if(strand=="-"){
-                promoterStart <- row$end + 1
-                promoterEnd <- row$end + promoterLength
+                promoterStart <- min(row$end + 1, width(BrapaGenome[row$seqid]))
+                promoterEnd <- min(row$end + promoterLength, width(BrapaGenome[row$seqid]))
               }
               output <- cbind(row, data.frame(promoterStart, promoterEnd))
             })
@@ -68,5 +69,15 @@ fname <- paste("all_genes_promoters_",
                as.character(round(promoterLength/1000, 0)),
                "k.fasta", sep="")
 writeXStringSet(ourPromoterDSS, file.path(dirPath, fname))
+
+# to read in a fasta:
+dirPath <- file.path(rootDir, "data", "Brapa2.5")
+Promoters <- readDNAStringSet(file.path(dirPath, "all_genes_promoters_1k.fasta"))
+
+# temp df to test limits of string set indexing.
+df <- data.frame("seqid"=rep("A01", 3),
+                 "strand"=rep("+", 3),
+                 "promoterStart"=c(1,1,33885991),
+                 "promoterEnd"=c(1,1,33885992))
 
 

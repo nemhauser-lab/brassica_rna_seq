@@ -53,6 +53,8 @@ makeFname <- function(folder, cont, change="", dtype="", FDRmax, logFCmin){
     filename <- paste(filename, ".csv", sep="")
   } else if (grepl("plot|hist|diag", dtype)){
     filename <- paste(filename, ".png", sep="")
+  } else if (dtype == "_promoters") {
+    filename <- paste(filename, ".fasta", sep="")
   }
   return(filename)
 }
@@ -68,25 +70,40 @@ save_DEGs <- function(DEGList, folder, cont, FDRmax, logFCmin, dir){
   # fPath <- file.path(dirPath, fname)
   # write.csv(DEGs, fPath, row.names=TRUE)
   
+  upDEGs <- subset(DEGs, logFC > 0)
+  downDEGs <- subset(DEGs, logFC < 0)
+  
   fname <- makeFname(folder=folder, cont=cont, change="_UP", FDRmax=FDRmax, logFCmin=logFCmin)
   fPath <- file.path(dirPath, fname)
-  write.csv(subset(DEGs, logFC > 0), fPath, row.names=TRUE)
+  write.csv(upDEGs, fPath, row.names=TRUE)
   
   fname <- makeFname(folder=folder, cont=cont, change="_DOWN", FDRmax=FDRmax, logFCmin=logFCmin)
   fPath <- file.path(dirPath, fname)
-  write.csv(subset(DEGs, logFC < 0), fPath, row.names=TRUE)
+  write.csv(downDEGs, fPath, row.names=TRUE)
   
   fname <- makeFname(folder=paste(folder, "/GO_lists", sep=""), cont=cont, 
                      change="_UP", dtype="_At_homologs", FDRmax=FDRmax, logFCmin=logFCmin)
   fPath <- file.path(dirPath, fname)
-  write.table(subset(DEGs, (logFC>0)&(!is.na(Symbol)), select="A._thaliana_best_hit"), 
+  write.table(subset(upDEGs, (!is.na(Symbol)), select="A._thaliana_best_hit"), 
               fPath, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
   
   fname <- makeFname(folder=paste(folder, "/GO_lists", sep=""), cont=cont, 
                      change="_DOWN", dtype="_At_homologs", FDRmax=FDRmax, logFCmin=logFCmin)
   fPath <- file.path(dirPath, fname)
-  write.table(subset(DEGs, (logFC<0)&(!is.na(Symbol)), select="A._thaliana_best_hit"), 
+  write.table(subset(downDEGs, (!is.na(Symbol)), select="A._thaliana_best_hit"), 
               fPath, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
+  
+  
+  fname <- makeFname(folder=paste(folder, "/promoters", sep=""), cont=cont, 
+                     change="_UP", dtype="_promoters", FDRmax=FDRmax, logFCmin=logFCmin)  
+  fPath <- file.path(dirPath, fname)
+  writeXStringSet(allPromoters2[names(allPromoters) %in% upDEGs$Gene_ID], file.path(dirPath, fname))
+  
+  fname <- makeFname(folder=paste(folder, "/promoters", sep=""), cont=cont, 
+                     change="_DOWN", dtype="_promoters", FDRmax=FDRmax, logFCmin=logFCmin)  
+  fPath <- file.path(dirPath, fname)
+  writeXStringSet(allPromoters2[names(allPromoters) %in% downDEGs$Gene_ID], file.path(dirPath, fname))
+  
 }
 
 
@@ -94,6 +111,8 @@ save_DEGs <- function(DEGList, folder, cont, FDRmax, logFCmin, dir){
 save_Venn_Lists <- function(allGenesList, folder, cont, FDRmax, logFCmin, change, dir){
   # AllGenesList should have edinInfo, and group columns 
   # change should be of form "_UP", or "_DOWN"
+  
+  allGenesList$Gene_ID <- row.names(allGenesList)
   
   # WT significant:
   fname <- makeFname(folder=folder, cont=paste(cont, "WT_SIG", sep="_"), 
@@ -109,6 +128,12 @@ save_Venn_Lists <- function(allGenesList, folder, cont, FDRmax, logFCmin, change
                      select="A._thaliana_best_hit"), 
               fPath, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
   
+  fname <- makeFname(folder=paste(folder, "/promoters", sep=""), 
+                     cont=paste(cont, "WT_SIG", sep="_"), 
+                     change=change, dtype="_promoters", FDRmax=FDRmax, logFCmin=logFCmin)
+  fPath <- file.path(dirPath, fname)
+  writeXStringSet(allPromoters2[names(allPromoters) %in% row.names(allGenesList[allGenesList$group == "WT_sig", ])], file.path(dirPath, fname))
+  
   # phyB significant:
   fname <- makeFname(folder=folder, cont=paste(cont, "phyB_SIG", sep="_"), 
                      change=change, FDRmax=FDRmax, logFCmin=logFCmin)
@@ -123,6 +148,12 @@ save_Venn_Lists <- function(allGenesList, folder, cont, FDRmax, logFCmin, change
                      select="A._thaliana_best_hit"), 
               fPath, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
   
+  fname <- makeFname(folder=paste(folder, "/promoters", sep=""), 
+                     cont=paste(cont, "phyB_SIG", sep="_"), 
+                     change=change, dtype="_promoters", FDRmax=FDRmax, logFCmin=logFCmin)
+  fPath <- file.path(dirPath, fname)
+  writeXStringSet(allPromoters2[names(allPromoters) %in% row.names(allGenesList[allGenesList$group == "phyB_sig", ])], file.path(dirPath, fname))
+  
   # both significant:
   fname <- makeFname(folder=folder, cont=paste(cont, "BOTH_SIG", sep="_"), 
                      change=change, FDRmax=FDRmax, logFCmin=logFCmin)
@@ -136,6 +167,13 @@ save_Venn_Lists <- function(allGenesList, folder, cont, FDRmax, logFCmin, change
   write.table(subset(allGenesList, (group=="Both_sig")&(!is.na(Symbol)), 
                      select="A._thaliana_best_hit"), 
               fPath, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
+  
+  fname <- makeFname(folder=paste(folder, "/promoters", sep=""), 
+                     cont=paste(cont, "BOTH_SIG", sep="_"), 
+                     change=change, dtype="_promoters", FDRmax=FDRmax, logFCmin=logFCmin)
+  fPath <- file.path(dirPath, fname)
+  writeXStringSet(allPromoters2[names(allPromoters) %in% row.names(allGenesList[allGenesList$group == "Both_sig", ])], file.path(dirPath, fname))  
+
   
 }
 
@@ -401,7 +439,7 @@ woundDGEdata <- DGEdata[, c(1:8,13:16,17:22,26:28)] # Excludes S timepoint
 
 ```
 
-### add Edinburgh info to all genes
+### add Edinburgh info to all genes & load promoters FASTA
 ```{r}
 
 allGeneIDs <- row.names(DGEdata)
@@ -426,6 +464,19 @@ allGenesEdin <- data.table::rbindlist(list(allGenesEdin, dfNew), use.names=TRUE,
 fname <- file.path(dirPath, "allGeneA.tHomologs.csv")
 write.table(subset(allGenesEdin, select="A._thaliana_best_hit"), 
             fname, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
+
+
+# load promoters fasta file:
+# to read in a fasta:
+promoterDirPath <- file.path(rootDir, "data", "Brapa2.5")
+allPromoters <- readDNAStringSet(file.path(promoterDirPath, "all_genes_promoters_1k.fasta"))
+allPromoters2 <- allPromoters
+temp <- edinburghGeneInfo
+row.names(temp) <- temp$Gene_ID
+names(allPromoters2) <- paste(names(allPromoters),
+                             temp[names(allPromoters), "A._thaliana_best_hit"],
+                             temp[names(allPromoters), "Symbol"],
+                             temp[names(allPromoters), "Description"], sep=" | ")
 
 ```
 
@@ -1620,7 +1671,7 @@ dev.off()
 
 --------------------------------------------------------------------------------
 # END MAIN ANALYSIS
-
+--------------------------------------------------------------------------------
 
 
 
