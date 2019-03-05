@@ -15,6 +15,7 @@ library(stats)
 library(VennDiagram)
 library(stringr)
 library(rprojroot)
+library(Biostrings)
 
 rootDir <- find_root(is_rstudio_project)
 dirPath <- file.path(rootDir, "results", "analysis_v3_output")
