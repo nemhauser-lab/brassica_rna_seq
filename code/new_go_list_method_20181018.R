@@ -274,3 +274,112 @@ temp <- geneHeatmap(c(phyB_only_down),
 
 temp <- geneHeatmap(row.names(DEGs), DGEdata, rsOnly=FALSE)
 temp <- geneHeatmap(row.names(DEGs), woundDGEdata, rsOnly=FALSE)
+################################################################################
+library(RankProd)
+
+
+phyB.RvS_counts <- counts[row.names(allGenesphyB_RvS), c(23:28)]
+phyB.RvS_cl <- rep(c(0,1), c(3,3))
+
+rpPhyB.RvS <- RankProducts(phyB.RvS_counts, phyB.RvS_cl)
+
+# plotRP(rpPhyB.RvS, 0.05)
+RpDEGs <- topGene(rpPhyB.RvS, cutoff=0.05, method="pfp", gene.names=row.names(phyB.RvS_counts))
+
+
+RpAllGenes <- topGene(rpPhyB.RvS, cutoff=2, method="pfp", gene.names=row.names(phyB.RvS_counts))
+
+pValcomb <- pmin(RpAllGenes$Table1[row.names(allGenes), "P.value"],RpAllGenes$Table2[row.names(allGenes), "P.value"])
+
+plotData <- data.frame("geneID" = row.names(allGenes),
+                       "edgeR_pVal"=allGenes$PValue,
+                       "RP_pVal1" = RpAllGenes$Table1[row.names(allGenes), "P.value"],
+                       "RP_pVal2" = RpAllGenes$Table2[row.names(allGenes), "P.value"],
+                       "RP_pValMin" = pValcomb,
+                       "logFC" = allGenes$logFC)
+
+ggplot(plotData, aes(x=edgeR_pVal, y=RP_pValMin)) + geom_point() +
+  scale_x_log10() + scale_y_log10() +
+  labs(title="phyB R vs. S p value comparsion, edgeR linear model vs. rank product method")
+
+plotDE("BraA03002208", cpm(DGEdata))
+plotDE("BraA07001554", cpm(DGEdata))
+
+plotDE("BraA06003490", cpm(DGEdata))
+plotDE("BraA10002909", cpm(DGEdata))
+
+nrow(RpDEGs$Table1)
+nrow(RpDEGs$Table2)
+
+sum(!row.names(RpDEGs$Table1) %in% row.names(DEGsphyB_RvS))
+sum(!row.names(RpDEGs$Table2) %in% row.names(DEGsphyB_RvS))
+
+RP_UP_only <- row.names(RpDEGs$Table1)[(!(row.names(RpDEGs$Table1) %in% row.names(DEGsphyB_RvS)))]
+RP_DWN_only <- row.names(RpDEGs$Table2)[(!(row.names(RpDEGs$Table2) %in% row.names(DEGsphyB_RvS)))]
+
+plotDE("BraA07003151", cpm(DGEdata))
+plotDE("BraA07002366", cpm(DGEdata))
+plotDE("BraA07003292", cpm(DGEdata))
+
+#-------------
+# phyB.R vs WT.R
+
+
+R_phyBvWT_counts <- counts[row.names(allGenesR), c(13:16, 26:28)]
+R_phyBvWT_cl <- rep(c(1,0), c(4,3))
+
+rp_R_phyBvWT <- RankProducts(R_phyBvWT_counts, R_phyBvWT_cl)
+
+
+# plotRP(rp_R_phyBvWT, 0.05)
+RpDEGsR <- topGene(rp_R_phyBvWT, cutoff=0.05, method="pfp", gene.names=row.names(R_phyBvWT_counts))
+RpAllGenesR <- topGene(rp_R_phyBvWT, cutoff=2, method="pfp", gene.names=row.names(R_phyBvWT_counts))
+
+pValcombR <- pmin(RpAllGenesR$Table1[allGeneIDs, "P.value"],RpAllGenesR$Table2[row.names(allGenesR), "P.value"])
+
+
+plotData <- data.frame("geneID" = row.names(allGenesR),
+                       "edgeR_pVal"=allGenesR$PValue,
+                       "RP_pVal1" = RpAllGenesR$Table1[allGeneIDs, "P.value"],
+                       "RP_pVal2" = RpAllGenesR$Table2[allGeneIDs, "P.value"],
+                       "RP_pValMin" = pValcombR,
+                       "logFC" = allGenes$logFC)
+
+ggplot(plotData, aes(x=edgeR_pVal, y=RP_pValMin)) + geom_point() +
+  scale_x_log10() + scale_y_log10() +
+  labs(title="phyB.R vs. WT.R p-value comparsion, edgeR linear model vs. rank product method")
+
+plotDE("BraA03002208", cpm(DGEdata))
+
+
+ggplot() +
+  geom_point(aes(x=pValcomb, y=pValcombR)) +
+  scale_x_log10() + scale_y_log10() +
+  labs(title="Rank Prod p-values, phyB RvsS, vs. phyB.R vs WT.R")
+
+
+ggplot() +
+  geom_point(aes(x=allGenesphyB_RvS[allGeneIDs, ]$PValue, y=allGenesR[allGeneIDs, ]$PValue)) +
+  scale_x_log10() + scale_y_log10() +
+  labs(title="edgeR p-values, phyB RvsS, vs. phyB.R vs WT.R")
+
+
+ggplot() +
+  geom_point(aes(x=allGenesphyB_RvS[allGeneIDs, ]$PValue, y=rowSums(counts[allGeneIDs, 26:28]))) +
+  scale_x_log10() + scale_y_log10() +
+  labs(title="")
+
+
+nrow(RpDEGsR$Table1)
+nrow(RpDEGsR$Table2)
+
+sum(!row.names(RpDEGs$Table1) %in% row.names(DEGsphyB_RvS))
+sum(!row.names(RpDEGs$Table2) %in% row.names(DEGsphyB_RvS))
+
+RP_UP_only <- row.names(RpDEGs$Table1)[(!(row.names(RpDEGs$Table1) %in% row.names(DEGsphyB_RvS)))]
+RP_DWN_only <- row.names(RpDEGs$Table2)[(!(row.names(RpDEGs$Table2) %in% row.names(DEGsphyB_RvS)))]
+
+plotDE("BraA07003151", cpm(DGEdata))
+plotDE("BraA07002366", cpm(DGEdata))
+plotDE("BraA07003292", cpm(DGEdata))
+
