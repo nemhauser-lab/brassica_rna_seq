@@ -513,27 +513,27 @@ colnames(design)[colnames(design) == "24"] <- "T24"
 
 ### Modified design: ~gt + trt + gt:trt
 ```{r}
-
-sampleCond <- data.frame(limma::strsplit2(colnames(counts), "_"))
-colnames(sampleCond) <- c("Genotype", "Plant", "Timepoint")
-
-# re order factor levels to ensure model intercept is correct
-sampleCond$Genotype <- factor(sampleCond$Genotype, c("WT", "phyB"))
-sampleCond$Plant <- factor(sampleCond$Plant, c("3", "4", "5", "6"))
-sampleCond$Timepoint <- factor(sampleCond$Timepoint, c("P", "24", "S", "R"))
-
-# create the model matrix used for the linear model
-design <- model.matrix( ~Timepoint + Genotype:Timepoint, data=sampleCond)
-# remove column because there is no phyB plant #6
-design <- design[, !(colnames(design) %in% c("GenotypephyB:Plant6"))]
-
-# simplify column names of design
-colnames(design) <- gsub("Genotype|Timepoint|Plant", "", colnames(design))
-colnames(design) <- gsub(":", ".", colnames(design))
-
-# rename intercept column to avoid warning further down
-colnames(design)[colnames(design) == "(Intercept)"] <- "Intercept"
-colnames(design)[colnames(design) == "24"] <- "T24"
+# 
+# sampleCond <- data.frame(limma::strsplit2(colnames(counts), "_"))
+# colnames(sampleCond) <- c("Genotype", "Plant", "Timepoint")
+# 
+# # re order factor levels to ensure model intercept is correct
+# sampleCond$Genotype <- factor(sampleCond$Genotype, c("WT", "phyB"))
+# sampleCond$Plant <- factor(sampleCond$Plant, c("3", "4", "5", "6"))
+# sampleCond$Timepoint <- factor(sampleCond$Timepoint, c("P", "24", "S", "R"))
+# 
+# # create the model matrix used for the linear model
+# design <- model.matrix( ~Timepoint + Genotype:Timepoint, data=sampleCond)
+# # remove column because there is no phyB plant #6
+# design <- design[, !(colnames(design) %in% c("GenotypephyB:Plant6"))]
+# 
+# # simplify column names of design
+# colnames(design) <- gsub("Genotype|Timepoint|Plant", "", colnames(design))
+# colnames(design) <- gsub(":", ".", colnames(design))
+# 
+# # rename intercept column to avoid warning further down
+# colnames(design)[colnames(design) == "(Intercept)"] <- "Intercept"
+# colnames(design)[colnames(design) == "24"] <- "T24"
 
 ```
 
@@ -743,7 +743,7 @@ DEGs <- addAvgCpm(DEGs, woundDGEdata, groups=conds)
 save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, dirPath)
 
 woundDEGsWT <- DEGs
-
+# usually have to run below line twice.
 fig <- hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
          xlab = "p-value")
 
