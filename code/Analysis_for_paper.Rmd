@@ -1,0 +1,1337 @@
+---
+title: "Generation of DEG lists with revised methods"
+output: html_notebook
+---
+
+
+```{r setup, include=FALSE}
+
+library(openxlsx)
+library(edgeR)
+library(ggplot2)
+library(gplots)
+library(plotly)
+library(stats)
+library(VennDiagram)
+library(stringr)
+library(rprojroot)
+library(Biostrings)
+
+rootDir <- find_root(is_rstudio_project)
+# dirPath <- file.path(rootDir, "results", "analysis_v3_output")
+# old dirPath:  "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/analysis_v3_output"
+# file.exists(dirPath)
+
+```
+
+## Description
+
+### v3 Description Dec. 5, 2018
+
+V3 of this analysis code is intended to be the final major revision, updates to this revision from v2 focus on naming comparisions and files more consistently, saving all results we need to a hierarchical folder system, and clean up of un-needed code chunks. 
+
+
+### v2 notes
+With Feedback from a meeting on Oct. 26, 2018, this analysis is updated to use more consistent parameters for defining sets of differentially expressed genes (DEGs).
+
+The key updates are:
+* Use more stringent filter for genes based on level of expression
+* use wound control to eliminate genes before analysis to help FDR when identifying genes between D and R conditions
+* Use a reasonable FDR cutouff
+* use a consistent fold change filter
+
+## Setup:
+
+
+```{r}
+#load utility functions
+source(file.path(rootDir, "code", "utilities.R"))
+
+# get gene Info from Edinburgh results
+edinburghPath <- file.path(rootDir, "data", "blast_top_hits.xlsx")
+df <- read.xlsx(xlsxFile=edinburghPath, sheet=2, skipEmptyRows=FALSE)
+colnames(df) <- gsub("(\\.)([a-z])", "_\\2", colnames(df))
+colnames(df)[1] <- "Gene_ID"
+edinburghGeneInfo <- df
+
+# Generate file structure to save results in
+resultsPath <- makeResultsFolder(file.path(rootDir, "results"))
+
+```
+
+
+## Loading the data
+
+The code below for loading the data is largely unchanged from previous .Rmd docs.
+With the exception that a more stringent filter is being used to filter out genes with low expression
+
+The filter criteria is to remove rows(genes) that have less than 3 samples having above 100 counts.
+
+```{r}
+
+countsFile <- file.path(rootDir, "data", "raw_counts.csv")
+# old path: "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/raw_counts.csv"
+counts <- read.csv(countsFile, row.names="X")
+# rename S (for sensence) to D (for dark-treatment)
+colnames(counts) <- sub("_S", "_D", colnames(counts))
+
+group <- gsub("_\\d_", ".", colnames(counts))
+
+# group <- factor(c(rep("WT.P",4), rep("WT.24", 4), rep("WT.D", 4), rep("WT.R", 4),
+#            rep("phyB.P", 3), rep("phyB.24", 3), rep("phyB.D", 3), 
+#            rep("phyB.R", 3)))
+
+# create the DGEList object edgeR uses
+DGEdata <- DGEList(counts=counts, group=group)
+
+# filter out rows with fewer than 3 samples that have more than 10 counts/million
+keep <- rowSums(cpm(DGEdata) > 10) >= 3
+DGEdata <- DGEdata[keep, , keep.lib.sizes=FALSE]
+
+# woundDGEdata <- DGEdata[, c(1:8,17:22)]
+woundDGEdata <- DGEdata[, c(1:8,13:16,17:22,26:28)] # Excludes D timepoint
+
+```
+
+### add Edinburgh info to all genes & load promoters FASTA
+```{r}
+
+allGeneIDs <- row.names(DGEdata)
+
+fname <- file.path(resultsPath, "all_gene_ids.csv")
+write.table(allGeneIDs, fname, row.names=FALSE, na="", col.names=FALSE, sep=",")
+
+allGenesEdin <- dplyr::left_join(data.frame(Gene_ID=allGeneIDs), 
+                                 edinburghGeneInfo, by="Gene_ID")
+
+
+# add the amaryllis file's info to this
+fname <- file.path(rootDir, "data", "All genes and identities.xlsx")
+df <- read.xlsx(xlsxFile=fname, sheet=1, skipEmptyRows=FALSE)
+
+# add some genes from the amarullis file
+dfNew <- df[!(df$gene.ID %in% edinburghGeneInfo$Gene_ID), c("gene.ID", "X9", "description")]
+colnames(dfNew) <- c("Gene_ID", "A._thaliana_best_hit", "Description")
+allGenesEdin <- data.table::rbindlist(list(allGenesEdin, dfNew), use.names=TRUE, fill=TRUE)
+
+
+fname <- file.path(resultsPath, "allGeneA.tHomologs.csv")
+write.table(subset(allGenesEdin, select="A._thaliana_best_hit"), 
+            fname, quote=FALSE, row.names=FALSE, na="", col.names=FALSE, sep=",")
+
+
+# load promoters fasta file:
+# to read in a fasta:
+promoterDirPath <- file.path(rootDir, "data", "Brapa2.5")
+allPromoters <- readDNAStringSet(file.path(promoterDirPath, "all_genes_promoters_1k.fasta"))
+allPromoters2 <- allPromoters
+temp <- edinburghGeneInfo
+row.names(temp) <- temp$Gene_ID
+names(allPromoters2) <- paste(names(allPromoters),
+                             temp[names(allPromoters), "A._thaliana_best_hit"],
+                             temp[names(allPromoters), "Symbol"],
+                             temp[names(allPromoters), "Description"], sep=" | ")
+
+```
+
+
+
+
+ 
+### Design: ~gt + gt:trt  
+```{r}
+
+sampleCond <- data.frame(limma::strsplit2(colnames(counts), "_"))
+colnames(sampleCond) <- c("Genotype", "Plant", "Timepoint")
+
+# re order factor levels to ensure model intercept is correct
+sampleCond$Genotype <- factor(sampleCond$Genotype, c("WT", "phyB"))
+sampleCond$Plant <- factor(sampleCond$Plant, c("3", "4", "5", "6"))
+sampleCond$Timepoint <- factor(sampleCond$Timepoint, c("P", "24", "D", "R"))
+
+# create the model matrix used for the linear model
+design <- model.matrix( ~Genotype + Genotype:Timepoint, data=sampleCond)
+# remove column because there is no phyB plant #6
+design <- design[, !(colnames(design) %in% c("GenotypephyB:Plant6"))] 
+
+# simplify column names of design
+colnames(design) <- gsub("Genotype|Timepoint|Plant", "", colnames(design))
+colnames(design) <- gsub(":", ".", colnames(design))
+
+# rename intercept column to avoid warning further down
+colnames(design)[colnames(design) == "(Intercept)"] <- "Intercept" 
+colnames(design)[colnames(design) == "24"] <- "T24"
+
+```
+
+### Wound design:
+```{r}
+
+sampleCond <- data.frame(limma::strsplit2(colnames(woundDGEdata$counts), "_"))
+colnames(sampleCond) <- c("Genotype", "Plant", "Timepoint")
+
+# re order factor levels to ensure model intercept is correct
+sampleCond$Genotype <- factor(sampleCond$Genotype, c("WT", "phyB"))
+sampleCond$Plant <- factor(sampleCond$Plant, c("3", "4", "5", "6"))
+sampleCond$Timepoint <- factor(sampleCond$Timepoint, c("P", "24", "R"))
+
+# create the model matrix used for the linear model
+woundDesign <- model.matrix( ~Genotype + Genotype:Timepoint + Genotype:Plant, data=sampleCond)
+# remove column because there is no phyB plant #6
+woundDesign <- woundDesign[, !(colnames(woundDesign) %in% c("GenotypephyB:Plant6"))] 
+
+# simplify column names of design
+colnames(woundDesign) <- gsub("Genotype|Timepoint|Plant", "", colnames(woundDesign))
+colnames(woundDesign) <- gsub(":", ".", colnames(woundDesign))
+
+# rename intercept column to avoid warning further down
+colnames(woundDesign)[colnames(woundDesign) == "(Intercept)"] <- "Intercept" 
+colnames(woundDesign)[colnames(woundDesign) == "24"] <- "T24"
+
+```
+
+
+### Contrasts
+
+```{r}
+fullContrasts <- makeContrasts("WT.24_vs_WT.P" = WT.24,
+                               "phyB.24_vs_phyB.P" = phyB.24,
+                               "WT.D_vs_WT.P" = WT.D,
+                               "phyB.D_vs_phyB.P" = phyB.D,
+                               "WT.R_vs_WT.D" = (WT.R - WT.D),  
+                               "phyB.R_vs_phyB.D" = phyB.R - phyB.D,
+                               "WT.R_vs_WT.P" = WT.R,
+                               "phyB.R_vs_phyB.P" = phyB.R,
+                               
+                               "phyB.24_vs_WT.24" = phyB.24 + phyB - WT.24,
+                               "phyB.R_vs_WT.R" = phyB.R + phyB - WT.R,
+                               "phyB.D_vs_WT.D" = phyB.D +phyB - WT.D,
+                               "phyB.P_vs_WT.P" = phyB,                               
+                             
+                               "phyB.R-D_vs_WT.R-D" = (phyB.R - phyB.D) - 
+                                 (WT.R - WT.D),
+                               "phyB.D-P_vs_WT.D-P" = phyB.D - WT.D,
+                               "phyB.R-P_vs_WT.R-P" = phyB.R - WT.R,
+                               "phyB.24-P_vs_WT.24-P" = phyB.24 - WT.24,
+                               
+                               "phyB.PDR_vs_WT.PDR" = 3*phyB +  phyB.D + 
+                                 phyB.R -  WT.D - WT.R,
+                             
+                             levels = design)
+```
+
+
+### linear model fit
+
+```{r}
+
+woundDGEdata <- calcNormFactors(woundDGEdata)
+# estimate dispersion
+woundDGEdata <- estimateDisp(woundDGEdata, design=woundDesign)
+# generalized linear model
+# woundFit <- glmQLFit(woundDGEdata, woundDesign)
+
+
+
+DGEdata <- calcNormFactors(DGEdata)
+# estimate dispersion
+DGEdata <- estimateDisp(DGEdata, design=design)
+# generalized linear model
+LmFit <- glmQLFit(DGEdata, design)
+```
+
+
+
+# Analysis
+
+
+
+
+## Wound Control
+
+### phyB.(24-P) vs WT.(24-P)
+
+```{r}
+# --- inputs --- #
+folder <- "wound_control"
+cont <- "phyB.24-P_vs_WT.24-P"
+conds <- c("WT.P", "WT.24", "phyB.P", "phyB.24")
+FDRmax <- 0.05
+logFCmin <- 1
+# ---        --- #
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addAvgCpm(DEGs, woundDGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+
+
+fig <- hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off
+
+
+```
+
+
+
+The linear model does not do a good job here, see how the p-value histogram drops off as it nears 0. we believe this is due to the dispersion/variance of the data being dominated by the D condition, removing D from the model improves the 
+
+NOTE: even the exact test is influenced by the dispersion calculation and thus by the D condition.
+
+To avoid our wound control gene lists being impacted by the D condition and the linear model, we will use direct comparisons with fischer exact tests to generate wound control genes.
+
+### WT.24 vs WT.P
+
+```{r echo=FALSE}
+# --- inputs --- #
+folder <- "wound_control"
+cont <- "WT.24_vs_WT.P_exact"
+conds <- c("WT.P", "WT.24")
+FDRmax <- 0.05
+logFCmin <- 1
+# --- ------ --- #
+exTest <- exactTest(woundDGEdata, pair=c("WT.24", "WT.P"))
+allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addAvgCpm(DEGs, woundDGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+woundDEGsWT <- DEGs
+# usually have to run below line twice.
+fig <- hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+```
+
+
+### phyB.24 - phyB.P 
+
+```{r echo=FALSE}
+# --- inputs --- #
+folder <- "wound_control"
+cont <- "phyB.24_vs_phyB.P_exact"
+conds <- c("phyB.P", "phyB.24")
+FDRmax <- 0.05
+logFCmin <- 1
+# --- ------ --- #
+exTest <- exactTest(woundDGEdata, pair=c("phyB.24", "phyB.P"))
+allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addAvgCpm(DEGs, woundDGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+woundDEGsphyB <- DEGs
+
+hist(subset(allGenes, !PValue==1)$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+```
+
+### collection of all wound controll genes
+
+```{r}
+# --- inputs --- #
+folder <- "wound_control"
+cont <- "wound_ctrl_genes"
+FDRmax <- 0.05
+logFCmin <- 1
+# --- ------ --- #
+woundIDs <- unique(c(row.names(woundDEGsWT), row.names(woundDEGsphyB)))
+
+fname <- makeFname(folder=folder, cont=cont, FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+write.table(woundIDs, fname, row.names=FALSE, na="", col.names=FALSE, sep=",")
+
+```
+
+
+
+
+
+
+# Timepoint v. Timepoint
+
+## D vs P
+
+### WT D vs P
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint"
+cont <- "WT.D_vs_WT.P"
+conds <- c("WT.P", "WT.D")
+FDRmax <- 0.01
+logFCmin <- 1
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# -- specific --- # 
+allGenesWT_DvP <- allGenes
+DEGsWT_DvP <- DEGs
+
+head(DEGs, 20)
+
+```
+
+
+### phyB D vs P
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint"
+cont <- "phyB.D_vs_phyB.P"
+conds <- c("phyB.P", "phyB.D")
+FDRmax <- 0.01
+logFCmin <- 1
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# -- specific --- # 
+allGenesphyB_DvP <- allGenes
+DEGsphyB_DvP <- DEGs
+
+head(DEGs, 20)
+
+```
+
+
+### phyB D-P vs WT D-P
+
+```{r}
+# --- inputs --- #
+folder <- "geno_x_timepoint"
+cont <- "phyB.D-P_vs_WT.D-P"
+conds <- c("WT.P", "phyB.P", "WT.D", "phyB.D")
+FDRmax <- 0.1
+logFCmin <- 0
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# --- specific --- #
+
+DEGs_DvP <- DEGs
+```
+
+
+### Venn diagram of D vs. P
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint/DvP_venn"
+cont <- "DvP"
+conds <- c("WT.P", "phyB.P", "WT.D", "phyB.D")
+FDRmax <- 0.01
+logFCmin <- 1
+# --- ------ --- #
+
+
+allGenes_DvP <- mergeGenes(allGenesWT_DvP, allGenesphyB_DvP)
+allGenes_DvP <- addAvgCpm(allGenes_DvP, DGEdata, groups=conds)
+colnames(allGenes_DvP) <- gsub("\\.x", "_WT", colnames(allGenes_DvP))
+colnames(allGenes_DvP) <- gsub("\\.y", "_phyB", colnames(allGenes_DvP))
+
+
+
+allGenes_DvP <- dplyr::left_join(allGenes_DvP, edinburghGeneInfo, by="Gene_ID")
+row.names(allGenes_DvP) <- allGenes_DvP$Gene_ID
+
+fname <- makeFname(folder=folder, cont="DvP_all_genes", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+write.csv(allGenes_DvP, fname, row.names=TRUE)
+
+# --- UP --- #
+group <- plyr::aaply(.data=allGenes_DvP, .margins=1, .fun=setGroup, change="up",
+                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
+allGenes_DvP$group <- group
+
+save_Venn_Lists(allGenesList=allGenes_DvP, 
+                folder=folder,
+                cont=cont,
+                FDRmax=FDRmax,
+                logFCmin=logFCmin,
+                change="_UP",
+                dir=resultsPath)
+
+sum(allGenes_DvP$group %in% c("WT_sig", "Both_sig"))
+
+
+plot.new()
+temp <- draw.pairwise.venn(area1=sum(allGenes_DvP$group %in% c("WT_sig", "Both_sig")), 
+                           area2=sum(allGenes_DvP$group %in% c("phyB_sig", "Both_sig")), 
+                           cross.area=sum(allGenes_DvP$group %in% c("Both_sig")), 
+                   fill=c("blue", "red"), category=c("WT D vs. P", "phyB D vs. P"))
+grid.draw(temp)
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_UP", sep=""), dtype="_Venn_diag", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+
+cols <- c("none"="grey50", "phyB_sig"="red", "WT_sig"="blue", "Both_sig"="purple")
+plotData <- allGenes_DvP
+ggplot(plotData, aes(x=logFC_WT, y=logFC_phyB, color=group)) +
+  geom_point(data=subset(plotData, group=="none"), alpha=0.2, stroke=0) +
+  geom_point(data=subset(plotData, group=="Both_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="phyB_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="WT_sig"), alpha=0.5, stroke=0) +
+  scale_color_manual(values=cols) +
+  labs(x = "WT logFC", y="phyB logFC", title="logFC D vs. P")
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_UP", sep=""), 
+                     dtype="_LogFC_plot", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+```
+
+```{r}
+# --- DOWN --- #
+group <- plyr::aaply(.data=allGenes_DvP, .margins=1, .fun=setGroup, change="down",
+                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
+allGenes_DvP$group <- group
+
+save_Venn_Lists(allGenesList=allGenes_DvP, 
+                folder=folder,
+                cont=cont,
+                FDRmax=FDRmax,
+                logFCmin=logFCmin,
+                change="_DOWN",
+                dir=resultsPath)
+
+sum(allGenes_DvP$group %in% c("WT_sig", "Both_sig"))
+
+
+plot.new()
+temp <- draw.pairwise.venn(area1=sum(allGenes_DvP$group %in% c("WT_sig", "Both_sig")), 
+                           area2=sum(allGenes_DvP$group %in% c("phyB_sig", "Both_sig")), 
+                           cross.area=sum(allGenes_DvP$group %in% c("Both_sig")), 
+                   fill=c("blue", "red"), category=c("WT D vs. P", "phyB D vs. P"))
+grid.draw(temp)
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_DOWN", sep=""), 
+                     dtype="_Venn_diag", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+
+cols <- c("none"="grey50", "phyB_sig"="red", "WT_sig"="blue", "Both_sig"="purple")
+plotData <- allGenes_DvP
+ggplot(plotData, aes(x=logFC_WT, y=logFC_phyB, color=group)) +
+  geom_point(data=subset(plotData, group=="none"), alpha=0.2, stroke=0) +
+  geom_point(data=subset(plotData, group=="Both_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="phyB_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="WT_sig"), alpha=0.5, stroke=0) +
+  scale_color_manual(values=cols) +
+  labs(x = "WT logFC", y="phyB logFC", title="logFC D vs. P")
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_DOWN", sep=""), dtype="_LogFC_plot", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+```
+
+
+
+
+
+
+
+## R vs. D
+
+
+### WT R vs. D
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint"
+cont <- "WT.R_vs_WT.D"
+conds <- c("WT.D", "WT.R")
+FDRmax <- 0.01
+logFCmin <- 1
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# -- specific --- # 
+allGenesWT_RvD <- allGenes
+DEGsWT_RvD <- DEGs
+
+head(DEGs, 20)
+
+```
+
+
+### phyB R vs. D
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint"
+cont <- "phyB.R_vs_phyB.D"
+conds <- c("phyB.D", "phyB.R")
+FDRmax <- 0.01
+logFCmin <- 1
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# -- specific --- # 
+allGenesphyB_RvD <- allGenes
+DEGsphyB_RvD <- DEGs
+
+head(DEGs, 20)
+
+```
+
+
+### phyB R-D vs WT R-D
+
+```{r}
+# --- inputs --- #
+folder <- "geno_x_timepoint"
+cont <- "phyB.R-D_vs_WT.R-D"
+conds <- c("WT.D", "phyB.D", "WT.R", "phyB.R")
+FDRmax <- 0.1
+logFCmin <- 0
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# --- specific --- #
+
+DEGs_RvD <- DEGs
+```
+
+
+
+### venn diagarm R vs. D
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint/RvD_venn"
+cont <- "RvD"
+conds <- c("WT.D", "phyB.D", "WT.R", "phyB.R")
+FDRmax <- 0.01
+logFCmin <- 1
+# --- ------ --- #
+
+
+allGenes_RvD <- mergeGenes(allGenesWT_RvD, allGenesphyB_RvD)
+allGenes_RvD <- addAvgCpm(allGenes_RvD, DGEdata, groups=conds)
+colnames(allGenes_RvD) <- gsub("\\.x", "_WT", colnames(allGenes_RvD))
+colnames(allGenes_RvD) <- gsub("\\.y", "_phyB", colnames(allGenes_RvD))
+
+
+
+allGenes_RvD <- dplyr::left_join(allGenes_RvD, edinburghGeneInfo, by="Gene_ID")
+row.names(allGenes_RvD) <- allGenes_RvD$Gene_ID
+
+fname <- makeFname(folder=folder, cont="RvD_all_genes", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+write.csv(allGenes_RvD, fname, row.names=TRUE)
+
+# --- UP --- #
+group <- plyr::aaply(.data=allGenes_RvD, .margins=1, .fun=setGroup, change="up",
+                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
+allGenes_RvD$group <- group
+
+save_Venn_Lists(allGenesList=allGenes_RvD, 
+                folder=folder,
+                cont=cont,
+                FDRmax=FDRmax,
+                logFCmin=logFCmin,
+                change="_UP",
+                dir=resultsPath)
+
+sum(allGenes_RvD$group %in% c("WT_sig", "Both_sig"))
+
+
+plot.new()
+temp <- draw.pairwise.venn(area1=sum(allGenes_RvD$group %in% c("WT_sig", "Both_sig")), 
+                           area2=sum(allGenes_RvD$group %in% c("phyB_sig", "Both_sig")), 
+                           cross.area=sum(allGenes_RvD$group %in% c("Both_sig")), 
+                   fill=c("blue", "red"), category=c("WT R vs. D", "phyB R vs. D"))
+grid.draw(temp)
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_UP", sep=""), dtype="_Venn_diag", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+cols <- c("none"="grey50", "phyB_sig"="red", "WT_sig"="blue", "Both_sig"="purple")
+plotData <- allGenes_RvD
+ggplot(plotData, aes(x=logFC_WT, y=logFC_phyB, color=group)) +
+  geom_point(data=subset(plotData, group=="none"), alpha=0.2, stroke=0) +
+  geom_point(data=subset(plotData, group=="Both_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="phyB_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="WT_sig"), alpha=0.5, stroke=0) +
+  scale_color_manual(values=cols) +
+  labs(x = "WT logFC", y="phyB logFC", title="logFC R vs. D")
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_UP", sep=""), dtype="_LogFC_plot", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+
+```
+
+```{r}
+# --- DOWN --- #
+group <- plyr::aaply(.data=allGenes_RvD, .margins=1, .fun=setGroup, change="down",
+                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
+allGenes_RvD$group <- group
+
+save_Venn_Lists(allGenesList=allGenes_RvD, 
+                folder=folder,
+                cont=cont,
+                FDRmax=FDRmax,
+                logFCmin=logFCmin,
+                change="_DOWN",
+                dir=resultsPath)
+
+sum(allGenes_RvD$group %in% c("WT_sig", "Both_sig"))
+
+
+plot.new()
+temp <- draw.pairwise.venn(area1=sum(allGenes_RvD$group %in% c("WT_sig", "Both_sig")), 
+                           area2=sum(allGenes_RvD$group %in% c("phyB_sig", "Both_sig")), 
+                           cross.area=sum(allGenes_RvD$group %in% c("Both_sig")), 
+                   fill=c("blue", "red"), category=c("WT R vs. D", "phyB R vs. D"))
+grid.draw(temp)
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_DOWN", sep=""), dtype="_Venn_diag", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+
+
+cols <- c("none"="grey50", "phyB_sig"="red", "WT_sig"="blue", "Both_sig"="purple")
+plotData <- allGenes_RvD
+ggplot(plotData, aes(x=logFC_WT, y=logFC_phyB, color=group)) +
+  geom_point(data=subset(plotData, group=="none"), alpha=0.2, stroke=0) +
+  geom_point(data=subset(plotData, group=="Both_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="phyB_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="WT_sig"), alpha=0.5, stroke=0) +
+  scale_color_manual(values=cols) +
+  labs(x = "WT logFC", y="phyB logFC", title="logFC R vs. D")
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_DOWN", sep=""), dtype="_LogFC_plot", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+```
+
+
+## R vs. P
+
+
+### WT R vs. P
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint"
+cont <- "WT.R_vs_WT.P"
+conds <- c("WT.P", "WT.R")
+FDRmax <- 0.01
+logFCmin <- 1
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# -- specific --- # 
+allGenesWT_RvP <- allGenes
+DEGsWT_RvP <- DEGs
+
+head(DEGs, 20)
+
+```
+
+
+### phyB R vs. P
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint"
+cont <- "phyB.R_vs_phyB.P"
+conds <- c("phyB.P", "phyB.R")
+FDRmax <- 0.01
+logFCmin <- 1
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# -- specific --- # 
+allGenesphyB_RvP <- allGenes
+DEGsphyB_RvP <- DEGs
+
+head(DEGs, 20)
+
+```
+
+
+### phyB R-P vs WT R-P
+
+```{r}
+# --- inputs --- #
+folder <- "geno_x_timepoint"
+cont <- "phyB.R-P_vs_WT.R-P"
+conds <- c("WT.P", "phyB.P", "WT.R", "phyB.R")
+FDRmax <- 0.1
+logFCmin <- 0
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# --- specific --- #
+
+DEGs_RvP <- DEGs
+```
+
+
+
+### venn diagarm R vs. P
+
+```{r}
+# --- inputs --- #
+folder <- "timepoint_v_timepoint/RvP_venn"
+cont <- "RvP"
+conds <- c("WT.P", "phyB.P", "WT.R", "phyB.R")
+FDRmax <- 0.01
+logFCmin <- 1
+# --- ------ --- #
+
+
+allGenes_RvP <- mergeGenes(allGenesWT_RvP, allGenesphyB_RvP)
+allGenes_RvP <- addAvgCpm(allGenes_RvP, DGEdata, groups=conds)
+colnames(allGenes_RvP) <- gsub("\\.x", "_WT", colnames(allGenes_RvP))
+colnames(allGenes_RvP) <- gsub("\\.y", "_phyB", colnames(allGenes_RvP))
+
+
+
+allGenes_RvP <- dplyr::left_join(allGenes_RvP, edinburghGeneInfo, by="Gene_ID")
+row.names(allGenes_RvP) <- allGenes_RvP$Gene_ID
+
+fname <- makeFname(folder=folder, cont="RvP_all_genes", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+write.csv(allGenes_RvP, fname, row.names=TRUE)
+
+# --- UP --- #
+group <- plyr::aaply(.data=allGenes_RvP, .margins=1, .fun=setGroup, change="up",
+                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
+allGenes_RvP$group <- group
+
+save_Venn_Lists(allGenesList=allGenes_RvP, 
+                folder=folder,
+                cont=cont,
+                FDRmax=FDRmax,
+                logFCmin=logFCmin,
+                change="_UP",
+                dir=resultsPath)
+
+sum(allGenes_RvP$group %in% c("WT_sig", "Both_sig"))
+
+
+plot.new()
+temp <- draw.pairwise.venn(area1=sum(allGenes_RvP$group %in% c("WT_sig", "Both_sig")), 
+                           area2=sum(allGenes_RvP$group %in% c("phyB_sig", "Both_sig")), 
+                           cross.area=sum(allGenes_RvP$group %in% c("Both_sig")), 
+                   fill=c("blue", "red"), category=c("WT R vs. P", "phyB R vs. P"))
+grid.draw(temp)
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_UP", sep=""), dtype="_Venn_diag", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+
+cols <- c("none"="grey50", "phyB_sig"="red", "WT_sig"="blue", "Both_sig"="purple")
+plotData <- allGenes_RvP
+ggplot(plotData, aes(x=logFC_WT, y=logFC_phyB, color=group)) +
+  geom_point(data=subset(plotData, group=="none"), alpha=0.2, stroke=0) +
+  geom_point(data=subset(plotData, group=="Both_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="phyB_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="WT_sig"), alpha=0.5, stroke=0) +
+  scale_color_manual(values=cols) +
+  labs(x = "WT logFC", y="phyB logFC", title="logFC R vs. P")
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_UP", sep=""), dtype="_LogFC_plot", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+```
+
+```{r}
+# --- DOWN --- #
+group <- plyr::aaply(.data=allGenes_RvP, .margins=1, .fun=setGroup, change="down",
+                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
+allGenes_RvP$group <- group
+
+save_Venn_Lists(allGenesList=allGenes_RvP, 
+                folder=folder,
+                cont=cont,
+                FDRmax=FDRmax,
+                logFCmin=logFCmin,
+                change="_DOWN",
+                dir=resultsPath)
+
+sum(allGenes_RvP$group %in% c("WT_sig", "Both_sig"))
+
+
+plot.new()
+temp <- draw.pairwise.venn(area1=sum(allGenes_RvP$group %in% c("WT_sig", "Both_sig")), 
+                           area2=sum(allGenes_RvP$group %in% c("phyB_sig", "Both_sig")), 
+                           cross.area=sum(allGenes_RvP$group %in% c("Both_sig")), 
+                   fill=c("blue", "red"), category=c("WT R vs. P", "phyB R vs. P"))
+grid.draw(temp)
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_DOWN", sep=""), dtype="_Venn_diag", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+cols <- c("none"="grey50", "phyB_sig"="red", "WT_sig"="blue", "Both_sig"="purple")
+plotData <- allGenes_RvP
+ggplot(plotData, aes(x=logFC_WT, y=logFC_phyB, color=group)) +
+  geom_point(data=subset(plotData, group=="none"), alpha=0.2, stroke=0) +
+  geom_point(data=subset(plotData, group=="Both_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="phyB_sig"), alpha=0.5, stroke=0) +
+  geom_point(data=subset(plotData, group=="WT_sig"), alpha=0.5, stroke=0) +
+  scale_color_manual(values=cols) +
+  labs(x = "WT logFC", y="phyB logFC", title="logFC R vs. P")
+
+figFile <- makeFname(folder=folder, cont=paste(cont, "_DOWN", sep=""), dtype="_LogFC_plot", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+```
+
+
+
+
+
+## phyB vs WT at each timepoint (exact tests)
+
+
+### phyB.P vs WT.P
+
+Note: we're using woundDGEdata here
+
+```{r echo=FALSE}
+# --- inputs --- #
+folder <- "phyB_v_WT_at_timepoint"
+cont <- "phyB.P_vs_WT.P_exact"
+conds <- c("phyB.P", "WT.P")
+FDRmax <- 0.05
+logFCmin <- 1
+# --- ------ --- #
+exTest <- exactTest(woundDGEdata, pair=conds)
+allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# --- specific --- #
+allGenesP <- allGenes
+DEGsP <- DEGs
+```
+
+
+### phyB.24 vs WT.24
+
+Note: we're using woundDGEdata here
+
+```{r echo=FALSE}
+# --- inputs --- #
+folder <- "phyB_v_WT_at_timepoint"
+cont <- "phyB.24_vs_WT.24_exact"
+conds <- c("phyB.24", "WT.24")
+FDRmax <- 0.05
+logFCmin <- 1
+# --- ------ --- #
+exTest <- exactTest(woundDGEdata, pair=conds)
+allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# --- specific --- #
+allGenes24 <- allGenes
+DEGs24 <- DEGs
+```
+
+
+### phyB.D vs WT.D
+
+```{r echo=FALSE}
+# --- inputs --- #
+folder <- "phyB_v_WT_at_timepoint"
+cont <- "phyB.D_vs_WT.D_exact"
+conds <- c("phyB.D", "WT.D")
+FDRmax <- 0.05
+logFCmin <- 1
+# --- ------ --- #
+exTest <- exactTest(DGEdata, pair=conds)
+allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# --- specific --- #
+allGenesS <- allGenes
+DEGsD <- DEGs
+```
+
+
+### phyB.R vs WT.R
+
+```{r echo=FALSE}
+# --- inputs --- #
+folder <- "phyB_v_WT_at_timepoint"
+cont <- "phyB.R_vs_WT.R_exact"
+conds <- c("phyB.R", "WT.R")
+FDRmax <- 0.05
+logFCmin <- 1
+# --- ------ --- #
+exTest <- exactTest(woundDGEdata, pair=conds)
+allGenes <- as.data.frame(topTags(exTest, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# --- specific --- #
+allGenesR <- allGenes
+DEGsR <- DEGs
+```
+
+
+
+## GT at all time points at once
+
+
+### phyB vs WT at P,S,R
+
+```{r}
+# --- inputs --- #
+folder <- "phyB_v_WT_at_timepoint"
+cont <- "phyB.PDR_vs_WT.PDR"
+conds <- c("WT.P", "phyB.P", "WT.D", "phyB.D", "WT.R", "phyB.R")
+FDRmax <- 0.05
+logFCmin <- 1
+# --- ------ --- #
+
+qlf <- glmQLFTest(LmFit, contrast=fullContrasts[, cont])
+allGenes <- as.data.frame(topTags(qlf, n=Inf, p.value=1)) 
+DEGs <- subset(allGenes, (FDR<FDRmax) & (abs(logFC)>logFCmin))
+DEGs <- addWoundCtrl(DEGs, woundIDs)
+DEGs <- addAvgCpm(DEGs, DGEdata, groups=conds)
+save_DEGs(DEGs, folder, cont, FDRmax, logFCmin, resultsPath)
+
+hist(allGenes$PValue, breaks=40, main=paste(cont, "p-value histogram", sep=" "),
+         xlab = "p-value")
+figFile <- makeFname(folder=paste(folder, "/plots", sep=""), cont=cont, 
+                     dtype="_p_val_hist", FDRmax=FDRmax, logFCmin=logFCmin, dirPath=resultsPath)
+dev.copy(png, figFile)
+dev.off()
+
+# --- specific --- #
+
+
+```
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+# END MAIN ANALYSIS
+--------------------------------------------------------------------------------
+
+
+
+
+
+```{r}
+
+
+nVenn(list("RvsD (WT+phyB)"=row.names(DEGsRvD), "R (WTvs.phyB)"=row.names(DEGsR),
+           "D (WTvs.phyB)"=row.names(DEGsD)))
+
+
+
+nVenn(list("DvsP (WT+phyB)"=row.names(DEGsDvP), "D (WTvs.phyB)"=row.names(DEGsD),
+           "P (WTvs.phyB)"=row.names(DEGsP)))
+
+```
+
+# PCA
+
+```{r}
+
+cpmData <- cpm(DGEdata)
+cpmData <- cpmData[, !grepl("24$", colnames(cpmData))]
+pcaData <- cpmData
+  
+pca <- prcomp(t(pcaData), scale=TRUE)
+
+
+
+plotData <- as.data.frame(pca$x)
+plotData$sample <- row.names(plotData)
+plotData <- tidyr::separate(plotData, sample, into=c("genotype", "plant", "treatment"), sep="_", remove=FALSE)
+plotData$group <- paste(plotData$genotype, plotData$treatment, sep="_")
+
+Palette <- c("#68d53f", "#c7dd27", "#c6874e", "red")
+
+ggplot(plotData, aes(x=PC1, y=PC2, color=treatment, shape=genotype)) + 
+  geom_point(size=4) + scale_colour_manual(values=Palette)
+
+
+```
+
+
+```{r}
+ggplot(plotData, aes(x=PC2, y=PC3, color=treatment, shape=genotype)) + 
+  geom_point(size=4) + scale_colour_manual(values=Palette)
+```
+```{r}
+theta = -0.33*pi
+#theta = 0.4*pi
+
+plotData$PC2.3A <- plotData$PC3*sin(theta) + plotData$PC2*cos(theta)
+plotData$PC2.3B <- plotData$PC3*cos(theta) - plotData$PC2*sin(theta)
+
+ggplot(plotData, aes(x=PC1, y=PC2.3A, color=treatment, shape=genotype)) + 
+  geom_point(size=4) + scale_colour_manual(values=Palette)
+
+newPCs <- data.frame("PC2.3A" = pca$rotation[, 3]*sin(theta) + 
+                       pca$rotation[, 2]*cos(theta), 
+                     "PC2.3B"=pca$rotation[, 3]*cos(theta) -
+                       pca$rotation[, 2]*sin(theta), 
+                     row.names=row.names(pca$rotation))
+
+```
+
+
+
+
+```{r}
+PC2.3sdev <- data.frame("PC" = c(2,3), "sdev"=c(
+  sqrt((pca$sdev[3]*sin(theta))^2 + (pca$sdev[2]*cos(theta))^2),
+  sqrt((pca$sdev[3]*cos(theta))^2 + (pca$sdev[2]*sin(theta))^2)
+))
+
+sdevData <- data.frame("PC" = 1:length(pca$sdev), "sdev"=pca$sdev)
+
+
+
+
+
+ggplot() + geom_point(data=sdevData, aes(x=PC, y=sdev, 
+                                         colour="Principal Components"), size=4) + 
+  geom_point(data=PC2.3sdev, aes(x=PC, y=sdev, color="PC2.3 rotation"), size=4) +
+  labs(title="Standard deviation of principal components")
+
+# plot(x=1:length(pca$sdev), y=pca$sdev)
+```
+
+
+### do a PCA with only genes listed as "Yes" for Leaf_development
+
+```{r}
+leafDevGenes <- subset(edinburghGeneInfo, Leaf_development=="YES")$Gene_ID
+leafDevGenes <- leafDevGenes[leafDevGenes %in% row.names(pcaData)]
+
+leafPcaData <- pcaData[leafDevGenes, ]
+  
+pca <- prcomp(t(leafPcaData), scale=TRUE)
+
+plotData <- as.data.frame(pca$x)
+plotData$sample <- row.names(plotData)
+plotData <- tidyr::separate(plotData, sample, into=c("genotype", "plant#", "treatment"), sep="_", remove=FALSE)
+plotData$group <- paste(plotData$genotype, plotData$treatment, sep="_")
+
+Palette <- c("#68d53f", "#c7dd27", "#c6874e")
+
+ggplot(plotData, aes(x=PC1, y=PC2, color=treatment, shape=genotype)) + 
+  geom_point(size=4) + scale_colour_manual(values=Palette)
+
+
+```
+
+```{r}
+ggplot(plotData, aes(x=PC2, y=PC3, color=treatment, shape=genotype)) + 
+  geom_point(size=4) + scale_colour_manual(values=Palette)
+```
+
+```{r}
+theta = -0.28*pi
+
+plotData$PC2.3A <- plotData$PC3*sin(theta) + plotData$PC2*cos(theta)
+
+ggplot(plotData, aes(x=PC1, y=PC2.3A, color=treatment, shape=genotype)) + 
+  geom_point(size=4) + scale_colour_manual(values=Palette)
+
+```
+
+
+
+
+
+```{r}
+plot(x=1:length(pca$sdev), y=pca$sdev)
+```
+
+
+
