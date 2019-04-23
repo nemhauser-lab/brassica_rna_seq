@@ -1,6 +1,10 @@
 ---
 title: "Generation of DEG lists with revised methods"
 output: html_notebook
+output: 
+  html_notebook:
+    theme: united
+    toc: yes
 ---
 
 
@@ -1155,5 +1159,8 @@ ggplot(plotData, aes(x=PC1, y=PC2.3A, color=treatment, shape=genotype)) +
 plot(x=1:length(pca$sdev), y=pca$sdev)
 ```
 
-
+## Session Info
+```{r}
+sessionInfo()
+```
 
