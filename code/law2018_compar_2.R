@@ -3,15 +3,15 @@
 
 library(rprojroot)
 library(pd.aragene.1.1.st)
-suppressPackageStartupMessages(library(oligo))
-suppressPackageStartupMessages(library(limma))
-suppressPackageStartupMessages(library(scatterplot3d))
-suppressPackageStartupMessages(library(vcd))
-suppressPackageStartupMessages(library(vsn))
-suppressPackageStartupMessages(library(DESeq))
-suppressPackageStartupMessages(library(LSD))
-suppressPackageStartupMessages(library(RColorBrewer))
-suppressPackageStartupMessages(library(VennDiagram))
+library(oligo)
+library(limma)
+library(scatterplot3d)
+library(vcd)
+library(vsn)
+library(DESeq)
+library(LSD)
+library(RColorBrewer)
+library(VennDiagram)
 cols <- brewer.pal(8,"Dark2")
 
 
@@ -82,11 +82,14 @@ sum(res$adj.P.Val <= 0.01) # should get 3819 DEGs
 # Data from our results, run first part of DGE_analysis_v3.rmd first
 
 # WT S vs P
-SvP_DF <- allGenesWT_SvP
+# SvP_DF <- allGenesWT_SvP
+SvP_DF <- WT_DvP_results$allGenes
 SvP_DF$Gene_ID <- row.names(SvP_DF)
 SvP_DF <- dplyr::left_join(SvP_DF, edinburghGeneInfo, by="Gene_ID")
 
-
+# reset design as Law's desing after running DGE_analysis...
+design <- model.matrix(~0+sample.type)
+colnames(design) <- levels(sample.type)
 #===============================================================================
 #Comparisons
 
@@ -124,11 +127,36 @@ CommonDF <- dplyr::inner_join(res, SvP_DF[,c(1:8)], by=c("At_Gene_ID" = "A._thal
 nrow(subset(CommonDF, abs(logFC)>=1 & FDR<=0.01))
 nrow(subset(CommonDF, adj.P.Val.DP <= 0.01 & adj.P.Val.IDL <= 0.01 ))
 
+# Original
 vennDF <- data.frame("SvP" = with(CommonDF, (abs(logFC) >= 1 & FDR <= 0.01) * sign(logFC)),
                      "DP.t3" = with(CommonDF, (adj.P.Val.DP <= 0.01) * sign(logFC.DP)),
                      "IDL.t3" = with(CommonDF, (adj.P.Val.IDL <= 0.01) * sign(logFC.IDL)))
-vennDiagram(vennDF, include=c("up","down"))
+vennDiagram(vennDF, include=c("up","down"), main="|logFC| > 1 for SvP")
 vennDiagram(vennDF, include="both")
+
+# logFC filter on all conditions
+vennDF <- data.frame("SvP" = with(CommonDF, (abs(logFC) >= 1 & FDR <= 0.01) * sign(logFC)),
+                     "DP.t3" = with(CommonDF, (adj.P.Val.DP <= 0.01 & abs(logFC.DP) >= 1) * sign(logFC.DP)),
+                     "IDL.t3" = with(CommonDF, (adj.P.Val.IDL <= 0.01 & abs(logFC.IDL) >= 1) * sign(logFC.IDL)))
+vennDiagram(vennDF, include=c("up","down"), main="|logFC| > 1 for All")
+vennDiagram(vennDF, include="both")
+
+# no logFC filter
+vennDF <- data.frame("SvP" = with(CommonDF, (FDR <= 0.01) * sign(logFC)),
+                     "DP.t3" = with(CommonDF, (adj.P.Val.DP <= 0.01 ) * sign(logFC.DP)),
+                     "IDL.t3" = with(CommonDF, (adj.P.Val.IDL <= 0.01 ) * sign(logFC.IDL)))
+vennDiagram(vennDF, include=c("up","down"), main="no logFC filter")
+vennDiagram(vennDF, include="both")
+
+
+no_log_FC_DF <- subset(CommonDF, P.Value.DP<0.01 & FDR<0.01)
+logFC_DF <- subset(CommonDF, P.Value.DP<0.01 & FDR<0.01 & abs(logFC) > 1)
+both_DF <- subset(CommonDF, P.Value.DP<0.01 & FDR<0.01 & abs(logFC) > 1)
+
+ggplot() + geom_point(aes(x=no_log_FC_DF$logFC, y=no_log_FC_DF$logFC.DP)) +
+  geom_point(aes(x=logFC_DF$logFC, y=logFC_DF$logFC.DP), color="red")
+
+
 
 # ---------------------------------------
 # D6
@@ -181,3 +209,9 @@ sum(temp)
 clipr::write_clip(unique(CommonDF$At_Gene_ID[temp]))
 
 clipr::write_clip(CommonDF)
+
+
+
+
+
+

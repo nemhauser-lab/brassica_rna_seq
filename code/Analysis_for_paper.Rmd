@@ -1058,10 +1058,19 @@ plotData$sample <- row.names(plotData)
 plotData <- tidyr::separate(plotData, sample, into=c("genotype", "plant", "treatment"), sep="_", remove=FALSE)
 plotData$group <- paste(plotData$genotype, plotData$treatment, sep="_")
 
-Palette <- c("#68d53f", "#c7dd27", "#c6874e", "red")
+# Palette <- c("#68d53f", "#c7dd27", "#c6874e", "red")
+Palette <- c("#c6874e", "#68d53f", "#c7dd27")
+
+variance <- pca$sdev^2
+totalVar <- sum(variance)
+varPercent <- 100*variance/totalVar
 
 ggplot(plotData, aes(x=PC1, y=PC2, color=treatment, shape=genotype)) + 
-  geom_point(size=4) + scale_colour_manual(values=Palette)
+  geom_point(size=4) + scale_colour_manual(values=Palette) +
+  xlab(paste("PC1: ", round(varPercent[1],1), "% of variance", sep="")) +
+  ylab(paste("PC2: ", round(varPercent[2],1), "% of variance", sep="")) +
+  theme(axis.text=element_text(size=12),
+        axis.title=element_text(size=14,face="bold"))
 
 
 ```
