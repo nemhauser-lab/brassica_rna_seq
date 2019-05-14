@@ -578,9 +578,11 @@ fname <- makeFname(folder=folder, cont="DvP_all_genes", FDRmax=FDRmax, logFCmin=
 write.csv(allGenes_DvP, fname, row.names=TRUE)
 
 # --- UP --- #
-group <- plyr::aaply(.data=allGenes_DvP, .margins=1, .fun=setGroup, change="up",
-                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
-allGenes_DvP$group <- group
+# group <- plyr::aaply(.data=allGenes_DvP, .margins=1, .fun=setGroup, change="up",
+#                        sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
+# allGenes_DvP$group <- group
+
+allGenes_DvP <- setGroup2(allGenes_DvP, change="up", sigLvl=FDRmax, LFCutoff=logFCmin)
 
 save_Venn_Lists(allGenesList=allGenes_DvP, 
                 folder=folder,
@@ -624,9 +626,8 @@ dev.off()
 
 ```{r}
 # --- DOWN --- #
-group <- plyr::aaply(.data=allGenes_DvP, .margins=1, .fun=setGroup, change="down",
-                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
-allGenes_DvP$group <- group
+
+allGenes_DvP <- setGroup2(allGenes_DvP, change="down", sigLvl=FDRmax, LFCutoff=logFCmin)
 
 save_Venn_Lists(allGenesList=allGenes_DvP, 
                 folder=folder,
@@ -695,9 +696,7 @@ fname <- makeFname(folder=folder, cont="RvD_all_genes", FDRmax=FDRmax, logFCmin=
 write.csv(allGenes_RvD, fname, row.names=TRUE)
 
 # --- UP --- #
-group <- plyr::aaply(.data=allGenes_RvD, .margins=1, .fun=setGroup, change="up",
-                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
-allGenes_RvD$group <- group
+allGenes_RvD <- setGroup2(allGenes_RvD, change="up", sigLvl=FDRmax, LFCutoff=logFCmin)
 
 save_Venn_Lists(allGenesList=allGenes_RvD, 
                 folder=folder,
@@ -740,9 +739,7 @@ dev.off()
 
 ```{r}
 # --- DOWN --- #
-group <- plyr::aaply(.data=allGenes_RvD, .margins=1, .fun=setGroup, change="down",
-                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
-allGenes_RvD$group <- group
+allGenes_RvD <- setGroup2(allGenes_RvD, change="down", sigLvl=FDRmax, LFCutoff=logFCmin)
 
 save_Venn_Lists(allGenesList=allGenes_RvD, 
                 folder=folder,
@@ -811,9 +808,7 @@ fname <- makeFname(folder=folder, cont="RvP_all_genes", FDRmax=FDRmax, logFCmin=
 write.csv(allGenes_RvP, fname, row.names=TRUE)
 
 # --- UP --- #
-group <- plyr::aaply(.data=allGenes_RvP, .margins=1, .fun=setGroup, change="up",
-                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
-allGenes_RvP$group <- group
+allGenes_RvP <- setGroup2(allGenes_RvP, change="up", sigLvl=FDRmax, LFCutoff=logFCmin)
 
 save_Venn_Lists(allGenesList=allGenes_RvP, 
                 folder=folder,
@@ -856,9 +851,7 @@ dev.off()
 
 ```{r}
 # --- DOWN --- #
-group <- plyr::aaply(.data=allGenes_RvP, .margins=1, .fun=setGroup, change="down",
-                       sigLvl=FDRmax, LFCutoff=logFCmin, .expand=FALSE)
-allGenes_RvP$group <- group
+allGenes_RvP <- setGroup2(allGenes_RvP, change="down", sigLvl=FDRmax, LFCutoff=logFCmin)
 
 save_Venn_Lists(allGenesList=allGenes_RvP, 
                 folder=folder,

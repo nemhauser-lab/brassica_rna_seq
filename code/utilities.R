@@ -338,30 +338,57 @@ nVenn <- function(DEGsList){
 }
 
 # set group names for ven diagram
+# note LFCutoff should always be positive
+# ! DO NOT USE, USE setGroup2 instead !
 setGroup <- function(row, change="up", sigLvl=0.01, LFCutoff=1){
   if (change=="up"){
-    subsetMask <- (row$logFC_WT > LFCutoff | row$logFC_phyB > LFCutoff) &
-      (row$FDR_WT < sigLvl | row$FDR_phyB < sigLvl)
+    dSign <- 1
   }
   if (change=="down"){
-    subsetMask <- (row$FDR_WT < sigLvl | row$FDR_phyB < sigLvl) &
-      (row$logFC_WT < -LFCutoff | row$logFC_phyB < -LFCutoff)
+    dSign <- -1
   }
-  wtSigTest <-row$FDR_WT < sigLvl & row$FDR_phyB > sigLvl
-  phyBSigTest <- row$FDR_phyB < sigLvl & row$FDR_WT > sigLvl
+  subsetMask <- (row$logFC_WT*dSign > LFCutoff | row$logFC_phyB*dSign > LFCutoff)
+  wtSigTest <- row$FDR_WT < sigLvl & dSign*row$logFC_WT > 0
+  phyBSigTest <- row$FDR_phyB < sigLvl & dSign*row$logFC_phyB > 0
   group <- "none"
   if (subsetMask) {
-    group <- "sig"
+    group <- "none"
     if (wtSigTest) {
       group <- "WT_sig"
-    }else if (phyBSigTest) {
+    }
+    if (phyBSigTest) {
       group <- "phyB_sig"
-    } else {
+    }
+    if (wtSigTest & phyBSigTest) {
       group <- "Both_sig"
     }
   }
   return(group)
 }
+
+
+setGroup2 <- function(df, change="up", sigLvl=0.01, LFCutoff=1){
+  if (change=="up"){
+    dSign <- 1
+  }
+  if (change=="down"){
+    dSign <- -1
+  }
+  subsetMask <- (df$logFC_WT*dSign > LFCutoff | df$logFC_phyB*dSign > LFCutoff)
+  wtSigTest <- df$FDR_WT < sigLvl & dSign*df$logFC_WT > 0
+  phyBSigTest <- df$FDR_phyB < sigLvl & dSign*df$logFC_phyB > 0
+  group <- rep("none", nrow(df))
+  group[subsetMask & wtSigTest] <- "WT_sig"
+  group[subsetMask & phyBSigTest] <- "phyB_sig"
+  group[subsetMask & wtSigTest & phyBSigTest] <- "Both_sig"
+  df$group <- group
+  return(df)
+}
+
+
+
+
+
 
 #' add average counts per million to a gene list/data frame where row names are
 #' gene ids
