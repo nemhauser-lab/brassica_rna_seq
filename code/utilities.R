@@ -82,11 +82,10 @@ makeFname <- function(folder, cont, change="", dtype="", FDRmax, logFCmin,
 #' generate and saves various files associated with a list of differentially
 #' expressed genes
 #'
-#'
 save_DEGs <- function(DEGList, folder, cont, FDRmax, logFCmin, dir){
   DEGs <- DEGList
   DEGs$Gene_ID <- row.names(DEGs)
-  DEGs <- dplyr::left_join(DEGs, edinburghGeneInfo, by="Gene_ID")
+  DEGs <- dplyr::left_join(DEGs, AtBlastGeneInfo, by="Gene_ID")
   row.names(DEGs) <- DEGs$Gene_ID
   upDEGs <- subset(DEGs, logFC > 0)
   downDEGs <- subset(DEGs, logFC < 0)
@@ -125,11 +124,9 @@ save_DEGs <- function(DEGList, folder, cont, FDRmax, logFCmin, dir){
                   fname)
 }
 
-
-
 save_Venn_Lists <- function(allGenesList, folder, cont, FDRmax, logFCmin,
                             change, dir){
-  # AllGenesList should have edinInfo, and group columns
+  # AllGenesList should have Blast Info, and group columns
   # change should be of form "_UP", or "_DOWN"
 
   allGenesList$Gene_ID <- row.names(allGenesList)
@@ -432,3 +429,80 @@ addAvgCpm <- function(geneList, DGEdata, groups=NULL){
   return(cbind(geneList, DEGCpm))
 
 }
+
+# stylePlotDE("BraA02001861", cpm(DGEdata), At_hom="AT1G66200")
+stylePlotDE <- function(geneId, normExpr, At_hom="", display=TRUE, save=FALSE, saveDir="",
+                      fileType="svg", title=NULL, ...){
+  group2Line <- Vectorize(function(group){
+    switch(group,
+           phyB.24 = 1,
+           phyB.P = 1,
+           phyB.R = 1,
+           phyB.D = 1,
+           WT.24 = 2,
+           WT.P = 2,
+           WT.R = 2,
+           WT.D = 2)
+  })
+  normExpr <- data.frame(normExpr)
+  group <- gsub("_\\d_", ".", colnames(normExpr))
+  geneData <- as.data.frame(t(normExpr[geneId, ]))
+  geneData$group <- group
+  geneData <- dplyr::group_by(geneData, group)
+  dataSummary <- dplyr::summarise(geneData, mean=mean(!!rlang::sym(geneId)),
+                                  SE=se(!!rlang::sym(geneId)))
+  dataSummary <- tidyr::separate(dataSummary, group,
+                                 into=c("Genotype", "Timepoint"), sep="[.]",
+                                 remove=FALSE)
+  dataSummary$Timepoint <- factor(dataSummary$Timepoint, levels=c("P", "24", "D", "R"))
+  dataSummary <- subset(dataSummary, Timepoint %in% c("P", "D", "R"))
+  dataSummary$line <- group2Line(dataSummary$group)
+  plotTitle <- paste(geneId, "\n", At_hom, sep="")
+  # make plot
+  lnThick <- 5
+  yBreaks <- c(0, max(dataSummary$mean)/2, max(dataSummary$mean))
+  yBreaks <- signif(yBreaks, 2)
+  plot <- ggplot(dataSummary, aes(x=Timepoint, y=mean, color=Genotype)) +
+    # geom_point(size=lnThick-.5) +
+    geom_errorbar(aes(ymin=mean-SE, ymax=mean+SE), width=0, size=lnThick/2, alpha=.5) +
+    geom_line(aes(group=line), size=lnThick, lineend="round") +
+    expand_limits(y=0) +
+    # labs(title=plotTitle, x="", y="") +
+    ggtitle(plotTitle) +
+    scale_x_discrete(expand=expand_scale(mult=0.1)) +
+    scale_y_continuous(breaks=yBreaks) +
+    theme(
+      panel.background = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      # plot.title = element_text(face="bold", size=30, vjust=-20, hjust=0.1),
+      plot.title = element_text(face="bold", size=30, margin=margin(t=20, b=-70), hjust=0.04, debug=FALSE),
+      panel.border = element_rect(colour="black", fill=NA, size=5),
+      # axis.text.x = element_text(face="bold", size=30, vjust=20),
+      axis.text.x = element_text(face="bold", size=30),
+      axis.ticks.x = element_blank(),
+      axis.text.y = element_text(face="bold", size=15),
+      legend.key = element_blank(),
+      legend.text = element_text(face="bold", size=15),
+      legend.title = element_text(face="bold", size=20),
+      legend.position = "none",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank())
+  if (display) {
+    print(plot)
+  }
+  if (save) {
+    if (!file.exists(saveDir)) {
+      stop("the save directory does not exist")
+    }
+    saveFile <- file.path(saveDir, paste(At_hom, "_", geneId, "_exprs_plot.", fileType, sep=""))
+    if (file.exists(saveFile)) {
+      warning(paste(saveFile, "is being overwritten"))
+    }
+    ggsave(saveFile, plot, device=fileType, ...)
+  }
+}
+
+
+stylePlotDE("BraA02001861", cpm(DGEdata), At_hom="AT1G66200")
+# stylePlotDE("BraA02001861", cpm(DGEdata), At_hom="GSR2")

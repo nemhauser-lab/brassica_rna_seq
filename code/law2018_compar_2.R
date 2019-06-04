@@ -14,8 +14,6 @@ library(RColorBrewer)
 library(VennDiagram)
 cols <- brewer.pal(8,"Dark2")
 
-
-
 rootDir <- find_root(is_rstudio_project)
 law_data_path <- file.path(rootDir, "data", "Law_et_al_2018", "CEL_files")
 celfiles <- list.celfiles(path=law_data_path, full.names=TRUE)
@@ -24,7 +22,6 @@ rawdata<-read.celfiles(files=celfiles)
 pms <- pm(rawdata)
 pms<-vsn::vsnMatrix(pms)
 meanSdPlot(pms)
-
 pm(rawdata) <- exprs(pms)
 eset <- rma(rawdata,normalize=FALSE,background=FALSE)
 
@@ -79,20 +76,34 @@ res <- topTable(fit2,number=nrow(mat))
 sum(res$adj.P.Val <= 0.01) # should get 3819 DEGs
 
 #===============================================================================
-# Data from our results, run first part of DGE_analysis_v3.rmd first
 
-# WT S vs P
-# SvP_DF <- allGenesWT_SvP
-SvP_DF <- WT_DvP_results$allGenes
-SvP_DF$Gene_ID <- row.names(SvP_DF)
-SvP_DF <- dplyr::left_join(SvP_DF, edinburghGeneInfo, by="Gene_ID")
+# WT D vs P
+DvP_DF <- read.table(file.path(rootDir, "results", "WT.D_vs_WT.P_all_genes_20190516.csv"),
+                     row.names=1, header=TRUE, sep=",", stringsAsFactors=FALSE)
+
+# load arabidopsis blast results for Brassica genes
+AtBlastPath <- file.path(rootDir, "data", "blast_top_hits.xlsx")
+df <- read.xlsx(xlsxFile=AtBlastPath, sheet=2, skipEmptyRows=FALSE)
+colnames(df) <- gsub("(\\.)([a-z])", "_\\2", colnames(df))
+colnames(df)[1] <- "Gene_ID"
+AtBlastGeneInfo <- df
+
+# DvP_DF <- allGenesWT_DvP
+# DvP_DF <- WT_DvP_results$allGenes
+DvP_DF$Gene_ID <- row.names(DvP_DF)
+DvP_DF <- dplyr::left_join(DvP_DF, AtBlastGeneInfo, by="Gene_ID")
 
 # reset design as Law's desing after running DGE_analysis...
-design <- model.matrix(~0+sample.type)
-colnames(design) <- levels(sample.type)
+# design <- model.matrix(~0+sample.type)
+# colnames(design) <- levels(sample.type)
+
 #===============================================================================
 #Comparisons
 
+groupKey <- data.frame(DvP = c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  TRUE,  TRUE ),
+                       DP =  c(FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE, TRUE,  TRUE),
+                       IDL = c(FALSE, TRUE,  FALSE, TRUE,  FALSE, TRUE,  FALSE, TRUE),
+                       group=c("none", "IDL", "DP", "IDL&DP", "DvP", "DvP&IDL", "DvP&DP", "DvP&DP&IDL"))
 
 
 
@@ -120,43 +131,39 @@ colnames(res) <- sub("\\.y", ".IDL", colnames(res))
 resVennDF <- data.frame("DP.t3" = with(res, (adj.P.Val.DP <= 0.01)*sign(logFC.DP)),
                         "IDL.t3" = with(res, (adj.P.Val.IDL <= 0.01)*sign(logFC.IDL)),
                         row.names = res$At_Gene_ID)
-#vennDiagram(resVennDF, include=c("up","down"))
+vennDiagram(resVennDF, include=c("up","down"))
+title(list("Recreated Law 2018 fig 2B", font=1, cex=2),  line=-1.5)
+# the fact that the gene counts in our diagram match the Law 2018 figure exactly
+# gives us confidence that we are re-creating their gene lists correctly.
 
-CommonDF <- dplyr::inner_join(res, SvP_DF[,c(1:8)], by=c("At_Gene_ID" = "A._thaliana_best_hit"))
+# make a dataframe combining our WT DvP results with thier T3 results
+commonDF <- dplyr::inner_join(res, DvP_DF[,c(1:8)], by=c("At_Gene_ID" = "A._thaliana_best_hit"))
 
-nrow(subset(CommonDF, abs(logFC)>=1 & FDR<=0.01))
-nrow(subset(CommonDF, adj.P.Val.DP <= 0.01 & adj.P.Val.IDL <= 0.01 ))
+# Venn-diagrams:
+vennDF <- data.frame("DvP" = with(commonDF, (abs(logFC) >= 1 & FDR <= 0.01) * sign(logFC)),
+                     "DP.t3" = with(commonDF, (adj.P.Val.DP <= 0.01) * sign(logFC.DP)),
+                     "IDL.t3" = with(commonDF, (adj.P.Val.IDL <= 0.01) * sign(logFC.IDL)))
+vennDiagram(vennDF, include=c("up","down"))
+title(list("Non-unique A.t homologs of Brassica genes", font=1, cex=2),  line=-1.5)
+# vennDiagram(vennDF, include="both")
 
-# Original
-vennDF <- data.frame("SvP" = with(CommonDF, (abs(logFC) >= 1 & FDR <= 0.01) * sign(logFC)),
-                     "DP.t3" = with(CommonDF, (adj.P.Val.DP <= 0.01) * sign(logFC.DP)),
-                     "IDL.t3" = with(CommonDF, (adj.P.Val.IDL <= 0.01) * sign(logFC.IDL)))
-vennDiagram(vennDF, include=c("up","down"), main="|logFC| > 1 for SvP")
-vennDiagram(vennDF, include="both")
+# Add venn categories to commonDF and save
+commonDF$t3.upVennGroup <- dplyr::left_join(data.frame(vennDF==1), groupKey,
+                                            by=c("DvP"="DvP", "DP.t3"="DP",
+                                                 "IDL.t3"="IDL"))$group
+commonDF$t3.downVennGroup <- dplyr::left_join(data.frame(vennDF==-1), groupKey,
+                                              by=c("DvP"="DvP", "DP.t3"="DP",
+                                                   "IDL.t3"="IDL"))$group
 
-# logFC filter on all conditions
-vennDF <- data.frame("SvP" = with(CommonDF, (abs(logFC) >= 1 & FDR <= 0.01) * sign(logFC)),
-                     "DP.t3" = with(CommonDF, (adj.P.Val.DP <= 0.01 & abs(logFC.DP) >= 1) * sign(logFC.DP)),
-                     "IDL.t3" = with(CommonDF, (adj.P.Val.IDL <= 0.01 & abs(logFC.IDL) >= 1) * sign(logFC.IDL)))
-vennDiagram(vennDF, include=c("up","down"), main="|logFC| > 1 for All")
-vennDiagram(vennDF, include="both")
+# generate unique A.t Venn diagram lists and counts
+t3.upUnique <- unique(commonDF[, c("At_Gene_ID", "t3.upVennGroup")])
+table(t3.upUnique$t3.upVennGroup)
 
-# no logFC filter
-vennDF <- data.frame("SvP" = with(CommonDF, (FDR <= 0.01) * sign(logFC)),
-                     "DP.t3" = with(CommonDF, (adj.P.Val.DP <= 0.01 ) * sign(logFC.DP)),
-                     "IDL.t3" = with(CommonDF, (adj.P.Val.IDL <= 0.01 ) * sign(logFC.IDL)))
-vennDiagram(vennDF, include=c("up","down"), main="no logFC filter")
-vennDiagram(vennDF, include="both")
+t3.downUnique <- unique(commonDF[, c("At_Gene_ID", "t3.downVennGroup")])
+table(t3.downUnique$t3.downVennGroup)
 
-
-no_log_FC_DF <- subset(CommonDF, P.Value.DP<0.01 & FDR<0.01)
-logFC_DF <- subset(CommonDF, P.Value.DP<0.01 & FDR<0.01 & abs(logFC) > 1)
-both_DF <- subset(CommonDF, P.Value.DP<0.01 & FDR<0.01 & abs(logFC) > 1)
-
-ggplot() + geom_point(aes(x=no_log_FC_DF$logFC, y=no_log_FC_DF$logFC.DP)) +
-  geom_point(aes(x=logFC_DF$logFC, y=logFC_DF$logFC.DP), color="red")
-
-
+# save files
+fname <-
 
 # ---------------------------------------
 # D6
@@ -186,32 +193,43 @@ resVennDF <- data.frame("DP.t6" = with(res, (adj.P.Val.DP <= 0.01)*sign(logFC.DP
 colnames
 vennDiagram(resVennDF, include=c("up","down"))
 
-CommonDF <- dplyr::inner_join(res, SvP_DF[,c(1:8)], by=c("At_Gene_ID" = "A._thaliana_best_hit"))
+commonDF <- dplyr::inner_join(res, DvP_DF[,c(1:8)], by=c("At_Gene_ID" = "A._thaliana_best_hit"))
 
 
-vennDF <- data.frame("SvP" = with(CommonDF, (abs(logFC)>1 & FDR<0.01)*sign(logFC)),
-                     "DP.t6" = with(CommonDF, (adj.P.Val.DP <= 0.01)*sign(logFC.DP)),
-                     "IDL.t6" = with(CommonDF, (adj.P.Val.IDL <= 0.01)*sign(logFC.IDL)))
+vennDF <- data.frame("DvP" = with(commonDF, (abs(logFC)>1 & FDR<0.01)*sign(logFC)),
+                     "DP.t6" = with(commonDF, (adj.P.Val.DP <= 0.01)*sign(logFC.DP)),
+                     "IDL.t6" = with(commonDF, (adj.P.Val.IDL <= 0.01)*sign(logFC.IDL)))
 vennDiagram(vennDF, include=c("up","down"))
-vennDiagram(vennDF, include="both")
-title(list("title here", font=1, cex=2),  line=0)
+title(list("Non-unique A.t homologs of Brassica genes", font=1, cex=2),  line=-1.5)
+# vennDiagram(vennDF, include="both")
 
+
+
+
+
+
+################################################################################
+# MISC. JUNK
 
 temp <- aaply(t(vennDF), .margins=2,  paste, collapse="", .expand=FALSE)
 
-temp <- vennDF$SvP!=-1 & vennDF$DP.t3!=-1 & vennDF$IDL.t3!=-1
+temp <- vennDF$DvP!=-1 & vennDF$DP.t3!=-1 & vennDF$IDL.t3!=-1
 sum(temp)
-length(unique(CommonDF$At_Gene_ID[temp]))
+length(unique(commonDF$At_Gene_ID[temp]))
 
 # coppy list of unique At_Gene_IDs to clipboard for specific condition
-temp <- vennDF$SvP!=-1 & vennDF$DP.t6==-1 & vennDF$IDL.t6==-1
+temp <- vennDF$DvP!=-1 & vennDF$DP.t6==-1 & vennDF$IDL.t6==-1
 sum(temp)
-clipr::write_clip(unique(CommonDF$At_Gene_ID[temp]))
+clipr::write_clip(unique(commonDF$At_Gene_ID[temp]))
 
-clipr::write_clip(CommonDF)
+clipr::write_clip(commonDF)
 
+groupKey <- data.frame(DvP = c(FALSE, FALSE, FALSE, FALSE, TRUE,  TRUE,  TRUE,  TRUE ),
+                       DP =  c(FALSE, FALSE, TRUE,  TRUE,  FALSE, FALSE, TRUE,  TRUE),
+                       IDL = c(FALSE, TRUE,  FALSE, TRUE,  FALSE, TRUE,  FALSE, TRUE),
+                       group=c("none", "IDL", "DP", "IDL&DP", "DvP", "DvP&IDL", "DvP&DP", "DvP&DP&IDL"))
 
-
-
-
+t6.upGroup <- dplyr::left_join(data.frame(vennDF==1), groupKey, by=c("DvP"="DvP", "DP.t6"="DP", "IDL.t6"="IDL"))$group
+t6.downGroup <- dplyr::left_join(data.frame(vennDF==-1), groupKey, by=c("DvP"="DvP", "DP.t6"="DP", "IDL.t6"="IDL"))$group
+temp <- cbind(vennDF, t6.upGroup, t6.downGroup)
 
