@@ -1,0 +1,17 @@
+{
+"name": "",
+"children":[
+{
+ "label": "a.t_motifs_m31_AT1G14687",
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m31_AT1G14687_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m31_AT1G14687_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m31_AT1G14687_logo.png",
+ "name" : "AT1G14687",
+ "ic" : "7.84",
+ "size" : 11,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "AWWATDCGWWW"
+}
+]
+}

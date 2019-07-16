@@ -1,0 +1,22 @@
+MEME version 4.4
+
+ALPHABET= ACGT
+
+strands: + -
+
+Background letter frequencies (from uniform background):
+A 0.25000 C 0.25000 G 0.25000 T 0.25000 
+
+MOTIF MP00664 Potri.002G002400
+
+letter-probability matrix: alength= 4 w= 7 nsites= 20 E= 0
+  0.200803	  0.265688	  0.324512	  0.208998	
+  0.009309	  0.029398	  0.954258	  0.007035	
+  0.007863	  0.011497	  0.098703	  0.881937	
+  0.951482	  0.042864	  0.005197	  0.000457	
+  0.152819	  0.705747	  0.029349	  0.112085	
+  0.041494	  0.080283	  0.858817	  0.019405	
+  0.187700	  0.049642	  0.695648	  0.067010	
+
+URL http://planttfdb.cbi.pku.edu.cn/tf.php?sp=Ptr&did=Potri.002G002400.1#bind_motif
+

@@ -1,0 +1,8306 @@
+<html>
+<header>
+<title>/var/www/html/rsat/public_html/tmp/apache/2019/07/05/matrix-clustering_2019-07-05.192043_zxAuzQ/matrix-clustering_tables/alignment_table.tab</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" /><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+
+<script type="text/javascript">
+ <!-- 
+var stIsIE = /*@cc_on!@*/false;
+
+sorttable = {
+  init: function() {
+    // quit if this function has already been called
+    if (arguments.callee.done) return;
+    // flag this function so we don't do the same thing twice
+    arguments.callee.done = true;
+    // kill the timer
+    if (_timer) clearInterval(_timer);
+    
+    if (!document.createElement || !document.getElementsByTagName) return;
+    
+    sorttable.DATE_RE = /^(\d\d?)[\/\.-](\d\d?)[\/\.-]((\d\d)?\d\d)$/;
+    
+    forEach(document.getElementsByTagName('table'), function(table) {
+      if (table.className.search(/\bsortable\b/) != -1) {
+        sorttable.makeSortable(table);
+      }
+    });
+    
+  },
+  
+  makeSortable: function(table) {
+    if (table.getElementsByTagName('thead').length == 0) {
+      // table doesn't have a tHead. Since it should have, create one and
+      // put the first table row in it.
+      the = document.createElement('thead');
+      the.appendChild(table.rows[0]);
+      table.insertBefore(the,table.firstChild);
+    }
+    // Safari doesn't support table.tHead, sigh
+    if (table.tHead == null) table.tHead = table.getElementsByTagName('thead')[0];
+    
+    if (table.tHead.rows.length != 1) return; // can't cope with two header rows
+    
+    // Sorttable v1 put rows with a class of "sortbottom" at the bottom (as
+    // "total" rows, for example). This is B&R, since what you're supposed
+    // to do is put them in a tfoot. So, if there are sortbottom rows,
+    // for backwards compatibility, move them to tfoot (creating it if needed).
+    sortbottomrows = [];
+    for (var i=0; i<table.rows.length; i++) {
+      if (table.rows[i].className.search(/\bsortbottom\b/) != -1) {
+        sortbottomrows[sortbottomrows.length] = table.rows[i];
+      }
+    }
+    if (sortbottomrows) {
+      if (table.tFoot == null) {
+        // table doesn't have a tfoot. Create one.
+        tfo = document.createElement('tfoot');
+        table.appendChild(tfo);
+      }
+      for (var i=0; i<sortbottomrows.length; i++) {
+        tfo.appendChild(sortbottomrows[i]);
+      }
+      delete sortbottomrows;
+    }
+    
+    // work through each column and calculate its type
+    headrow = table.tHead.rows[0].cells;
+    for (var i=0; i<headrow.length; i++) {
+      // manually override the type with a sorttable_type attribute
+      if (!headrow[i].className.match(/\bsorttable_nosort\b/)) { // skip this col
+        mtch = headrow[i].className.match(/\bsorttable_([a-z0-9]+)\b/);
+        if (mtch) { override = mtch[1]; }
+	      if (mtch && typeof sorttable["sort_"+override] == 'function') {
+	        headrow[i].sorttable_sortfunction = sorttable["sort_"+override];
+	      } else {
+	        headrow[i].sorttable_sortfunction = sorttable.guessType(table,i);
+	      }
+	      // make it clickable to sort
+	      headrow[i].sorttable_columnindex = i;
+	      headrow[i].sorttable_tbody = table.tBodies[0];
+	      dean_addEvent(headrow[i],"click", function(e) {
+
+          if (this.className.search(/\bsorttable_sorted\b/) != -1) {
+            // if we're already sorted by this column, just 
+            // reverse the table, which is quicker
+            sorttable.reverse(this.sorttable_tbody);
+            this.className = this.className.replace('sorttable_sorted',
+                                                    'sorttable_sorted_reverse');
+            this.removeChild(document.getElementById('sorttable_sortfwdind'));
+            sortrevind = document.createElement('span');
+            sortrevind.id = "sorttable_sortrevind";
+            sortrevind.innerHTML = stIsIE ? '&nbsp<font face="webdings">5</font>' : '&nbsp;&#x25B4;';
+            this.appendChild(sortrevind);
+            return;
+          }
+          if (this.className.search(/\bsorttable_sorted_reverse\b/) != -1) {
+            // if we're already sorted by this column in reverse, just 
+            // re-reverse the table, which is quicker
+            sorttable.reverse(this.sorttable_tbody);
+            this.className = this.className.replace('sorttable_sorted_reverse',
+                                                    'sorttable_sorted');
+            this.removeChild(document.getElementById('sorttable_sortrevind'));
+            sortfwdind = document.createElement('span');
+            sortfwdind.id = "sorttable_sortfwdind";
+            sortfwdind.innerHTML = stIsIE ? '&nbsp<font face="webdings">6</font>' : '&nbsp;&#x25BE;';
+            this.appendChild(sortfwdind);
+            return;
+          }
+          
+          // remove sorttable_sorted classes
+          theadrow = this.parentNode;
+          forEach(theadrow.childNodes, function(cell) {
+            if (cell.nodeType == 1) { // an element
+              cell.className = cell.className.replace('sorttable_sorted_reverse','');
+              cell.className = cell.className.replace('sorttable_sorted','');
+            }
+          });
+          sortfwdind = document.getElementById('sorttable_sortfwdind');
+          if (sortfwdind) { sortfwdind.parentNode.removeChild(sortfwdind); }
+          sortrevind = document.getElementById('sorttable_sortrevind');
+          if (sortrevind) { sortrevind.parentNode.removeChild(sortrevind); }
+          
+          this.className += ' sorttable_sorted';
+          sortfwdind = document.createElement('span');
+          sortfwdind.id = "sorttable_sortfwdind";
+          sortfwdind.innerHTML = stIsIE ? '&nbsp<font face="webdings">6</font>' : '&nbsp;&#x25BE;';
+          this.appendChild(sortfwdind);
+
+	        // build an array to sort. This is a Schwartzian transform thing,
+	        // i.e., we "decorate" each row with the actual sort key,
+	        // sort based on the sort keys, and then put the rows back in order
+	        // which is a lot faster because you only do getInnerText once per row
+	        row_array = [];
+	        col = this.sorttable_columnindex;
+	        rows = this.sorttable_tbody.rows;
+	        for (var j=0; j<rows.length; j++) {
+	          row_array[row_array.length] = [sorttable.getInnerText(rows[j].cells[col]), rows[j]];
+	        }
+	        /* If you want a stable sort, uncomment the following line */
+	        //sorttable.shaker_sort(row_array, this.sorttable_sortfunction);
+	        /* and comment out this one */
+	        row_array.sort(this.sorttable_sortfunction);
+	        
+	        tb = this.sorttable_tbody;
+	        for (var j=0; j<row_array.length; j++) {
+	          tb.appendChild(row_array[j][1]);
+	        }
+	        
+	        delete row_array;
+	      });
+	    }
+    }
+  },
+  
+  guessType: function(table, column) {
+    // guess the type of a column based on its first non-blank row
+    sortfn = sorttable.sort_alpha;
+    for (var i=0; i<table.tBodies[0].rows.length; i++) {
+      text = sorttable.getInnerText(table.tBodies[0].rows[i].cells[column]);
+      if (text != '') {
+        if (text.match(/^-?[£$¤]?[\d,.]+%?$/)||text.match(/^\d+((\.|,)\d+)?(E|e)(\+|\-)\d+/)) {
+          return sorttable.sort_numeric;
+        }
+        // check for a date: dd/mm/yyyy or dd/mm/yy 
+        // can have / or . or - as separator
+        // can be mm/dd as well
+        possdate = text.match(sorttable.DATE_RE)
+        if (possdate) {
+          // looks like a date
+          first = parseInt(possdate[1]);
+          second = parseInt(possdate[2]);
+          if (first > 12) {
+            // definitely dd/mm
+            return sorttable.sort_ddmm;
+          } else if (second > 12) {
+            return sorttable.sort_mmdd;
+          } else {
+            // looks like a date, but we can't tell which, so assume
+            // that it's dd/mm (English imperialism!) and keep looking
+            sortfn = sorttable.sort_ddmm;
+          }
+        }
+      }
+    }
+    return sortfn;
+  },
+  
+  getInnerText: function(node) {
+    // gets the text we want to use for sorting for a cell.
+    // strips leading and trailing whitespace.
+    // this is *not* a generic getInnerText function; it's special to sorttable.
+    // for example, you can override the cell text with a customkey attribute.
+    // it also gets .value for <input> fields.
+    
+    hasInputs = (typeof node.getElementsByTagName == 'function') &&
+                 node.getElementsByTagName('input').length;
+    
+    if (node.getAttribute("sorttable_customkey") != null) {
+      return node.getAttribute("sorttable_customkey");
+    }
+    else if (typeof node.textContent != 'undefined' && !hasInputs) {
+      return node.textContent.replace(/^\s+|\s+$/g, '');
+    }
+    else if (typeof node.innerText != 'undefined' && !hasInputs) {
+      return node.innerText.replace(/^\s+|\s+$/g, '');
+    }
+    else if (typeof node.text != 'undefined' && !hasInputs) {
+      return node.text.replace(/^\s+|\s+$/g, '');
+    }
+    else {
+      switch (node.nodeType) {
+        case 3:
+          if (node.nodeName.toLowerCase() == 'input') {
+            return node.value.replace(/^\s+|\s+$/g, '');
+          }
+        case 4:
+          return node.nodeValue.replace(/^\s+|\s+$/g, '');
+          break;
+        case 1:
+        case 11:
+          var innerText = '';
+          for (var i = 0; i < node.childNodes.length; i++) {
+            innerText += sorttable.getInnerText(node.childNodes[i]);
+          }
+          return innerText.replace(/^\s+|\s+$/g, '');
+          break;
+        default:
+          return '';
+      }
+    }
+  },
+  
+  reverse: function(tbody) {
+    // reverse the rows in a tbody
+    newrows = [];
+    for (var i=0; i<tbody.rows.length; i++) {
+      newrows[newrows.length] = tbody.rows[i];
+    }
+    for (var i=newrows.length-1; i>=0; i--) {
+       tbody.appendChild(newrows[i]);
+    }
+    delete newrows;
+  },
+  
+  /* sort functions
+     each sort function takes two parameters, a and b
+     you are comparing a[0] and b[0] */
+  /* Numeric order */
+  sort_numeric: function(a,b) {
+	aa = parseFloat(a[0].replace(/[^0-9.\-eE]/g,''));
+	if (isNaN(aa)) aa = 0;
+	bb = parseFloat(b[0].replace(/[^0-9.\-eE]/g,''));
+	if (isNaN(bb)) bb = 0;
+	return aa-bb;
+    },
+//   sort_numeric: function(a,b) {
+//     aa = parseFloat(a[0].replace(/[^0-9.-eE]/g,''));
+//     if (isNaN(aa)) aa = 0;
+//     bb = parseFloat(b[0].replace(/[^0-9.-eE]/g,'')); 
+//     if (isNaN(bb)) bb = 0;    
+//     return aa-bb;
+//   },
+
+  /* alphabetical order */
+  sort_alpha: function(a,b) {
+    if (a[0]==b[0]) return 0;
+    if (a[0]<b[0]) return -1;
+    return 1;
+  },
+
+  /* sort dates formatted as ddmm (day first, month after) */
+  sort_ddmm: function(a,b) {
+    mtch = a[0].match(sorttable.DATE_RE);
+    y = mtch[3]; m = mtch[2]; d = mtch[1];
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt1 = y+m+d;
+    mtch = b[0].match(sorttable.DATE_RE);
+    y = mtch[3]; m = mtch[2]; d = mtch[1];
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt2 = y+m+d;
+    if (dt1==dt2) return 0;
+    if (dt1<dt2) return -1;
+    return 1;
+  },
+
+  /* sort dates formatted as mmdd (month first, day after) */
+  sort_mmdd: function(a,b) {
+    mtch = a[0].match(sorttable.DATE_RE);
+    y = mtch[3]; d = mtch[2]; m = mtch[1];
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt1 = y+m+d;
+    mtch = b[0].match(sorttable.DATE_RE);
+    y = mtch[3]; d = mtch[2]; m = mtch[1];
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt2 = y+m+d;
+    if (dt1==dt2) return 0;
+    if (dt1<dt2) return -1;
+    return 1;
+  },
+  
+  shaker_sort: function(list, comp_func) {
+    // A stable sort function to allow multi-level sorting of data
+    // see: http://en.wikipedia.org/wiki/Cocktail_sort
+    // thanks to Joseph Nahmias
+    var b = 0;
+    var t = list.length - 1;
+    var swap = true;
+
+    while(swap) {
+        swap = false;
+        for(var i = b; i < t; ++i) {
+            if ( comp_func(list[i], list[i+1]) > 0 ) {
+                var q = list[i]; list[i] = list[i+1]; list[i+1] = q;
+                swap = true;
+            }
+        } // for
+        t--;
+
+        if (!swap) break;
+
+        for(var i = t; i > b; --i) {
+            if ( comp_func(list[i], list[i-1]) < 0 ) {
+                var q = list[i]; list[i] = list[i-1]; list[i-1] = q;
+                swap = true;
+            }
+        } // for
+        b++;
+
+    } // while(swap)
+  }  
+}
+
+/* ******************************************************************
+   Supporting functions: bundled here to avoid depending on a library
+   ****************************************************************** */
+
+// Dean Edwards/Matthias Miller/John Resig
+
+/* for Mozilla/Opera9 */
+if (document.addEventListener) {
+    document.addEventListener("DOMContentLoaded", sorttable.init, false);
+}
+
+/* for Internet Explorer */
+/*@cc_on @*/
+/*@if (@_win32)
+    document.write("<script id=__ie_onload defer src=javascript:void(0)><\/script>");
+    var script = document.getElementById("__ie_onload");
+    script.onreadystatechange = function() {
+        if (this.readyState == "complete") {
+            sorttable.init(); // call the onload handler
+        }
+    };
+/*@end @*/
+
+/* for Safari */
+if (/WebKit/i.test(navigator.userAgent)) { // sniff
+    var _timer = setInterval(function() {
+        if (/loaded|complete/.test(document.readyState)) {
+            sorttable.init(); // call the onload handler
+        }
+    }, 10);
+}
+
+/* for other browsers */
+window.onload = sorttable.init;
+
+// written by Dean Edwards, 2005
+// with input from Tino Zijdel, Matthias Miller, Diego Perini
+
+// http://dean.edwards.name/weblog/2005/10/add-event/
+
+function dean_addEvent(element, type, handler) {
+	if (element.addEventListener) {
+		element.addEventListener(type, handler, false);
+	} else {
+		// assign each event handler a unique ID
+		if (!handler.$$guid) handler.$$guid = dean_addEvent.guid++;
+		// create a hash table of event types for the element
+		if (!element.events) element.events = {};
+		// create a hash table of event handlers for each element/event pair
+		var handlers = element.events[type];
+		if (!handlers) {
+			handlers = element.events[type] = {};
+			// store the existing event handler (if there is one)
+			if (element["on" + type]) {
+				handlers[0] = element["on" + type];
+			}
+		}
+		// store the event handler in the hash table
+		handlers[handler.$$guid] = handler;
+		// assign a global event handler to do all the work
+		element["on" + type] = handleEvent;
+	}
+};
+// a counter used to create unique IDs
+dean_addEvent.guid = 1;
+
+function removeEvent(element, type, handler) {
+	if (element.removeEventListener) {
+		element.removeEventListener(type, handler, false);
+	} else {
+		// delete the event handler from the hash table
+		if (element.events && element.events[type]) {
+			delete element.events[type][handler.$$guid];
+		}
+	}
+};
+
+function handleEvent(event) {
+	var returnValue = true;
+	// grab the event object (IE uses a global event object)
+	event = event || fixEvent(((this.ownerDocument || this.document || this).parentWindow || window).event);
+	// get a reference to the hash table of event handlers
+	var handlers = this.events[event.type];
+	// execute each event handler
+	for (var i in handlers) {
+		this.$$handleEvent = handlers[i];
+		if (this.$$handleEvent(event) === false) {
+			returnValue = false;
+		}
+	}
+	return returnValue;
+};
+
+function fixEvent(event) {
+	// add W3C standard event methods
+	event.preventDefault = fixEvent.preventDefault;
+	event.stopPropagation = fixEvent.stopPropagation;
+	return event;
+};
+fixEvent.preventDefault = function() {
+	this.returnValue = false;
+};
+fixEvent.stopPropagation = function() {
+  this.cancelBubble = true;
+}
+
+// Dean's forEach: http://dean.edwards.name/base/forEach.js
+/*
+	forEach, version 1.0
+	Copyright 2006, Dean Edwards
+	License: http://www.opensource.org/licenses/mit-license.php
+*/
+
+// array-like enumeration
+if (!Array.forEach) { // mozilla already supports this
+	Array.forEach = function(array, block, context) {
+		for (var i = 0; i < array.length; i++) {
+			block.call(context, array[i], i, array);
+		}
+	};
+}
+
+// generic enumeration
+Function.prototype.forEach = function(object, block, context) {
+	for (var key in object) {
+		if (typeof this.prototype[key] == "undefined") {
+			block.call(context, object[key], key, object);
+		}
+	}
+};
+
+// character enumeration
+String.forEach = function(string, block, context) {
+	Array.forEach(string.split(""), function(chr, index) {
+		block.call(context, chr, index, string);
+	});
+};
+
+// globally resolve forEach enumeration
+var forEach = function(object, block, context) {
+	if (object) {
+		var resolve = Object; // default
+		if (object instanceof Function) {
+			// functions have a "length" property
+			resolve = Function;
+		} else if (object.forEach instanceof Function) {
+			// the object implements a custom forEach method so use that
+			object.forEach(block, context);
+			return;
+		} else if (typeof object == "string") {
+			// the object is a string
+			resolve = String;
+		} else if (typeof object.length == "number") {
+			// the object is array-like
+			resolve = Array;
+		}
+		resolve.forEach(object, block, context);
+	}
+}
+
+// --> 
+</script>
+<style type='text/css'>
+/* Style sheet for the HTML formatting of RSAT results */
+
+/* BODY  */
+body {
+       font-family: Verdana, Helvetica, Arial, sans-serif;
+       font-size: 70%;
+       margin-top: 2px;
+       margin-left: 20px;
+       text-align: justify;
+       background: #ffffff;
+       margin-right: 20px;
+/*       background: #0D73A7 url(images/bullet2-normal.gif) no-repeat 7px 7px;*/
+}
+
+
+/* div for menu */
+
+#Menu_space {
+	margin-top:120px;
+	margin-bottom:300px;
+}
+#Menu_wait {
+	position:absolute;
+	top:120px;
+	left:50%;
+	width:400px;
+	margin-left: -200px;
+	padding:10px;
+	text-align:center;
+	}
+
+#Menu {
+	position:absolute;
+	top:120px;
+	left:50%;
+	width:800px;
+	margin-left: -400px;
+	padding:10px;
+	background-color:#eee;
+	border:1px dashed #999;
+	line-height:17px;
+	font-size: 110%;
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	text-align:left;
+	}
+
+#Menu h3 {
+	margin:0;
+	text-align:center;
+	padding-bottom:5px;
+}
+
+#Menu ul {
+	list-style-type:none;
+}
+
+/* TABLE */
+#Menu table {
+	margin: 10px 10px 10px;
+}
+
+#Menu  td, th {
+	font-size: 70%;
+	padding: 2px 10px;
+	vertical-align:top;
+}
+
+.menulink a:link,a:visited {
+	color:#cc6600;
+	background: transparent;
+	text-decoration: none;
+	}
+
+.menulink a:visited {
+	color:#cc6600;
+	background: transparent;
+	text-decoration: none;
+	}
+
+.menulink A:active {
+	color: #cc6600;
+	background: transparent;
+	text-decoration: none
+}
+
+.menulink A:hover {
+	text-decoration: underline;
+	color: #cc6600;
+}
+
+
+/* Links  */
+
+A:link,A:visited {
+	color: #0D73A7;
+	background: transparent;
+	text-decoration: none;
+}
+
+A:active {
+	color: #ff0000;
+	background: transparent;
+	text-decoration: none
+}
+
+A:hover {
+	text-decoration: underline;
+	color: #cc6600;
+}
+
+/* Headers  */
+
+h1 {
+	margin-top: 10px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	margin-bottom: 0px;
+	padding-left: 10px;
+	border: 1px solid #2D282E;
+	background-color: #0D73A7;
+	font-size: 16px;
+	color: #D6EEFA;
+}
+h1 a:link, h1 a:visited {
+	color: #D6EEFA;
+}
+
+h1 a:hover {
+	color: #ffffff;
+}
+
+h2 {
+	margin-top: 10px;
+	padding-top: 15px;
+	margin-bottom: 0px;
+	color: #002266;
+	font-size: 15px;
+}
+
+h3 {
+	margin-top: 6px;
+	padding-top: 6px;
+	margin-bottom: 0px;
+	color: #002266;
+	font-size: 11px;
+}
+
+h4 {
+	margin-top: 4px;
+	padding-top: 4px;
+	margin-bottom: 0px;
+	color : #2D282E;
+	font-size: 11px;
+}
+
+h2.motif {
+	margin-top: 3px;
+	padding-top: 0px;
+	margin-bottom: 4px;
+	color : #2D282E;
+	font-size: 12px;
+}
+
+/* Other tag formatting  */
+hr {
+	border: 1px dotted #2D282E;
+	height: 1px;
+}
+
+hr.solid {
+	border: 1px solid #2D282E;
+	height: 1px;
+}
+
+pre,tt {
+         font-size: 12px;
+}
+
+pre { 
+      background:#EEEEEE;
+ }
+
+
+center {
+	margin-top: 5px;
+	margin-bottom: 20px;
+	font-weight: bold;
+}
+
+blockquote {
+	color : #cc6600;
+	font-size: 12px;
+}
+
+body blockquote.information {
+	color : #009900;
+	font-size: 12px;
+}
+
+body blockquote.warning {
+	color : #aa0000;
+	font-size: 12px;
+}
+
+blockquote.demo {
+	color : #000000;
+	font-size: 12px;
+	font-style:italic;
+}
+
+
+
+/* TABLE */
+table.simple {
+	margin: 10px 20px 20px;
+	color: #000000;
+}
+
+table.simple td,table.list th {
+	font-size: 70%;
+	padding: 2px 10px;
+	background-color: #FFFFFF;
+	page-break-inside: auto;
+}
+
+table.simple th {
+	font-size: 70%;
+	background-color: #F6E6CA;
+}
+
+/* TABLE */
+
+/* table with white bg and small fonts */
+table.whitebg {
+	margin: 10px 20px 20px;
+	color: #000000;
+	border-left: 1px solid #cbcbb4;
+	border-top: 1px solid #cbcbb4;
+	border-spacing: 0px;
+}
+
+table.whitebg td,table.whitebg th {
+	font-size: 70%;
+	border-right: 1px solid #cbcbb4;
+	border-bottom: 1px solid #cbcbb4;
+	padding: 2px 10px;
+	background-color: #FFFFFF;
+	page-break-inside: auto;
+}
+
+
+/* table with blue bg and small font */
+table.whitebg th {
+	font-size: 70%;
+	background-color: #F6E6CA;
+}
+
+table.bluebg {
+	color: #333333;
+	border-left: 1px solid #cbcbb4;
+	border-top: 1px solid #cbcbb4;
+	}
+
+table.bluebg td,table.bluebg th {
+	font-size: 70%;
+	border-right: 1px solid #cbcbb4;
+	border-bottom: 1px solid #cbcbb4;
+	background-color: #D6EEFA;
+	page-break-inside: auto;
+}
+
+table.bluebg th {
+	background-color: #0D73A7;
+	color: #D6EEFA;
+}
+	
+/* Table on result pages - compatible with the sorttable type defined by javascript */
+
+table.sortable {
+	margin: 10px 20px 20px;
+	color: #000000;
+	border-left: 1px solid #cbcbb4;
+	border-right: 1px solid #cbcbb4;
+	border-top: 1px solid #cbcbb4;
+	border-bottom: 1px solid #cbcbb4;
+	border-spacing: 0px;
+}
+
+table.sortable td,table.sortable th {
+	padding: 2px 10px;
+	font-size: 70%;
+	border-right: 1px solid #cbcbb4;
+	border-bottom: 1px solid #cbcbb4;
+	padding: 2px 10px;
+	background-color: #FFFFFF;
+	page-break-inside: auto;
+}
+
+table.sortable th {
+	font-size: 70%;
+	background-color: #0D73A7;
+	color: #D6EEFA;
+}
+
+
+/* LINK TABLE ON RESULTS PAGES */
+table.resultlink {
+	margin-left:5px;
+	width : 90%;
+	color: #2D282E;
+	background-color: #D6EEFA;
+}
+
+
+table.resultlink td, table.resultlink th {
+	font-size: 70%;
+	padding-left:5px;
+	padding-right:3px;
+	text-align :left;
+	page-break-inside: auto;
+}
+
+/* COLLAPSIBLE MENUS */
+
+.menu_heading_open {
+	background: url(images_html/arrow_box_down.gif) no-repeat 5px 7px;
+	text-decoration: none;
+	padding: 0px 6px 4px 21px;
+	margin: 0;
+	cursor: pointer;
+	font-weight: bold;
+	display: block;
+}
+
+.menu_heading_closed {
+	background: url(images_html/arrow_box.gif) no-repeat 5px 7px;
+	text-decoration: underline; 
+	display: block;
+	padding:0px 6px 4px 21px;
+	margin: 0;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.menu_collapsible {
+	display: none;
+	margin-bottom: 10px;
+	margin-left: 30px;
+}
+
+.menu_collapsible_display {
+   display: block;
+   margin-bottom: 10px;
+   margin-left: 30px;
+}
+</style>
+<header>
+<body bgcolor='#ffffff'>
+<pre></pre>
+
+<table  class="sortable"  cellspacing='1' cellpadding='3' border='1'>
+<tr valign='top'>
+<th align='left' >id</th>
+<th align='left'>name</th>
+<th align='left'>cluster</th>
+<th align='left'>strand</th>
+<th align='left'>offset_up</th>
+<th align='left'>offset_down</th>
+<th align='left'>width</th>
+<th align='left'>aligned_consensus</th>
+<th align='left'>aligned_consensus_rc</th>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m384_AT3G62420</td>
+<td>AT3G62420</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----dwwGmTGACGTGGCa--</td>
+<td>--TGCCACGTCAKCWWH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m453_AT4G34590</td>
+<td>AT4G34590</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----DWWGMTGACGTGGCA--</td>
+<td>--tGCCACGTCAkCwwh-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m47_AT1G22070</td>
+<td>AT1G22070</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>6</td>
+<td>2</td>
+<td>22</td>
+<td>------WTGMTGACGTCAYH--</td>
+<td>--drTGACGTCAkCaw------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m488_AT5G06960</td>
+<td>AT5G06960</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>6</td>
+<td>2</td>
+<td>22</td>
+<td>------WTGMTGACGTCAYH--</td>
+<td>--drTGACGTCAkCaw------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m297_AT3G12250</td>
+<td>AT3G12250</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----RWTGMTGACGTCAYH--</td>
+<td>--drTGACGTCAkCawy-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m607_AT5G65210</td>
+<td>AT5G65210</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----dwtGmTGACGTCAyy--</td>
+<td>--RRTGACGTCAKCAWH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m154_AT1G75390</td>
+<td>AT1G75390</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----dwwGmTGACGTGGCa--</td>
+<td>--TGCCACGTCAKCWWH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m189_AT2G18160</td>
+<td>AT2G18160</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----dwwGcTGACGTGGCa--</td>
+<td>--TGCCACGTCAGCWWH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m511_AT5G15830</td>
+<td>AT5G15830</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----dwwGmTGACGTGGCa--</td>
+<td>--TGCCACGTCAKCWWH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m341_AT3G30530</td>
+<td>AT3G30530</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>7</td>
+<td>3</td>
+<td>22</td>
+<td>-------TGCTGACGTGGM---</td>
+<td>---KCCACGTCAGCA-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m540_AT5G38800</td>
+<td>AT5G38800</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>7</td>
+<td>3</td>
+<td>22</td>
+<td>-------TGCTGACGTGGM---</td>
+<td>---kCCACGTCAGCa-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m68_AT1G32150</td>
+<td>AT1G32150</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----DWWKSTSACGTGGCA--</td>
+<td>--tGCCACGTsasmwwh-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m258_AT2G46270</td>
+<td>AT2G46270</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----DWWKSTSACGTGGCA--</td>
+<td>--TGCCACGTsasmwwh-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m486_AT5G06839</td>
+<td>AT5G06839</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----ratGmTGACGTCAyy--</td>
+<td>--RRTGACGTCAKCATY-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m224_AT2G35530</td>
+<td>AT2G35530</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----dwwksysACGTGGCA--</td>
+<td>--TGCCACGTSRSMWWH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m292_AT3G10800</td>
+<td>AT3G10800</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----dwwgrtsACGTGKCa--</td>
+<td>--TGMCACGTSAYCWWH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m368_AT3G56850</td>
+<td>AT3G56850</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----wwwggwsACGTGKCA--</td>
+<td>--TGMCACGTSWCCWWW-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m501_AT5G11260</td>
+<td>AT5G11260</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>22</td>
+<td>-----dwtGaTGACGTSgcm--</td>
+<td>--KGCSACGTCATCAWH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m182_AT2G04038</td>
+<td>AT2G04038</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>5</td>
+<td>3</td>
+<td>22</td>
+<td>-----DWTGCTGACGTGGM---</td>
+<td>---KCCACGTCAGCawh-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m537_AT5G28770</td>
+<td>AT5G28770</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>7</td>
+<td>3</td>
+<td>22</td>
+<td>-------GCCACGTSAGCA---</td>
+<td>---tgcTsACGTGgc-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m17_AT1G08320</td>
+<td>AT1G08320</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>8</td>
+<td>3</td>
+<td>22</td>
+<td>--------GmTGACGTCAy---</td>
+<td>---RTGACGTCAKC--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m82_AT1G42990</td>
+<td>AT1G42990</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>9</td>
+<td>3</td>
+<td>22</td>
+<td>---------rTGACGTCAy---</td>
+<td>---RTGACGTCAY---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m163_AT1G77920</td>
+<td>AT1G77920</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>4</td>
+<td>1</td>
+<td>22</td>
+<td>----RRAWRRTGACGTCAKCA-</td>
+<td>-tGmTGACGTCAyywtyy----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m227_AT2G36270</td>
+<td>AT2G36270</td>
+<td>cluster_1</td>
+<td>D</td>
+<td>4</td>
+<td>0</td>
+<td>22</td>
+<td>----WYTGMCACGTSWYCWYHW</td>
+<td>wdrwgrwsACGTGKCarw----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m497_AT5G10030</td>
+<td>AT5G10030</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>7</td>
+<td>4</td>
+<td>22</td>
+<td>-------TGMTGACGTCA----</td>
+<td>----TgACGTCAkCa-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m487_AT5G06950</td>
+<td>AT5G06950</td>
+<td>cluster_1</td>
+<td>R</td>
+<td>0</td>
+<td>2</td>
+<td>22</td>
+<td>WMRWWRWTGMTGACGTCAYY--</td>
+<td>--rrTGACGTCAkCawywwykw</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m390_AT4G01280</td>
+<td>AT4G01280</td>
+<td>cluster_2</td>
+<td>D</td>
+<td>2</td>
+<td>5</td>
+<td>18</td>
+<td>--AGATATTTTtw-----</td>
+<td>-----WAAAAATATCT--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m574_AT5G52660</td>
+<td>AT5G52660</td>
+<td>cluster_2</td>
+<td>D</td>
+<td>2</td>
+<td>5</td>
+<td>18</td>
+<td>--AGATATTTTtt-----</td>
+<td>-----AAAAAATATCT--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m1_AT1G01060</td>
+<td>AT1G01060</td>
+<td>cluster_2</td>
+<td>D</td>
+<td>2</td>
+<td>6</td>
+<td>18</td>
+<td>--AGATATTTwt------</td>
+<td>------AWAAATATCT--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m475_AT5G02840</td>
+<td>AT5G02840</td>
+<td>cluster_2</td>
+<td>D</td>
+<td>2</td>
+<td>6</td>
+<td>18</td>
+<td>--AGATATTTTt------</td>
+<td>------AAAAATATCT--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m287_AT3G10113</td>
+<td>AT3G10113</td>
+<td>cluster_2</td>
+<td>R</td>
+<td>0</td>
+<td>3</td>
+<td>18</td>
+<td>TWAGATATTTWTWTW---</td>
+<td>---wawawAAATATCtwa</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m514_AT5G17300</td>
+<td>AT5G17300</td>
+<td>cluster_2</td>
+<td>R</td>
+<td>0</td>
+<td>4</td>
+<td>18</td>
+<td>TWAGATATTTWTTT----</td>
+<td>----aaawAAATATCTwa</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m284_AT3G09600</td>
+<td>AT3G09600</td>
+<td>cluster_2</td>
+<td>D</td>
+<td>2</td>
+<td>4</td>
+<td>18</td>
+<td>--AGATATTTttwt----</td>
+<td>----AWAAAAATATCT--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m35_AT1G18330</td>
+<td>AT1G18330</td>
+<td>cluster_2</td>
+<td>R</td>
+<td>0</td>
+<td>6</td>
+<td>18</td>
+<td>TWAGATATTTWY------</td>
+<td>------rWAAATATCTwa</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m264_AT2G46830</td>
+<td>AT2G46830</td>
+<td>cluster_2</td>
+<td>R</td>
+<td>2</td>
+<td>8</td>
+<td>18</td>
+<td>--AGATATTT--------</td>
+<td>--------AAATATCT--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m27_AT1G13260</td>
+<td>AT1G13260</td>
+<td>cluster_2</td>
+<td>D</td>
+<td>1</td>
+<td>0</td>
+<td>18</td>
+<td>-VCAACARAAWWHAYCWK</td>
+<td>mwgrTdwwtTyTGTTGb-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m179_AT2G03340</td>
+<td>AT2G03340</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------aaaAGTCAAmg----------</td>
+<td>----------CKTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m233_AT2G38470</td>
+<td>AT2G38470</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------aawAGTCAAmg----------</td>
+<td>----------CKTTGACTWTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m66_AT1G30650</td>
+<td>AT1G30650</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>8</td>
+<td>29</td>
+<td>--------aAAAGTCAACgmy--------</td>
+<td>--------RKCGTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m367_AT3G56400</td>
+<td>AT3G56400</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>8</td>
+<td>8</td>
+<td>29</td>
+<td>--------AAAAGTCAACGSY--------</td>
+<td>--------rsCGTTGACTTTt--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m389_AT4G01250</td>
+<td>AT4G01250</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>8</td>
+<td>29</td>
+<td>--------aAAAGTCAACkat--------</td>
+<td>--------ATMGTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m575_AT5G52830</td>
+<td>AT5G52830</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>8</td>
+<td>8</td>
+<td>29</td>
+<td>--------AAAAGTCAACKMT--------</td>
+<td>--------akmGTTGACTTTt--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m204_AT2G23320</td>
+<td>AT2G23320</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------aaAAGTCAACg----------</td>
+<td>----------CGTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m425_AT4G23550</td>
+<td>AT4G23550</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------aaAAGTCAACk----------</td>
+<td>----------MGTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m114_AT1G62300</td>
+<td>AT1G62300</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>0</td>
+<td>10</td>
+<td>29</td>
+<td>DDRWHWRMMWWRGTCAACG----------</td>
+<td>----------CGTTGACYwwkkywdwyhh</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m424_AT4G22070</td>
+<td>AT4G22070</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>0</td>
+<td>10</td>
+<td>29</td>
+<td>dkrwwwrmmaaRGTCAACg----------</td>
+<td>----------CGTTGACYTTKKYWWWYMH</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m428_AT4G24240</td>
+<td>AT4G24240</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>7</td>
+<td>8</td>
+<td>29</td>
+<td>-------AAAAAGTCAACGMY--------</td>
+<td>--------rkcGTTGACTTTtt-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m443_AT4G31550</td>
+<td>AT4G31550</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>7</td>
+<td>8</td>
+<td>29</td>
+<td>-------AAAAAGTCAACGMY--------</td>
+<td>--------rkcGTTGACTTTtt-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m63_AT1G29860</td>
+<td>AT1G29860</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------aAAAGTCAAMg----------</td>
+<td>----------CKTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m216_AT2G30590</td>
+<td>AT2G30590</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------aAAAGTCAACg----------</td>
+<td>----------CGTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m504_AT5G13080</td>
+<td>AT5G13080</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>8</td>
+<td>29</td>
+<td>--------aAAAGTCAACgah--------</td>
+<td>--------DTCGTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m214_AT2G30250</td>
+<td>AT2G30250</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------aawRGTCAAMg----------</td>
+<td>----------CKTTGACYWTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m208_AT2G24570</td>
+<td>AT2G24570</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>7</td>
+<td>8</td>
+<td>29</td>
+<td>-------aaAAAGTCAACgvy--------</td>
+<td>--------RBCGTTGACTTTTT-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m489_AT5G07100</td>
+<td>AT5G07100</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>8</td>
+<td>29</td>
+<td>--------aaaAGTCAACGvy--------</td>
+<td>--------RBCGTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m62_AT1G29280</td>
+<td>AT1G29280</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------aaAAGTCAACG----------</td>
+<td>----------CGTTGACTTTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m259_AT2G46400</td>
+<td>AT2G46400</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------maAAGTCAACG----------</td>
+<td>----------CGTTGACTTTK--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m257_AT2G46130</td>
+<td>AT2G46130</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>7</td>
+<td>8</td>
+<td>29</td>
+<td>-------AAAAAGTCAACGAH--------</td>
+<td>--------dtCGTTGACTTTtt-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m248_AT2G44745</td>
+<td>AT2G44745</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>10</td>
+<td>9</td>
+<td>29</td>
+<td>----------MGGTCAACGR---------</td>
+<td>---------yCGTTGACCk----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m525_AT5G22570</td>
+<td>AT5G22570</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>10</td>
+<td>9</td>
+<td>29</td>
+<td>----------YRGTCAACGS---------</td>
+<td>---------sCGTTGACYr----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m121_AT1G66600</td>
+<td>AT1G66600</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>10</td>
+<td>11</td>
+<td>29</td>
+<td>----------yGGTCAAc-----------</td>
+<td>-----------GTTGACCR----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m579_AT5G56270</td>
+<td>AT5G56270</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>10</td>
+<td>11</td>
+<td>29</td>
+<td>----------bRGTCAAm-----------</td>
+<td>-----------KTTGACYV----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m413_AT4G18170</td>
+<td>AT4G18170</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>8</td>
+<td>8</td>
+<td>29</td>
+<td>--------AAAAGTCAAMGWH--------</td>
+<td>--------dwckTTGACTTtt--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m168_AT1G80840</td>
+<td>AT1G80840</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>6</td>
+<td>8</td>
+<td>29</td>
+<td>------RAAAAAGTCAAMRWH--------</td>
+<td>--------dwykTTGACTTttty------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m555_AT5G46350</td>
+<td>AT5G46350</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>6</td>
+<td>8</td>
+<td>29</td>
+<td>------raaAAAGTCAACgaw--------</td>
+<td>--------WTCGTTGACTTTTTY------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m445_AT4G31800</td>
+<td>AT4G31800</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>29</td>
+<td>--------maarGTCAAsr----------</td>
+<td>----------YSTTGACYTTK--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m198_AT2G21900</td>
+<td>AT2G21900</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>7</td>
+<td>10</td>
+<td>29</td>
+<td>-------mawwAGTCAAmr----------</td>
+<td>----------YKTTGACTWWTK-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m271_AT3G01970</td>
+<td>AT3G01970</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>7</td>
+<td>10</td>
+<td>29</td>
+<td>-------AAAAAGTCAAMG----------</td>
+<td>----------ckTTGACTTTtt-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m472_AT5G01900</td>
+<td>AT5G01900</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>10</td>
+<td>11</td>
+<td>29</td>
+<td>----------TRGTCAAM-----------</td>
+<td>-----------KTTGACYA----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m433_AT4G26640</td>
+<td>AT4G26640</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>8</td>
+<td>8</td>
+<td>29</td>
+<td>--------WWWRGTCAAMGBH--------</td>
+<td>--------dvCKTTGACywww--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m239_AT2G40740</td>
+<td>AT2G40740</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>9</td>
+<td>8</td>
+<td>29</td>
+<td>---------AAAGTCAACGCH--------</td>
+<td>--------dgCGTTGACTtt---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m529_AT5G24110</td>
+<td>AT5G24110</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>9</td>
+<td>9</td>
+<td>29</td>
+<td>---------aAAGTCAACGc---------</td>
+<td>---------GCGTTGACTTT---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m535_AT5G26170</td>
+<td>AT5G26170</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>6</td>
+<td>10</td>
+<td>29</td>
+<td>------WAAAAAGTCAAMR----------</td>
+<td>----------ykTTGACTTTTtw------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m209_AT2G25000</td>
+<td>AT2G25000</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>9</td>
+<td>9</td>
+<td>29</td>
+<td>---------vyGGTCAAmst---------</td>
+<td>---------ASKTTGACCRB---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m132_AT1G69310</td>
+<td>AT1G69310</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>9</td>
+<td>10</td>
+<td>29</td>
+<td>---------awrGTCAAmg----------</td>
+<td>----------CKTTGACYWT---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m547_AT5G41570</td>
+<td>AT5G41570</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>6</td>
+<td>9</td>
+<td>29</td>
+<td>------AAAAAAGTCAACGM---------</td>
+<td>---------kCGTTGACTTTttt------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m395_AT4G01720</td>
+<td>AT4G01720</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>6</td>
+<td>4</td>
+<td>29</td>
+<td>------AAMWWRGTCAACGMYWRTT----</td>
+<td>----aaywrkcGTTGACywwktt------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m396_AT4G04450</td>
+<td>AT4G04450</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>8</td>
+<td>0</td>
+<td>29</td>
+<td>--------MWWRGTCAACGMYRDKTMAAA</td>
+<td>tttkamhyrkcGTTGACywwk--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m266_AT2G47260</td>
+<td>AT2G47260</td>
+<td>cluster_3</td>
+<td>D</td>
+<td>11</td>
+<td>10</td>
+<td>29</td>
+<td>-----------RGTCAACG----------</td>
+<td>----------CGTTGACY-----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m183_AT2G04880</td>
+<td>AT2G04880</td>
+<td>cluster_3</td>
+<td>R</td>
+<td>6</td>
+<td>12</td>
+<td>29</td>
+<td>------RRCTCGGTCAA------------</td>
+<td>------------TTGACCGaGyy------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m112_AT1G60920</td>
+<td>AT1G60920</td>
+<td>cluster_4</td>
+<td>R</td>
+<td>4</td>
+<td>1</td>
+<td>11</td>
+<td>----TGGTGA-</td>
+<td>-TCACCA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m565_AT5G48670</td>
+<td>AT5G48670</td>
+<td>cluster_4</td>
+<td>D</td>
+<td>4</td>
+<td>1</td>
+<td>11</td>
+<td>----TGGTGA-</td>
+<td>-TCACCA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m53_AT1G25560</td>
+<td>AT1G25560</td>
+<td>cluster_4</td>
+<td>D</td>
+<td>2</td>
+<td>1</td>
+<td>11</td>
+<td>--wMTGTTGC-</td>
+<td>-GCAACAKW--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m128_AT1G68840</td>
+<td>AT1G68840</td>
+<td>cluster_4</td>
+<td>D</td>
+<td>2</td>
+<td>1</td>
+<td>11</td>
+<td>--kATGTTGC-</td>
+<td>-GCAACATM--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m332_AT3G25730</td>
+<td>AT3G25730</td>
+<td>cluster_4</td>
+<td>R</td>
+<td>2</td>
+<td>1</td>
+<td>11</td>
+<td>--TMTGTTGY-</td>
+<td>-rCAACAkA--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m582_AT5G58620</td>
+<td>AT5G58620</td>
+<td>cluster_4</td>
+<td>R</td>
+<td>4</td>
+<td>1</td>
+<td>11</td>
+<td>----TGTTGA-</td>
+<td>-TCAACA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m234_AT2G38880</td>
+<td>AT2G38880</td>
+<td>cluster_4</td>
+<td>R</td>
+<td>2</td>
+<td>0</td>
+<td>11</td>
+<td>--GWTGATGGA</td>
+<td>TCCATCAwc--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m596_AT5G62165</td>
+<td>AT5G62165</td>
+<td>cluster_4</td>
+<td>R</td>
+<td>2</td>
+<td>2</td>
+<td>11</td>
+<td>--RATGATG--</td>
+<td>--CATCATy--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m444_AT4G31610</td>
+<td>AT4G31610</td>
+<td>cluster_4</td>
+<td>R</td>
+<td>0</td>
+<td>1</td>
+<td>11</td>
+<td>DWGDTGTAGC-</td>
+<td>-gCTACAhCwh</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m59_AT1G28370</td>
+<td>AT1G28370</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---TGRCGGCGGMGGWGG------------</td>
+<td>------------ccwcCkCCGCCGyca---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m96_AT1G50640</td>
+<td>AT1G50640</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---ygrCGGCGGmGrhgg------------</td>
+<td>------------CCDYCKCCGCCGYCR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m161_AT1G77200</td>
+<td>AT1G77200</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>1</td>
+<td>15</td>
+<td>30</td>
+<td>-RWWWKTGTCGGYGR---------------</td>
+<td>---------------yCRCCGACAmwwwy-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m217_AT2G31220</td>
+<td>AT2G31220</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>1</td>
+<td>15</td>
+<td>30</td>
+<td>-rrwwkTGTCGGTGr---------------</td>
+<td>---------------YCACCGACAMWWYY-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m56_AT1G28160</td>
+<td>AT1G28160</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---ygrCGGCGGmGrhgg------------</td>
+<td>------------CCDYCKCCGCCGYCR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m83_AT1G43160</td>
+<td>AT1G43160</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---tkrCGGCGGmGghgg------------</td>
+<td>------------CCDCCKCCGCCGYMA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m221_AT2G33710</td>
+<td>AT2G33710</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---YKRCGGCGGMGGHGG------------</td>
+<td>------------ccdcCkCCGCCGymr---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m357_AT3G50260</td>
+<td>AT3G50260</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---TGKCGGTGGHGRTGG------------</td>
+<td>------------ccaycdcCACCGmCa---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m616_AT5G67190</td>
+<td>AT5G67190</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---TGKCGGTGRHGRYGR------------</td>
+<td>------------ycrycdyCACCGmCa---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m376_AT3G60490</td>
+<td>AT3G60490</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>1</td>
+<td>15</td>
+<td>30</td>
+<td>-rwwwkTGTCGGTGr---------------</td>
+<td>---------------YCACCGACAMWWWY-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m520_AT5G18560</td>
+<td>AT5G18560</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---HRRCGGCGGMGRHGG------------</td>
+<td>------------ccdyCkCCGCCGyyd---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m126_AT1G68550</td>
+<td>AT1G68550</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---YGRCGGCGGMGGHGG------------</td>
+<td>------------ccdcCkCCGCCGYcr---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m144_AT1G72360</td>
+<td>AT1G72360</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>6</td>
+<td>30</td>
+<td>---YGRHDRYGGCGGCGGMGRHGR------</td>
+<td>------ycdyckCCGCCGCCryhdycr---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m409_AT4G17490</td>
+<td>AT4G17490</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>6</td>
+<td>30</td>
+<td>---CKGYKRYGGCGGCGGMGRHGG------</td>
+<td>------ccdyckCCGCCGCCrymrcmg---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m560_AT5G47230</td>
+<td>AT5G47230</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---YGGCGGCGGCGGYGG------------</td>
+<td>------------ccrcCgCCGCCGCCr---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m85_AT1G44830</td>
+<td>AT1G44830</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---TGKCGGTGGMGGWGG------------</td>
+<td>------------ccwcCkCCACCGmCa---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m155_AT1G75490</td>
+<td>AT1G75490</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---WGGCGGYGGMGGYGG------------</td>
+<td>------------ccrcckCCRCCGcCw---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m606_AT5G65130</td>
+<td>AT5G65130</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---TGGCGGYGGHGGYGG------------</td>
+<td>------------ccrcCdCCrCCGCCa---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m46_AT1G21910</td>
+<td>AT1G21910</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>6</td>
+<td>30</td>
+<td>----GKCGGTGGHGGWGRWGGWGR------</td>
+<td>------ycwccwycwccdCCACCGmC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m436_AT4G28140</td>
+<td>AT4G28140</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>4</td>
+<td>6</td>
+<td>30</td>
+<td>----GdCGGyGgmgrhggyggygr------</td>
+<td>------YCRCCRCCDYCKCCRCCGHC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m434_AT4G27950</td>
+<td>AT4G27950</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>6</td>
+<td>30</td>
+<td>---CGGMGGHGGYGGCGGCGGMGG------</td>
+<td>------cckCCGCCGCCrCcdcckCcg---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m552_AT5G44210</td>
+<td>AT5G44210</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>6</td>
+<td>30</td>
+<td>---yggcggmkryGrCGGCGGmGr------</td>
+<td>------YCKCCGCCGYCRYMKCCGCCR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m40_AT1G19210</td>
+<td>AT1G19210</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>4</td>
+<td>12</td>
+<td>30</td>
+<td>----dtgGwCGGyGrhgr------------</td>
+<td>------------YCDYCRCCGWCCAH----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m81_AT1G36060</td>
+<td>AT1G36060</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>4</td>
+<td>12</td>
+<td>30</td>
+<td>----wtkGkCGGTGghgr------------</td>
+<td>------------YCDCCACCGMCMAW----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m237_AT2G40340</td>
+<td>AT2G40340</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>4</td>
+<td>5</td>
+<td>30</td>
+<td>----gGmGGyGghggyGGyGGtGGw-----</td>
+<td>-----WCCACCRCCRCCDCCRCCKCC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m531_AT5G25390</td>
+<td>AT5G25390</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>5</td>
+<td>30</td>
+<td>----GGCGGYGGHGGYGGCGGYGGW-----</td>
+<td>-----wCCrCCgCCrCCdCCrCCgCc----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m307_AT3G15210</td>
+<td>AT3G15210</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---WDRYGGCGGCGGMGR------------</td>
+<td>------------yCkCCGCCGCCryhw---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m324_AT3G23220</td>
+<td>AT3G23220</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---ygryGGCGGCGGmGg------------</td>
+<td>------------CCKCCGCCGCCRYCR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m25_AT1G12610</td>
+<td>AT1G12610</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---ygATGTCGrCrrmrr------------</td>
+<td>------------YYKYYGYCGACATCR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m430_AT4G25470</td>
+<td>AT4G25470</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---YKATGTCGGYRRARD------------</td>
+<td>------------hytyyrCCGACATmr---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m225_AT2G35700</td>
+<td>AT2G35700</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---TGTCGGYGrhgrhgr------------</td>
+<td>------------YCDYCDYCRCCGACA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m162_AT1G77640</td>
+<td>AT1G77640</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>4</td>
+<td>5</td>
+<td>30</td>
+<td>----grwggygrhdkTGtCGGTGgw-----</td>
+<td>-----WCCACCGACAMHDYCRCCWYC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m442_AT4G31060</td>
+<td>AT4G31060</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>6</td>
+<td>30</td>
+<td>----KKYGGYRRWDKTGTCGGTGG------</td>
+<td>------cCACCGaCAmhwyyrccrmm----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m249_AT2G44840</td>
+<td>AT2G44840</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>2</td>
+<td>13</td>
+<td>30</td>
+<td>--RWAAYGGCGGCKGAG-------------</td>
+<td>-------------ctcmGCCGCCrttwy--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m569_AT5G51190</td>
+<td>AT5G51190</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>2</td>
+<td>13</td>
+<td>30</td>
+<td>--ghrryGGCGGCGgmg-------------</td>
+<td>-------------CKCCGCCGCCRYYDC--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m151_AT1G74930</td>
+<td>AT1G74930</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>16</td>
+<td>30</td>
+<td>----TTGGTCGGYG----------------</td>
+<td>----------------crCCGACCAa----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m164_AT1G78080</td>
+<td>AT1G78080</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>16</td>
+<td>30</td>
+<td>----DWKGTCGGYG----------------</td>
+<td>----------------crCCGaCmwh----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m2_AT1G01250</td>
+<td>AT1G01250</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>1</td>
+<td>14</td>
+<td>30</td>
+<td>-rdwwkTGTCGGTGrh--------------</td>
+<td>--------------DYCACCGACAMWWHY-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m448_AT4G32800</td>
+<td>AT4G32800</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>1</td>
+<td>13</td>
+<td>30</td>
+<td>-RWWWKTGTCGGTGGHD-------------</td>
+<td>-------------hdcCACCGACAmwwwy-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m107_AT1G53910</td>
+<td>AT1G53910</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>6</td>
+<td>30</td>
+<td>---cgghgrwrryGGCGGCGgmgr------</td>
+<td>------YCKCCGCCGCCRYYWYCDCCG---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m315_AT3G20310</td>
+<td>AT3G20310</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>6</td>
+<td>30</td>
+<td>---TGRCGGCGGMGRHGGCGRHGR------</td>
+<td>------ycdycgccdyCkCCGCCGyca---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m559_AT5G47220</td>
+<td>AT5G47220</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>6</td>
+<td>30</td>
+<td>---YGRYGGCGGCGGHGGYGGHGG------</td>
+<td>------ccdccrccdcCGCCGCCrycr---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m250_AT2G44940</td>
+<td>AT2G44940</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---hwkTGTCGGTGrhrd------------</td>
+<td>------------HYDYCACCGACAMWD---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m311_AT3G16280</td>
+<td>AT3G16280</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>13</td>
+<td>30</td>
+<td>---wwkTGTCGGTGrhr-------------</td>
+<td>-------------YDYCACCGACAMWW---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m431_AT4G25480</td>
+<td>AT4G25480</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>13</td>
+<td>30</td>
+<td>---YKWTGTCGGYRRWR-------------</td>
+<td>-------------ywyyrCCGACawmr---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m571_AT5G51990</td>
+<td>AT5G51990</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>14</td>
+<td>30</td>
+<td>---ykAtGTCGGyrrm--------------</td>
+<td>--------------KYYRCCGACATMR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m49_AT1G22810</td>
+<td>AT1G22810</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>1</td>
+<td>14</td>
+<td>30</td>
+<td>-GgyggyGgCGGTGGh--------------</td>
+<td>--------------DCCACCGCCRCCRCC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m519_AT5G18450</td>
+<td>AT5G18450</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>1</td>
+<td>14</td>
+<td>30</td>
+<td>-ggyggarGCGGYGGm--------------</td>
+<td>--------------KCCRCCGCYTCCRCC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m572_AT5G52020</td>
+<td>AT5G52020</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---wwkTGTCGGCrrmrr------------</td>
+<td>------------YYKYYGCCGACAMWW---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m601_AT5G63090</td>
+<td>AT5G63090</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>5</td>
+<td>30</td>
+<td>----KGCGGCGGMGRHGGCGGMGGA-----</td>
+<td>-----tCCkCCGccdyckCCGCCGcm----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m205_AT2G23340</td>
+<td>AT2G23340</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>10</td>
+<td>30</td>
+<td>---wwwTGTCGGTGrhkrhr----------</td>
+<td>----------YDYMDYCACCGACAWWW---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m232_AT2G38340</td>
+<td>AT2G38340</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>10</td>
+<td>30</td>
+<td>---YWAWGKCGGTKDADRWR----------</td>
+<td>----------ywyhthmACCGMCwTwr---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m533_AT5G25810</td>
+<td>AT5G25810</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>2</td>
+<td>13</td>
+<td>30</td>
+<td>--DHWKTGTCGGYGRAR-------------</td>
+<td>-------------ytyCRCCGACAmwdh--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m8_AT1G03800</td>
+<td>AT1G03800</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>5</td>
+<td>30</td>
+<td>----DRYGGCGGCGGHGRMGGYGGW-----</td>
+<td>-----wccrcckycdcCGCCGCCryh----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m591_AT5G61600</td>
+<td>AT5G61600</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>7</td>
+<td>30</td>
+<td>----RRYGGCGGCGGMGRYGGYG-------</td>
+<td>-------crccryckcCGCCGCCryy----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m432_AT4G25490</td>
+<td>AT4G25490</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>14</td>
+<td>30</td>
+<td>----KATGTCGGYRRM--------------</td>
+<td>--------------kyyrCCGACatm----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m507_AT5G13910</td>
+<td>AT5G13910</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>5</td>
+<td>30</td>
+<td>----GGCGGYDGYGRCGGCGGMGGH-----</td>
+<td>-----dcCkCCGCCGycrchrccgcc----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m530_AT5G25190</td>
+<td>AT5G25190</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>6</td>
+<td>5</td>
+<td>30</td>
+<td>------cgghgghggCGGyGGmGgw-----</td>
+<td>-----WCCKCCRCCGCCDCCDCCG------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m111_AT1G59750</td>
+<td>AT1G59750</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>5</td>
+<td>17</td>
+<td>30</td>
+<td>-----WTGTCGGY-----------------</td>
+<td>-----------------RCCGACAw-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m115_AT1G63030</td>
+<td>AT1G63030</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>5</td>
+<td>17</td>
+<td>30</td>
+<td>-----ATGTCGGC-----------------</td>
+<td>-----------------GCCGACAT-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m218_AT2G31230</td>
+<td>AT2G31230</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>5</td>
+<td>10</td>
+<td>30</td>
+<td>-----RYGGCGGCKGHGGHG----------</td>
+<td>----------cdccdcMGCCGCCry-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m415_AT4G18450</td>
+<td>AT4G18450</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>5</td>
+<td>8</td>
+<td>30</td>
+<td>-----ryGGCGGCGGmggcggy--------</td>
+<td>--------RCCGCCKCCGCCGCCRY-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m43_AT1G19850</td>
+<td>AT1G19850</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>17</td>
+<td>30</td>
+<td>---WYTTGTCGGY-----------------</td>
+<td>-----------------rCCGACAArw---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m539_AT5G37020</td>
+<td>AT5G37020</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>4</td>
+<td>17</td>
+<td>30</td>
+<td>----hyTGTCGgm-----------------</td>
+<td>-----------------KCCGACARD----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m88_AT1G46768</td>
+<td>AT1G46768</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>5</td>
+<td>12</td>
+<td>30</td>
+<td>-----dtGkCGGYGghgr------------</td>
+<td>------------YCDCCRCCGMCAH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m452_AT4G34410</td>
+<td>AT4G34410</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>2</td>
+<td>13</td>
+<td>30</td>
+<td>--raaatkrCGGCGsmg-------------</td>
+<td>-------------CKSCGCCGYMATTTY--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m605_AT5G64750</td>
+<td>AT5G64750</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>4</td>
+<td>7</td>
+<td>30</td>
+<td>----ggcgradrtkrCGGCGGmG-------</td>
+<td>-------CKCCGCCGYMAYHTYCGCC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m407_AT4G16750</td>
+<td>AT4G16750</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>2</td>
+<td>13</td>
+<td>30</td>
+<td>--KYGTCGGYGRHGRHG-------------</td>
+<td>-------------cdycdyCrCCGaCrm--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m105_AT1G53170</td>
+<td>AT1G53170</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>11</td>
+<td>30</td>
+<td>----KRCGGCGGMGGHGRM-----------</td>
+<td>-----------kycdcCkCCGCCGym----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m594_AT5G62000</td>
+<td>AT5G62000</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>16</td>
+<td>30</td>
+<td>----YTTGTCKSHW----------------</td>
+<td>----------------wdsmGACAar----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m522_AT5G19790</td>
+<td>AT5G19790</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---MGMCGGCGRHGRMRG------------</td>
+<td>------------cykycdycGCCGkCk---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m140_AT1G71450</td>
+<td>AT1G71450</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>7</td>
+<td>30</td>
+<td>---YGRCGGYGRHGGYGGYGGWG-------</td>
+<td>-------cwcCrcCrcCdyCrCCGyCr---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m117_AT1G65620</td>
+<td>AT1G65620</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>3</td>
+<td>6</td>
+<td>30</td>
+<td>---CGSCGGMRRWKRCGGCGGMGR------</td>
+<td>------yckcCgCCGymwyykcCGsCG---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m215_AT2G30340</td>
+<td>AT2G30340</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>10</td>
+<td>30</td>
+<td>---cGsCGgarwwkrCGGcG----------</td>
+<td>----------CGCCGYMWWYTCCGSCG---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m490_AT5G07310</td>
+<td>AT5G07310</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>0</td>
+<td>15</td>
+<td>30</td>
+<td>CGGCGRYGRCGGCGG---------------</td>
+<td>---------------CCGCCGYcrycgCCg</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m293_AT3G11020</td>
+<td>AT3G11020</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>0</td>
+<td>9</td>
+<td>30</td>
+<td>wgrydrwGkCGGTGgwgrwrr---------</td>
+<td>---------YYWYCWCCACCGMCWYHRYCW</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m26_AT1G12630</td>
+<td>AT1G12630</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>2</td>
+<td>7</td>
+<td>30</td>
+<td>--KTGTCGGYRRMRRHRRYGRCR-------</td>
+<td>-------ygycryydyykyyrCCGACAm--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m398_AT4G06746</td>
+<td>AT4G06746</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>7</td>
+<td>30</td>
+<td>----WWKGTCGGTGRWDRTRRWR-------</td>
+<td>-------ywyyayhwyCACCGACmww----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m615_AT5G67000</td>
+<td>AT5G67000</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>3</td>
+<td>12</td>
+<td>30</td>
+<td>---CMDCMGCCGYRWHMR------------</td>
+<td>------------ykdwyrCGGCkGhkg---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m223_AT2G33860</td>
+<td>AT2G33860</td>
+<td>cluster_5</td>
+<td>D</td>
+<td>5</td>
+<td>15</td>
+<td>30</td>
+<td>-----tTGTCGGaah---------------</td>
+<td>---------------DTTCCGACAA-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m370_AT3G57600</td>
+<td>AT3G57600</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>4</td>
+<td>15</td>
+<td>30</td>
+<td>----GGCGGYGGMGG---------------</td>
+<td>---------------cCkCCRCCGCC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m325_AT3G23240</td>
+<td>AT3G23240</td>
+<td>cluster_5</td>
+<td>R</td>
+<td>2</td>
+<td>0</td>
+<td>30</td>
+<td>--RMGRCRGYDGYRRYGGCGGCKRWKRMRG</td>
+<td>cykymwymGCCGCCryyrchrcygycky--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m380_AT3G61150</td>
+<td>AT3G61150</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------KCATTAAWTRY-------</td>
+<td>-------ryAwTTAATGm----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m388_AT4G00730</td>
+<td>AT4G00730</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------gCATTAAwTry-------</td>
+<td>-------RYAWTTAATGC----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m65_AT1G30490</td>
+<td>AT1G30490</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>3</td>
+<td>28</td>
+<td>----------rTmATCATTAywwty---</td>
+<td>---RAWWRTAATGATKAY----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m101_AT1G52150</td>
+<td>AT1G52150</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>10</td>
+<td>3</td>
+<td>28</td>
+<td>----------RTMATCATTAYWWTY---</td>
+<td>---rawwrTAATGATkAy----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m268_AT3G01220</td>
+<td>AT3G01220</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------hyAATAATTra-------</td>
+<td>-------TYAATTATTRD----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m269_AT3G01470</td>
+<td>AT3G01470</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------wyAATAATTrw-------</td>
+<td>-------WYAATTATTRW----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m573_AT5G52170</td>
+<td>AT5G52170</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------DCATTAAWTRY-------</td>
+<td>-------ryAwTTAATGh----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m137_AT1G69780</td>
+<td>AT1G69780</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------tyAATAATTrw-------</td>
+<td>-------WYAATTATTRA----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m608_AT5G65310</td>
+<td>AT5G65310</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------yyAATmATTra-------</td>
+<td>-------TYAATKATTRR----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m191_AT2G18350</td>
+<td>AT2G18350</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>7</td>
+<td>6</td>
+<td>28</td>
+<td>-------WHAYTAATYAYDWTW------</td>
+<td>------wawhrTRATTArtdw-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m609_AT5G65410</td>
+<td>AT5G65410</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>7</td>
+<td>6</td>
+<td>28</td>
+<td>-------tmayTAATyAhgwww------</td>
+<td>------WWWCDTRATTARTKA-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m612_AT5G66700</td>
+<td>AT5G66700</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------mcAATAATTgw-------</td>
+<td>-------WCAATTATTGK----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m146_AT1G73360</td>
+<td>AT1G73360</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------kCATTwAwTry-------</td>
+<td>-------RYAWTWAATGM----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m382_AT3G61890</td>
+<td>AT3G61890</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>10</td>
+<td>8</td>
+<td>28</td>
+<td>----------YCAATCAWTM--------</td>
+<td>--------kawTgATTGr----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m408_AT4G17460</td>
+<td>AT4G17460</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>8</td>
+<td>28</td>
+<td>----------syAATCATkr--------</td>
+<td>--------YMATGATTRS----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m139_AT1G70920</td>
+<td>AT1G70920</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------yyAATyATTrk-------</td>
+<td>-------MYAATRATTRR----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m466_AT4G37790</td>
+<td>AT4G37790</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>9</td>
+<td>9</td>
+<td>28</td>
+<td>---------myyAATCATT---------</td>
+<td>---------AATGATTRRK---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m561_AT5G47370</td>
+<td>AT5G47370</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>9</td>
+<td>8</td>
+<td>28</td>
+<td>---------wyyAATCATtw--------</td>
+<td>--------WAATGATTRRW---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m177_AT2G02540</td>
+<td>AT2G02540</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>7</td>
+<td>7</td>
+<td>28</td>
+<td>-------rcamCAATwATTgr-------</td>
+<td>-------YCAATWATTGKTGY-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m262_AT2G46680</td>
+<td>AT2G46680</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>8</td>
+<td>7</td>
+<td>28</td>
+<td>--------AWYCAATCATTGA-------</td>
+<td>-------tcAATGATTGrwt--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m477_AT5G03790</td>
+<td>AT5G03790</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>9</td>
+<td>6</td>
+<td>28</td>
+<td>---------AHCAATAATTGAR------</td>
+<td>------yTcAATTATTGdt---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m131_AT1G69180</td>
+<td>AT1G69180</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>11</td>
+<td>9</td>
+<td>28</td>
+<td>-----------TWATCATW---------</td>
+<td>---------wATGATwA-----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m470_AT4G40060</td>
+<td>AT4G40060</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>11</td>
+<td>9</td>
+<td>28</td>
+<td>-----------TAATmATT---------</td>
+<td>---------AATKATTA-----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m153_AT1G75240</td>
+<td>AT1G75240</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>9</td>
+<td>8</td>
+<td>28</td>
+<td>---------RYTAATYAYRT--------</td>
+<td>--------ayrTrATTAry---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m276_AT3G03660</td>
+<td>AT3G03660</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>9</td>
+<td>8</td>
+<td>28</td>
+<td>---------AYTAATTAAYT--------</td>
+<td>--------ArTTAATTArt---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m200_AT2G22430</td>
+<td>AT2G22430</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>11</td>
+<td>6</td>
+<td>28</td>
+<td>-----------yAATmATthwy------</td>
+<td>------RWDAATKATTR-----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m251_AT2G45190</td>
+<td>AT2G45190</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>11</td>
+<td>7</td>
+<td>28</td>
+<td>-----------ywATmATAAt-------</td>
+<td>-------ATTATKATWR-----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m339_AT3G28920</td>
+<td>AT3G28920</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>2</td>
+<td>11</td>
+<td>28</td>
+<td>--wwwawthmyTAATyA-----------</td>
+<td>-----------TRATTARKDAWTWWW--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m544_AT5G39760</td>
+<td>AT5G39760</td>
+<td>cluster_6</td>
+<td>R</td>
+<td>0</td>
+<td>6</td>
+<td>28</td>
+<td>WWWTWWWTWAYTAATTAWDWWW------</td>
+<td>------wwwhwTAATTARtwawwwawww</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m187_AT2G17950</td>
+<td>AT2G17950</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>10</td>
+<td>7</td>
+<td>28</td>
+<td>----------TCAwTCAwTyA-------</td>
+<td>-------TRAWTGAWTGA----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m454_AT4G35550</td>
+<td>AT4G35550</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>8</td>
+<td>10</td>
+<td>28</td>
+<td>--------wrTCAATCAw----------</td>
+<td>----------WTGATTGAYW--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m459_AT4G36740</td>
+<td>AT4G36740</td>
+<td>cluster_6</td>
+<td>D</td>
+<td>7</td>
+<td>0</td>
+<td>28</td>
+<td>-------WWWWDWTTCAATWATTGGTKW</td>
+<td>wmacCAATwATTgaawhwwww-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m3_AT1G01260</td>
+<td>AT1G01260</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---rCACGTGC-</td>
+<td>-GCACGTGY---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m406_AT4G16430</td>
+<td>AT4G16430</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---rCACGTGy-</td>
+<td>-RCACGTGY---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m165_AT1G78700</td>
+<td>AT1G78700</td>
+<td>cluster_7</td>
+<td>R</td>
+<td>1</td>
+<td>0</td>
+<td>12</td>
+<td>-YCACACGTGYR</td>
+<td>yRCACGTGtgr-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m460_AT4G36780</td>
+<td>AT4G36780</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>1</td>
+<td>0</td>
+<td>12</td>
+<td>-yCaCACGTGyr</td>
+<td>YRCACGTGTGR-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m260_AT2G46510</td>
+<td>AT2G46510</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---GCACGTGC-</td>
+<td>-GCACGTGC---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m564_AT5G48560</td>
+<td>AT5G48560</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---GCACGTGC-</td>
+<td>-GCACGTGC---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m418_AT4G18890</td>
+<td>AT4G18890</td>
+<td>cluster_7</td>
+<td>R</td>
+<td>1</td>
+<td>0</td>
+<td>12</td>
+<td>-YCACACGTGYR</td>
+<td>yrCACGTGTgr-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m71_AT1G32640</td>
+<td>AT1G32640</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---rCACGTGy-</td>
+<td>-RCACGTGY---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m411_AT4G17880</td>
+<td>AT4G17880</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---rCACGTGC-</td>
+<td>-GCACGTGY---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m557_AT5G46760</td>
+<td>AT5G46760</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---vCACGTGb-</td>
+<td>-VCACGTGB---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m41_AT1G19350</td>
+<td>AT1G19350</td>
+<td>cluster_7</td>
+<td>R</td>
+<td>1</td>
+<td>0</td>
+<td>12</td>
+<td>-BSMCACGTGYG</td>
+<td>crCACGTGksv-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m247_AT2G43010</td>
+<td>AT2G43010</td>
+<td>cluster_7</td>
+<td>R</td>
+<td>2</td>
+<td>1</td>
+<td>12</td>
+<td>--GCCAYGTGA-</td>
+<td>-tCACRTGgc--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m462_AT4G36930</td>
+<td>AT4G36930</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>2</td>
+<td>1</td>
+<td>12</td>
+<td>--csCACGTGb-</td>
+<td>-VCACGTGSG--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m385_AT4G00050</td>
+<td>AT4G00050</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---cCACGTGm-</td>
+<td>-KCACGTGG---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m20_AT1G09530</td>
+<td>AT1G09530</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>1</td>
+<td>1</td>
+<td>12</td>
+<td>-dgCCACGTGr-</td>
+<td>-YCACGTGGCH-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m458_AT4G36730</td>
+<td>AT4G36730</td>
+<td>cluster_7</td>
+<td>R</td>
+<td>1</td>
+<td>1</td>
+<td>12</td>
+<td>-KKMCACGTSR-</td>
+<td>-ysACGTGkmm-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m206_AT2G24260</td>
+<td>AT2G24260</td>
+<td>cluster_7</td>
+<td>R</td>
+<td>2</td>
+<td>0</td>
+<td>12</td>
+<td>--HSCACGTGSD</td>
+<td>hsCACGTGsd--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m401_AT4G14410</td>
+<td>AT4G14410</td>
+<td>cluster_7</td>
+<td>R</td>
+<td>2</td>
+<td>0</td>
+<td>12</td>
+<td>--GGCACGTGCC</td>
+<td>GGCACGTGCC--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m374_AT3G59060</td>
+<td>AT3G59060</td>
+<td>cluster_7</td>
+<td>R</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---SCAYGTGR-</td>
+<td>-YCACRTGs---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m190_AT2G18300</td>
+<td>AT2G18300</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>12</td>
+<td>cgkGCACGTGct</td>
+<td>AGCACGTGCMCG</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m451_AT4G34000</td>
+<td>AT4G34000</td>
+<td>cluster_7</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>12</td>
+<td>---ACACGTGT-</td>
+<td>-ACACGTGT---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m9_AT1G03840</td>
+<td>AT1G03840</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>8</td>
+<td>6</td>
+<td>34</td>
+<td>--------hasaAAAmGACAAAAawaww------</td>
+<td>------WWTWTTTTTGTCKTTTTSTD--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m476_AT5G03150</td>
+<td>AT5G03150</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>8</td>
+<td>6</td>
+<td>34</td>
+<td>--------MASAAAAMGACAAAAAWWWW------</td>
+<td>------wwwwtTTTTGTCkTTTTstk--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m261_AT2G46590</td>
+<td>AT2G46590</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>18</td>
+<td>5</td>
+<td>34</td>
+<td>------------------sAAAAAGkdra-----</td>
+<td>-----TYHMCTTTTTS------------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m602_AT5G63260</td>
+<td>AT5G63260</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>18</td>
+<td>5</td>
+<td>34</td>
+<td>------------------sAWAAAGKdra-----</td>
+<td>-----TYHMCTTTWTS------------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m30_AT1G14580</td>
+<td>AT1G14580</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>8</td>
+<td>6</td>
+<td>34</td>
+<td>--------MRSWAAACGACAAAAAWAWW------</td>
+<td>------wwtwtTTTTGTCgTTTWsYk--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m175_AT2G02080</td>
+<td>AT2G02080</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>8</td>
+<td>9</td>
+<td>34</td>
+<td>--------mAsAAAAmGACAAAAww---------</td>
+<td>---------WWTTTTGTCKTTTTSTK--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m613_AT5G66730</td>
+<td>AT5G66730</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>8</td>
+<td>9</td>
+<td>34</td>
+<td>--------hasAAAAmGACAAAAaw---------</td>
+<td>---------WTTTTTGTCKTTTTSTD--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m362_AT3G52440</td>
+<td>AT3G52440</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>18</td>
+<td>5</td>
+<td>34</td>
+<td>------------------TTHMCTTTWTS-----</td>
+<td>-----sAwAAAGkdaa------------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m213_AT2G28810</td>
+<td>AT2G28810</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>6</td>
+<td>7</td>
+<td>34</td>
+<td>------VAAAAAGTWAAAAAAAAARAA-------</td>
+<td>-------ttyttttttttTwaCTTTTTb------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m474_AT5G02460</td>
+<td>AT5G02460</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>6</td>
+<td>7</td>
+<td>34</td>
+<td>------aAAAAAGwaAAaaraaaaara-------</td>
+<td>-------TYTTTTTYTTTTTWCTTTTTT------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m61_AT1G29160</td>
+<td>AT1G29160</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>10</td>
+<td>3</td>
+<td>34</td>
+<td>----------aaaaaaaarAAAAAGtraaaa---</td>
+<td>---TTTTYACTTTTTYTTTTTTTT----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m600_AT5G62940</td>
+<td>AT5G62940</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>10</td>
+<td>3</td>
+<td>34</td>
+<td>----------raaaaaarrAAAAAGtwrawa---</td>
+<td>---TWTYWACTTTTTYYTTTTTTY----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m116_AT1G64620</td>
+<td>AT1G64620</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>12</td>
+<td>3</td>
+<td>34</td>
+<td>------------wwaaaamAAAAAGkwaaww---</td>
+<td>---WWTTWMCTTTTTKTTTTWW------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m348_AT3G47500</td>
+<td>AT3G47500</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>12</td>
+<td>3</td>
+<td>34</td>
+<td>------------aaaaargAAAAAGtraaaa---</td>
+<td>---TTTTYACTTTTTCYTTTTT------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m109_AT1G55110</td>
+<td>AT1G55110</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>8</td>
+<td>8</td>
+<td>34</td>
+<td>--------mrsAAAAcGACAAAAawa--------</td>
+<td>--------TWTTTTTGTCGTTTTSYK--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m174_AT2G02070</td>
+<td>AT2G02070</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>8</td>
+<td>10</td>
+<td>34</td>
+<td>--------CRSWAAACGACAAAAW----------</td>
+<td>----------wTTTTGTCGTTTwsyg--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m359_AT3G50700</td>
+<td>AT3G50700</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>8</td>
+<td>11</td>
+<td>34</td>
+<td>--------hRswAAAMGACAAAA-----------</td>
+<td>-----------TTTTGTCKTTTWSYD--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m229_AT2G37590</td>
+<td>AT2G37590</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>18</td>
+<td>1</td>
+<td>34</td>
+<td>------------------MAAAAAGTWAAAWWW-</td>
+<td>-wwwtTTwaCTTTTTk------------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m588_AT5G60850</td>
+<td>AT5G60850</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>18</td>
+<td>2</td>
+<td>34</td>
+<td>------------------sAAAAAGkwaawww--</td>
+<td>--WWWTTWMCTTTTTS------------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m170_AT2G01570</td>
+<td>AT2G01570</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>8</td>
+<td>6</td>
+<td>34</td>
+<td>--------vAgAaaraGAsAAArraarr------</td>
+<td>------YYTTYYTTTSTCTYTTTCTB--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m358_AT3G50410</td>
+<td>AT3G50410</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>7</td>
+<td>6</td>
+<td>34</td>
+<td>-------AAAAAGYWRAAAAARARRRAA------</td>
+<td>------ttyyytytttttywrCTTTTt-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m344_AT3G45610</td>
+<td>AT3G45610</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>10</td>
+<td>5</td>
+<td>34</td>
+<td>----------AAAAAARRSAAAAAGTWRA-----</td>
+<td>-----tywaCTTTTTsyytttttt----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m366_AT3G55370</td>
+<td>AT3G55370</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>8</td>
+<td>5</td>
+<td>34</td>
+<td>--------AAAAAAAARRRAAAAAGWAAA-----</td>
+<td>-----tTtwCTTTTtyyytTTttttt--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m89_AT1G47655</td>
+<td>AT1G47655</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>17</td>
+<td>6</td>
+<td>34</td>
+<td>-----------------rsawAAAGTrr------</td>
+<td>------YYACTTTWTSY-----------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m543_AT5G39660</td>
+<td>AT5G39660</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>18</td>
+<td>6</td>
+<td>34</td>
+<td>------------------maWAAAGyrh------</td>
+<td>------DYRCTTTWTK------------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m255_AT2G45660</td>
+<td>AT2G45660</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>7</td>
+<td>6</td>
+<td>34</td>
+<td>-------ARARARARARARAARRARARR------</td>
+<td>------yyTytyYtTyTyTyTyTyTyt-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m515_AT5G17430</td>
+<td>AT5G17430</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>8</td>
+<td>6</td>
+<td>34</td>
+<td>--------aadrAarArARrrArArArr------</td>
+<td>------YYTYTYTYYYTYTYTTYHTT--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m303_AT3G13810</td>
+<td>AT3G13810</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>9</td>
+<td>4</td>
+<td>34</td>
+<td>---------ARAAAAMGACAAAAAWAAAAA----</td>
+<td>----tttttwttTTTGTCkTtTtyt---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m421_AT4G21040</td>
+<td>AT4G21040</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>19</td>
+<td>1</td>
+<td>34</td>
+<td>-------------------AWAAAGWRGCTTTW-</td>
+<td>-wAAAGcywCTTTwt-------------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m422_AT4G21080</td>
+<td>AT4G21080</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>18</td>
+<td>2</td>
+<td>34</td>
+<td>------------------rawAAAGtwrcTTT--</td>
+<td>--AAAGYWACTTTWTY------------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m100_AT1G51700</td>
+<td>AT1G51700</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>13</td>
+<td>0</td>
+<td>34</td>
+<td>-------------aaaaaraAAAAGtaraaaawr</td>
+<td>YWTTTTYTACTTTTTYTTTTT-------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m420_AT4G21030</td>
+<td>AT4G21030</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>14</td>
+<td>1</td>
+<td>34</td>
+<td>--------------aaaarAAAAAGGyaaaaaa-</td>
+<td>-TTTTTTRCCTTTTTYTTTT--------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m296_AT3G12130</td>
+<td>AT3G12130</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>15</td>
+<td>5</td>
+<td>34</td>
+<td>---------------TYWMCTTTTTSWTT-----</td>
+<td>-----aawsAAAAAGkwra---------------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m467_AT4G38000</td>
+<td>AT4G38000</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>6</td>
+<td>0</td>
+<td>34</td>
+<td>------WAAAAAGWWAAAAAAAAAAAAWAAAAAW</td>
+<td>wtttttwtttttttttttTwwCTTTTTw------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m173_AT2G01940</td>
+<td>AT2G01940</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>9</td>
+<td>10</td>
+<td>34</td>
+<td>---------WTTTTGTCTTWTTYT----------</td>
+<td>----------araAwAAGACAAAAw---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m135_AT1G69570</td>
+<td>AT1G69570</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>4</td>
+<td>3</td>
+<td>34</td>
+<td>----WAAAAAAAAAAAARRAAAAAGTRAAAA---</td>
+<td>---ttttyaCTTTTtyyTTTtttttttttw----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m614_AT5G66940</td>
+<td>AT5G66940</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>0</td>
+<td>5</td>
+<td>34</td>
+<td>WAAAAAAAAAAAGTAAAAARAAAAAAAAW-----</td>
+<td>-----wttttttttytTTTtaCTTTTtttttttw</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m92_AT1G49480</td>
+<td>AT1G49480</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>9</td>
+<td>10</td>
+<td>34</td>
+<td>---------TTTTTTTTTTTTKTY----------</td>
+<td>----------ramAAAAAAAAAaAa---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m587_AT5G60130</td>
+<td>AT5G60130</td>
+<td>cluster_8</td>
+<td>D</td>
+<td>10</td>
+<td>5</td>
+<td>34</td>
+<td>----------AAGcAAAwwmtAAGsAAAw-----</td>
+<td>-----WTTTSCTTAKWWTTTGCTT----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m427_AT4G24020</td>
+<td>AT4G24020</td>
+<td>cluster_8</td>
+<td>R</td>
+<td>8</td>
+<td>11</td>
+<td>34</td>
+<td>--------HYYSAARRGYCAWWW-----------</td>
+<td>-----------wwwTGrCyyTTsrrd--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m285_AT3G09735</td>
+<td>AT3G09735</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>20</td>
+<td>---rGAAgmTTCTAGAAr--</td>
+<td>--YTTCTAGAAKCTTCY---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m322_AT3G22830</td>
+<td>AT3G22830</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>20</td>
+<td>---rGAAsmTTCTAGAAg--</td>
+<td>--CTTCTAGAAKSTTCY---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m195_AT2G20400</td>
+<td>AT2G20400</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>1</td>
+<td>4</td>
+<td>20</td>
+<td>-aarGAATATTCbrww----</td>
+<td>----WWYVGAATATTCYTT-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m538_AT5G29000</td>
+<td>AT5G29000</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>1</td>
+<td>4</td>
+<td>20</td>
+<td>-aarGAATATTCbaww----</td>
+<td>----WWTVGAATATTCYTT-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m87_AT1G46264</td>
+<td>AT1G46264</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>20</td>
+<td>---AGAAgcTTCTAGAAg--</td>
+<td>--CTTCTAGAAGCTTCT---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m513_AT5G16820</td>
+<td>AT5G16820</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>4</td>
+<td>4</td>
+<td>20</td>
+<td>----GAAgcTTCTAGA----</td>
+<td>----TCTAGAAGCTTC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m595_AT5G62020</td>
+<td>AT5G62020</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>4</td>
+<td>4</td>
+<td>20</td>
+<td>----GAAgcTTCyAGA----</td>
+<td>----TCTRGAAGCTTC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m277_AT3G04030</td>
+<td>AT3G04030</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>2</td>
+<td>4</td>
+<td>20</td>
+<td>--AARAAKATTCYHTT----</td>
+<td>----aadrGAATmTTytt--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m554_AT5G45580</td>
+<td>AT5G45580</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>2</td>
+<td>4</td>
+<td>20</td>
+<td>--WRRAAKATTCYTTT----</td>
+<td>----aaarGAATmTTyyw--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m52_AT1G25550</td>
+<td>AT1G25550</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>3</td>
+<td>6</td>
+<td>20</td>
+<td>---rGAATmTTcwd------</td>
+<td>------HWGAAKATTCY---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m463_AT4G37180</td>
+<td>AT4G37180</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>3</td>
+<td>6</td>
+<td>20</td>
+<td>---RGAATCTTYTD------</td>
+<td>------harAAGATTCy---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m240_AT2G41690</td>
+<td>AT2G41690</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>3</td>
+<td>2</td>
+<td>20</td>
+<td>---RGAAGMTTCTAGAAG--</td>
+<td>--cTTCTAGAakcTTcy---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m69_AT1G32240</td>
+<td>AT1G32240</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>1</td>
+<td>4</td>
+<td>20</td>
+<td>-ARAGAATATTCTWAW----</td>
+<td>----wtwagaATATTCTyt-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m274_AT3G02990</td>
+<td>AT3G02990</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>3</td>
+<td>4</td>
+<td>20</td>
+<td>---rGAAgcTTCTAGA----</td>
+<td>----TCTAGAAGCTTCY---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m400_AT4G11660</td>
+<td>AT4G11660</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>3</td>
+<td>3</td>
+<td>20</td>
+<td>---AGAAGCTTCTAGAA---</td>
+<td>---TTCTAGAAgcTTCt---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m330_AT3G24520</td>
+<td>AT3G24520</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>4</td>
+<td>5</td>
+<td>20</td>
+<td>----GAAGCTTCTAG-----</td>
+<td>-----CTAGAAgcTTC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m169_AT2G01060</td>
+<td>AT2G01060</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>3</td>
+<td>4</td>
+<td>20</td>
+<td>---RGAATATTCYTTT----</td>
+<td>----aaarGAATATTCy---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m299_AT3G12730</td>
+<td>AT3G12730</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>3</td>
+<td>3</td>
+<td>20</td>
+<td>---RGAATATTCYYTTT---</td>
+<td>---aaArrGAATATTCy---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m180_AT2G03500</td>
+<td>AT2G03500</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>3</td>
+<td>6</td>
+<td>20</td>
+<td>---rGAATATtCyr------</td>
+<td>------YRGAATATTCY---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m236_AT2G40260</td>
+<td>AT2G40260</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>1</td>
+<td>4</td>
+<td>20</td>
+<td>-twwwwAyATTCyyTt----</td>
+<td>----AARRGAATRTWWWWA-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m93_AT1G49560</td>
+<td>AT1G49560</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>4</td>
+<td>5</td>
+<td>20</td>
+<td>----GAATCTTTGAT-----</td>
+<td>-----ATcaaAGATTC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m127_AT1G68670</td>
+<td>AT1G68670</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>4</td>
+<td>3</td>
+<td>20</td>
+<td>----GAATCTTTGATTC---</td>
+<td>---gaATcaaAGATTC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m28_AT1G13300</td>
+<td>AT1G13300</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>3</td>
+<td>2</td>
+<td>20</td>
+<td>---RGAATMTTCGATWCT--</td>
+<td>--agwatcgAAkATTCy---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m551_AT5G43840</td>
+<td>AT5G43840</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>4</td>
+<td>0</td>
+<td>20</td>
+<td>----GAAgmTTCTAGAAgmw</td>
+<td>WKCTTCTAGAAKCTTC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m417_AT4G18880</td>
+<td>AT4G18880</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>0</td>
+<td>1</td>
+<td>20</td>
+<td>tcwaGAAgcTTCTAGAAgm-</td>
+<td>-KCTTCTAGAAGCTTCTWGA</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m231_AT2G38300</td>
+<td>AT2G38300</td>
+<td>cluster_9</td>
+<td>R</td>
+<td>5</td>
+<td>4</td>
+<td>20</td>
+<td>-----AAHATTCYYTT----</td>
+<td>----aArrGAATdTt-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m549_AT5G42630</td>
+<td>AT5G42630</td>
+<td>cluster_9</td>
+<td>D</td>
+<td>4</td>
+<td>8</td>
+<td>20</td>
+<td>----GAATATTC--------</td>
+<td>--------GAATATTC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m447_AT4G32730</td>
+<td>AT4G32730</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>1</td>
+<td>8</td>
+<td>24</td>
+<td>-wwwwwTdACCGTTrr--------</td>
+<td>--------YYAACGGTHAWWWWW-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m502_AT5G11510</td>
+<td>AT5G11510</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>1</td>
+<td>8</td>
+<td>24</td>
+<td>-wwwwaTrrCCGTTrr--------</td>
+<td>--------YYAACGGYYATWWWW-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m210_AT2G26960</td>
+<td>AT2G26960</td>
+<td>cluster_10</td>
+<td>R</td>
+<td>5</td>
+<td>8</td>
+<td>24</td>
+<td>-----RAWWCGGTTAS--------</td>
+<td>--------sTAACcGwwTy-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m485_AT5G06100</td>
+<td>AT5G06100</td>
+<td>cluster_10</td>
+<td>R</td>
+<td>5</td>
+<td>8</td>
+<td>24</td>
+<td>-----DWKWCRGTTAT--------</td>
+<td>--------aTAACyGwmwh-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m119_AT1G66370</td>
+<td>AT1G66370</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>5</td>
+<td>8</td>
+<td>24</td>
+<td>-----wAkTymGTTAt--------</td>
+<td>--------ATAACKRAMTW-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m34_AT1G17950</td>
+<td>AT1G17950</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>4</td>
+<td>9</td>
+<td>24</td>
+<td>----ydwwACCGTTA---------</td>
+<td>---------TAACGGTWWHR----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m464_AT4G37260</td>
+<td>AT4G37260</td>
+<td>cluster_10</td>
+<td>R</td>
+<td>4</td>
+<td>9</td>
+<td>24</td>
+<td>----WWWTWCVGTTA---------</td>
+<td>---------TAACbGwawww----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m203_AT2G23290</td>
+<td>AT2G23290</td>
+<td>cluster_10</td>
+<td>R</td>
+<td>1</td>
+<td>9</td>
+<td>24</td>
+<td>-RGTTWWTWCSGTTA---------</td>
+<td>---------tAACsGwawwAAcy-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m356_AT3G50060</td>
+<td>AT3G50060</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>0</td>
+<td>9</td>
+<td>24</td>
+<td>ydrwwwwdaCsGTTA---------</td>
+<td>---------TAACSGTHWWWWYHR</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m473_AT5G02320</td>
+<td>AT5G02320</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>0</td>
+<td>9</td>
+<td>24</td>
+<td>aawwwwTdRCCGTTr---------</td>
+<td>---------YAACGGYHAWWWWTT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m219_AT2G32460</td>
+<td>AT2G32460</td>
+<td>cluster_10</td>
+<td>R</td>
+<td>5</td>
+<td>4</td>
+<td>24</td>
+<td>-----RWTWCGGTTWYRKTT----</td>
+<td>----aamyrwAACCGwawy-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m295_AT3G11440</td>
+<td>AT3G11440</td>
+<td>cluster_10</td>
+<td>R</td>
+<td>6</td>
+<td>5</td>
+<td>24</td>
+<td>------WKDCGGTTAYRRT-----</td>
+<td>-----ayyrTAACcGhmw------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m283_AT3G09230</td>
+<td>AT3G09230</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>5</td>
+<td>0</td>
+<td>24</td>
+<td>-----dtwaCsGTTwwwdhtsttd</td>
+<td>HAASADHWWWAACSGTWAH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m617_AT5G67300</td>
+<td>AT5G67300</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>5</td>
+<td>0</td>
+<td>24</td>
+<td>-----dwdwCvGTTwwwwCvGTTr</td>
+<td>YAACBGWWWWAACBGWHWH-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m134_AT1G69560</td>
+<td>AT1G69560</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>2</td>
+<td>9</td>
+<td>24</td>
+<td>--wthwwwACCGTTA---------</td>
+<td>---------TAACGGTWWWDAW--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m516_AT5G17800</td>
+<td>AT5G17800</td>
+<td>cluster_10</td>
+<td>R</td>
+<td>5</td>
+<td>4</td>
+<td>24</td>
+<td>-----AWWWCCGTTATTWWW----</td>
+<td>----wwwaaTAACGGwwwt-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m416_AT4G18770</td>
+<td>AT4G18770</td>
+<td>cluster_10</td>
+<td>R</td>
+<td>6</td>
+<td>3</td>
+<td>24</td>
+<td>------YWWMCGTTACWWWWW---</td>
+<td>---wwwwwGTAACGkwwr------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m583_AT5G58850</td>
+<td>AT5G58850</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>6</td>
+<td>7</td>
+<td>24</td>
+<td>------yrwmCGTTACr-------</td>
+<td>-------YGTAACGKWYR------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m337_AT3G27785</td>
+<td>AT3G27785</td>
+<td>cluster_10</td>
+<td>D</td>
+<td>2</td>
+<td>5</td>
+<td>24</td>
+<td>--awwwyrwmCGTTACrww-----</td>
+<td>-----WWYGTAACGKWYRWWWT--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m167_AT1G79580</td>
+<td>AT1G79580</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>2</td>
+<td>26</td>
+<td>---TTRCKTGWDWYWYAMGYWAYC--</td>
+<td>--grTwrCKTrwrwhwcAMGyaA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m399_AT4G10350</td>
+<td>AT4G10350</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>2</td>
+<td>26</td>
+<td>---TTRCKTGWWWTWYAMGYWAYC--</td>
+<td>--grTwrCKTrwawwwcAMGyAA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m437_AT4G28500</td>
+<td>AT4G28500</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----WRCKTRWRGAWSAAG-------</td>
+<td>-------CTTswtcywyAmGyw----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m439_AT4G29230</td>
+<td>AT4G29230</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----ArCkTgwwgawsAAG-------</td>
+<td>-------CTTSWTCWWCAMGYT----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m60_AT1G28470</td>
+<td>AT1G28470</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----wrCkTrwdgawsAMG-------</td>
+<td>-------CKTSWTCHWYAMGYW----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m598_AT5G62380</td>
+<td>AT5G62380</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>26</td>
+<td>---TTGCKTgwwwttyAmGywWyc--</td>
+<td>--GRWWRCKTRAAWWWCAMGCAA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m24_AT1G12260</td>
+<td>AT1G12260</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----TGCKTRWWTTTYAMG-------</td>
+<td>-------CkTraaawwyAmGCA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m456_AT4G36160</td>
+<td>AT4G36160</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----TRCKTGWDTTTYAMG-------</td>
+<td>-------CkTraaahwcAmGYA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m275_AT3G03200</td>
+<td>AT3G03200</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>7</td>
+<td>26</td>
+<td>---TTRCTTSWWCYWCAMG-------</td>
+<td>-------CkTGwrgwwsAAGyAA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m306_AT3G15170</td>
+<td>AT3G15170</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>7</td>
+<td>26</td>
+<td>---TTACKTGTTYHACAMG-------</td>
+<td>-------CkTGtdraacAMGtaA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m505_AT5G13180</td>
+<td>AT5G13180</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>4</td>
+<td>26</td>
+<td>---TWRCGTRWAWWACAMGYAA----</td>
+<td>----TTrCkTgtwwtwyACGywA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m518_AT5G18270</td>
+<td>AT5G18270</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>4</td>
+<td>26</td>
+<td>---TwrCKTGtrrmaCAmGtwA----</td>
+<td>----TWACKTGTKYYACAMGYWA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m556_AT5G46590</td>
+<td>AT5G46590</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>7</td>
+<td>26</td>
+<td>---TTRCTTSWTYYTYAMG-------</td>
+<td>-------CKTrarrawsAAGyAA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m611_AT5G66300</td>
+<td>AT5G66300</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>7</td>
+<td>26</td>
+<td>---TTGCTTSWWYTTYAMG-------</td>
+<td>-------CkTraarwwsAAGCAA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m118_AT1G65910</td>
+<td>AT1G65910</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>7</td>
+<td>26</td>
+<td>---TWRCKTGHRRMASAAG-------</td>
+<td>-------CTTstkyydCAmGywA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m314_AT3G18400</td>
+<td>AT3G18400</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>7</td>
+<td>26</td>
+<td>---TWRCKTGTKKYACAMG-------</td>
+<td>-------CkTGtrmmaCAmGywA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m288_AT3G10480</td>
+<td>AT3G10480</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>7</td>
+<td>26</td>
+<td>---TWACKTGYDWYRCAAG-------</td>
+<td>-------CTTGyrwhrCAMGtwA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m75_AT1G34180</td>
+<td>AT1G34180</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----TVCKTGTKCYSCAMG-------</td>
+<td>-------CkTGsrgmaCAmGba----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m542_AT5G39610</td>
+<td>AT5G39610</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----WRCKTGTKBTACAMG-------</td>
+<td>-------CkTGtavmACAmGyw----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m73_AT1G32870</td>
+<td>AT1G32870</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>7</td>
+<td>26</td>
+<td>---TTRCTTGYTCYSCAAG-------</td>
+<td>-------CTTGsrgarCAAGyaA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m108_AT1G54330</td>
+<td>AT1G54330</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>26</td>
+<td>---GRTWRCKTGTDRAACAMGYAA--</td>
+<td>--TTrCKTGttyhaCAmGywAyc---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m76_AT1G34190</td>
+<td>AT1G34190</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>0</td>
+<td>7</td>
+<td>26</td>
+<td>adkTTwCTTGbwsmaCAmG-------</td>
+<td>-------CKTGTKSWVCAAGWAAMHT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m576_AT5G53950</td>
+<td>AT5G53950</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>0</td>
+<td>7</td>
+<td>26</td>
+<td>MGDTTRCKTGTWYHACAMG-------</td>
+<td>-------CKTGtdrwaCAmGyaAhck</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m207_AT2G24430</td>
+<td>AT2G24430</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>5</td>
+<td>26</td>
+<td>---WWCKTGTWMHACAMGYWA-----</td>
+<td>-----TwrCkTGtdkwacAmGww---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m278_AT3G04060</td>
+<td>AT3G04060</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>26</td>
+<td>---TwrCKTGtrrmACAmGyaAhc--</td>
+<td>--GDTTRCKTGTKYYACAMGYWA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m491_AT5G07680</td>
+<td>AT5G07680</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>2</td>
+<td>3</td>
+<td>26</td>
+<td>--rTwrCKTGtrkaacAmGtaAh---</td>
+<td>---DTTACKTGTTMYACAMGYWAY--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m412_AT4G17980</td>
+<td>AT4G17980</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----TrCkTGarrawsAAG-------</td>
+<td>-------CTTSWTYYTCAMGYA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m39_AT1G19040</td>
+<td>AT1G19040</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>7</td>
+<td>26</td>
+<td>---wwrCTTGsrgmrCAAG-------</td>
+<td>-------CTTGYKCYSCAAGYWW---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m353_AT3G49530</td>
+<td>AT3G49530</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----TMCTTMATMRSYAAG-------</td>
+<td>-------CTTrsykatkAAGkA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m393_AT4G01550</td>
+<td>AT4G01550</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----wmCTTsTtyaayAAG-------</td>
+<td>-------CTTRTTRAASAAGKW----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m6_AT1G02230</td>
+<td>AT1G02230</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>6</td>
+<td>6</td>
+<td>26</td>
+<td>------CTTsYtywryAAGt------</td>
+<td>------ACTTRYWRARSAAG------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m392_AT4G01540</td>
+<td>AT4G01540</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>5</td>
+<td>6</td>
+<td>26</td>
+<td>-----aCTTsttymhyAAGT------</td>
+<td>------ACTTRDKRAASAAGT-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m70_AT1G32510</td>
+<td>AT1G32510</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>2</td>
+<td>3</td>
+<td>26</td>
+<td>--rTwrCTTGyrdywsAAGcAAc---</td>
+<td>---GTTGCTTSWRHYRCAAGYWAY--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m289_AT3G10490</td>
+<td>AT3G10490</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>3</td>
+<td>26</td>
+<td>---TWRCKTGYKKBCCAAGAAAC---</td>
+<td>---gTttCTTGgvmmrCAmGywA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m290_AT3G10500</td>
+<td>AT3G10500</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>6</td>
+<td>26</td>
+<td>---TTtCTTGkrgarCAAGw------</td>
+<td>------WCTTGYTCYMCAAGAAA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m310_AT3G15510</td>
+<td>AT3G15510</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>2</td>
+<td>7</td>
+<td>26</td>
+<td>--GTTTCTTGYRSAACAAG-------</td>
+<td>-------CTTGttsyrCAAGaAAc--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m301_AT3G12910</td>
+<td>AT3G12910</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>6</td>
+<td>26</td>
+<td>---yGsCGKrradwygmCGk------</td>
+<td>------MCGKCRWHTYYMCGSCR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m545_AT5G39820</td>
+<td>AT5G39820</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>5</td>
+<td>26</td>
+<td>---ygCCGTrwyytycACGby-----</td>
+<td>-----RVCGTGRARRWYACGGCR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m313_AT3G17730</td>
+<td>AT3G17730</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>4</td>
+<td>5</td>
+<td>26</td>
+<td>----TRCKTGTDMYACAMGYW-----</td>
+<td>-----wrCkTGtrkhaCAMGyA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m102_AT1G52880</td>
+<td>AT1G52880</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>4</td>
+<td>26</td>
+<td>---TKACGTRTWWWWYACGHWW----</td>
+<td>----wwdCgtrwwwwayACGtmA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m309_AT3G15500</td>
+<td>AT3G15500</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>1</td>
+<td>4</td>
+<td>26</td>
+<td>-RRWKMCGTRWWDWAYWHGAMW----</td>
+<td>----wktcdwrtwhwwYACGkmWyy-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m246_AT2G43000</td>
+<td>AT2G43000</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>3</td>
+<td>26</td>
+<td>---RYRRCGKRRADDWYACGGCR---</td>
+<td>---ygCCGTrwhhtyymCGyyry---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m156_AT1G76420</td>
+<td>AT1G76420</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>5</td>
+<td>3</td>
+<td>26</td>
+<td>-----RTTRCKTGTTYYWYACGY---</td>
+<td>---rCGTRwrraACAmGyaAy-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m188_AT2G18060</td>
+<td>AT2G18060</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>6</td>
+<td>7</td>
+<td>26</td>
+<td>------CkTgwwwtwyAmG-------</td>
+<td>-------CKTRWAWWWCAMG------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m7_AT1G02250</td>
+<td>AT1G02250</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>4</td>
+<td>26</td>
+<td>---TwrCTTsttywayAAGtww----</td>
+<td>----WWACTTRTWRAASAAGYWA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m603_AT5G64060</td>
+<td>AT5G64060</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>3</td>
+<td>2</td>
+<td>26</td>
+<td>---TDACTTGYWCMVCAAGTTWYC--</td>
+<td>--grwAACTTGbkgwrCAAGthA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m263_AT2G46770</td>
+<td>AT2G46770</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>3</td>
+<td>6</td>
+<td>26</td>
+<td>---TwrCkTraawwwcAMGc------</td>
+<td>------GCKTGWWWTTYAMGYWA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m176_AT2G02450</td>
+<td>AT2G02450</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>0</td>
+<td>7</td>
+<td>26</td>
+<td>ARDTKMCGTRTWRRWYASG-------</td>
+<td>-------CsTrwyywayACGkmAhyt</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m4_AT1G01720</td>
+<td>AT1G01720</td>
+<td>cluster_11</td>
+<td>D</td>
+<td>4</td>
+<td>0</td>
+<td>26</td>
+<td>----AAGWWKMCRWRTYMWWYACGTM</td>
+<td>kaCGTrwwkraywygkmwwctt----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m211_AT2G27300</td>
+<td>AT2G27300</td>
+<td>cluster_11</td>
+<td>R</td>
+<td>4</td>
+<td>3</td>
+<td>26</td>
+<td>----TWCYTSARRRWGAAGRAAM---</td>
+<td>---kTTyCTTCwyyytsARGwA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m308_AT3G15270</td>
+<td>AT3G15270</td>
+<td>cluster_12</td>
+<td>R</td>
+<td>2</td>
+<td>2</td>
+<td>16</td>
+<td>--DTCCGTACRRTT--</td>
+<td>--aayyGTACGGAh--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m558_AT5G46830</td>
+<td>AT5G46830</td>
+<td>cluster_12</td>
+<td>R</td>
+<td>2</td>
+<td>2</td>
+<td>16</td>
+<td>--RTCCGTACAAWT--</td>
+<td>--awttGTACGGAy--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m242_AT2G42200</td>
+<td>AT2G42200</td>
+<td>cluster_12</td>
+<td>R</td>
+<td>2</td>
+<td>3</td>
+<td>16</td>
+<td>--RWMMGTACAWT---</td>
+<td>---awtGTACkkwy--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m568_AT5G50570</td>
+<td>AT5G50570</td>
+<td>cluster_12</td>
+<td>R</td>
+<td>2</td>
+<td>3</td>
+<td>16</td>
+<td>--DWCCGTACAAW---</td>
+<td>---wttGTACGGwh--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m222_AT2G33810</td>
+<td>AT2G33810</td>
+<td>cluster_12</td>
+<td>D</td>
+<td>3</td>
+<td>5</td>
+<td>16</td>
+<td>---tCCGTACa-----</td>
+<td>-----TGTACGGA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m375_AT3G60030</td>
+<td>AT3G60030</td>
+<td>cluster_12</td>
+<td>R</td>
+<td>3</td>
+<td>5</td>
+<td>16</td>
+<td>---DYCGTACW-----</td>
+<td>-----wGTACGrh---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m45_AT1G20980</td>
+<td>AT1G20980</td>
+<td>cluster_12</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>16</td>
+<td>---tCCGTACaaww--</td>
+<td>--WWTTGTACGGA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m104_AT1G53160</td>
+<td>AT1G53160</td>
+<td>cluster_12</td>
+<td>R</td>
+<td>2</td>
+<td>4</td>
+<td>16</td>
+<td>--DDCCGTACDM----</td>
+<td>----khGTACGGhh--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m521_AT5G18830</td>
+<td>AT5G18830</td>
+<td>cluster_12</td>
+<td>R</td>
+<td>2</td>
+<td>4</td>
+<td>16</td>
+<td>--BRYCGTACGG----</td>
+<td>----cCGTACGryv--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m371_AT3G57920</td>
+<td>AT3G57920</td>
+<td>cluster_12</td>
+<td>R</td>
+<td>1</td>
+<td>1</td>
+<td>16</td>
+<td>-YKTCCGTACAATTH-</td>
+<td>-daatTGTACGGAmr-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m212_AT2G28550</td>
+<td>AT2G28550</td>
+<td>cluster_12</td>
+<td>D</td>
+<td>1</td>
+<td>5</td>
+<td>16</td>
+<td>-WCCTCGTACh-----</td>
+<td>-----DGTACGAGGW-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m365_AT3G54990</td>
+<td>AT3G54990</td>
+<td>cluster_12</td>
+<td>D</td>
+<td>2</td>
+<td>6</td>
+<td>16</td>
+<td>--YCTCGTAC------</td>
+<td>------GTACGAGR--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m265_AT2G47070</td>
+<td>AT2G47070</td>
+<td>cluster_12</td>
+<td>D</td>
+<td>3</td>
+<td>3</td>
+<td>16</td>
+<td>---dCCGTACGGa---</td>
+<td>---TCCGTACGGH---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m5_AT1G02065</td>
+<td>AT1G02065</td>
+<td>cluster_12</td>
+<td>R</td>
+<td>0</td>
+<td>0</td>
+<td>16</td>
+<td>WWWRWRGTACRWWWWW</td>
+<td>wwwwwyGTACywywww</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m54_AT1G27360</td>
+<td>AT1G27360</td>
+<td>cluster_12</td>
+<td>D</td>
+<td>1</td>
+<td>4</td>
+<td>16</td>
+<td>-adwmAGTACAa----</td>
+<td>----TTGTACTKWHT-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m79_AT1G35460</td>
+<td>AT1G35460</td>
+<td>cluster_13</td>
+<td>R</td>
+<td>2</td>
+<td>1</td>
+<td>14</td>
+<td>--WGCMACTTGCA-</td>
+<td>-tGCAAGTkGcw--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m243_AT2G42280</td>
+<td>AT2G42280</td>
+<td>cluster_13</td>
+<td>D</td>
+<td>2</td>
+<td>1</td>
+<td>14</td>
+<td>--dkCmACTTGcm-</td>
+<td>-KGCAAGTKGMH--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m97_AT1G51140</td>
+<td>AT1G51140</td>
+<td>cluster_13</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>14</td>
+<td>WKGCAAGTKGMHAA</td>
+<td>ttdkCmACTTGcmw</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m136_AT1G69690</td>
+<td>AT1G69690</td>
+<td>cluster_14</td>
+<td>R</td>
+<td>1</td>
+<td>16</td>
+<td>30</td>
+<td>-GTGGGKCCCACMW----------------</td>
+<td>----------------wkGTGGGmCCcAc-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m142_AT1G72010</td>
+<td>AT1G72010</td>
+<td>cluster_14</td>
+<td>R</td>
+<td>1</td>
+<td>16</td>
+<td>30</td>
+<td>-RTGGGKCCCACWW----------------</td>
+<td>----------------wwGTGGGmCCCAy-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m305_AT3G15030</td>
+<td>AT3G15030</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>4</td>
+<td>18</td>
+<td>30</td>
+<td>----GGGACCAC------------------</td>
+<td>------------------GTGGTCCC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m589_AT5G60970</td>
+<td>AT5G60970</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>4</td>
+<td>18</td>
+<td>30</td>
+<td>----GGGACCAY------------------</td>
+<td>------------------RTGGTCCC----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m106_AT1G53230</td>
+<td>AT1G53230</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>1</td>
+<td>16</td>
+<td>30</td>
+<td>-rtkGGGACCAChw----------------</td>
+<td>----------------WDGTGGTCCCMAY-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m272_AT3G02150</td>
+<td>AT3G02150</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>1</td>
+<td>16</td>
+<td>30</td>
+<td>-GTGGGGACCACww----------------</td>
+<td>----------------WWGTGGTCCCCAC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m342_AT3G45150</td>
+<td>AT3G45150</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>1</td>
+<td>18</td>
+<td>30</td>
+<td>-gTkGGGyCCAC------------------</td>
+<td>------------------GTGGRCCCMAC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m492_AT5G08070</td>
+<td>AT5G08070</td>
+<td>cluster_14</td>
+<td>R</td>
+<td>1</td>
+<td>18</td>
+<td>30</td>
+<td>-GTGGGGACCAC------------------</td>
+<td>------------------GTGGTCCCCAC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m336_AT3G27010</td>
+<td>AT3G27010</td>
+<td>cluster_14</td>
+<td>R</td>
+<td>1</td>
+<td>8</td>
+<td>30</td>
+<td>-GTGGGYCCCACHWKYTHTTTW--------</td>
+<td>--------waaadarmwdGTGGGrCCCAC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m350_AT3G47620</td>
+<td>AT3G47620</td>
+<td>cluster_14</td>
+<td>R</td>
+<td>1</td>
+<td>9</td>
+<td>30</td>
+<td>-GTGGGYCCCACMYSCTHTBT---------</td>
+<td>---------avAdAgsrkGTGGGrCCCAC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m64_AT1G30210</td>
+<td>AT1G30210</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>1</td>
+<td>17</td>
+<td>30</td>
+<td>-rtkGGGACCACh-----------------</td>
+<td>-----------------DGTGGTCCCMAY-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m414_AT4G18390</td>
+<td>AT4G18390</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>1</td>
+<td>19</td>
+<td>30</td>
+<td>-gtGGkmCCac-------------------</td>
+<td>-------------------GTGGKMCCAC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m570_AT5G51910</td>
+<td>AT5G51910</td>
+<td>cluster_14</td>
+<td>R</td>
+<td>1</td>
+<td>19</td>
+<td>30</td>
+<td>-GTGGGSCCCA-------------------</td>
+<td>-------------------tgGGsCCCAC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m494_AT5G08330</td>
+<td>AT5G08330</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>0</td>
+<td>16</td>
+<td>30</td>
+<td>wGTGGGmCCCAchw----------------</td>
+<td>----------------WDGTGGGKCCCACW</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m528_AT5G23280</td>
+<td>AT5G23280</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>1</td>
+<td>18</td>
+<td>30</td>
+<td>-GTGGGrCCCAy------------------</td>
+<td>------------------RTGGGYCCCAC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m256_AT2G45680</td>
+<td>AT2G45680</td>
+<td>cluster_14</td>
+<td>R</td>
+<td>0</td>
+<td>9</td>
+<td>30</td>
+<td>KGTGGGACCCACRRCWAATGG---------</td>
+<td>---------ccattwgyyGTGGGtCCCACm</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m80_AT1G35560</td>
+<td>AT1G35560</td>
+<td>cluster_14</td>
+<td>R</td>
+<td>0</td>
+<td>20</td>
+<td>30</td>
+<td>TGTGGGCCCC--------------------</td>
+<td>--------------------GGGGCCCACA</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m122_AT1G67260</td>
+<td>AT1G67260</td>
+<td>cluster_14</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>30</td>
+<td>RTRRKMMMRASWGRRGAGGKGGGRCCCACW</td>
+<td>wGTGGGyCCCmcctcyycwstykkkmyyay</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m245_AT2G42430</td>
+<td>AT2G42430</td>
+<td>cluster_15</td>
+<td>D</td>
+<td>1</td>
+<td>4</td>
+<td>20</td>
+<td>-cCggAAAwtccGGmr----</td>
+<td>----YKCCGGAWTTTCCGG-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m252_AT2G45410</td>
+<td>AT2G45410</td>
+<td>cluster_15</td>
+<td>D</td>
+<td>1</td>
+<td>4</td>
+<td>20</td>
+<td>-CCggAAAwtccGGar----</td>
+<td>----YTCCGGAWTTTCCGG-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m13_AT1G06280</td>
+<td>AT1G06280</td>
+<td>cluster_15</td>
+<td>D</td>
+<td>1</td>
+<td>4</td>
+<td>20</td>
+<td>-sCGAarAwatCGGag----</td>
+<td>----CTCCGATWTYTTCGS-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m124_AT1G68200</td>
+<td>AT1G68200</td>
+<td>cluster_15</td>
+<td>D</td>
+<td>1</td>
+<td>4</td>
+<td>20</td>
+<td>-CCGAaAAwwTCGGar----</td>
+<td>----YTCCGAWWTTTTCGG-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m253_AT2G45420</td>
+<td>AT2G45420</td>
+<td>cluster_15</td>
+<td>R</td>
+<td>1</td>
+<td>0</td>
+<td>20</td>
+<td>-SCGGAAAWTCCGSMGRARW</td>
+<td>wytycksCggawTTTCcGs-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m334_AT3G26620</td>
+<td>AT3G26620</td>
+<td>cluster_15</td>
+<td>R</td>
+<td>0</td>
+<td>5</td>
+<td>20</td>
+<td>RGCGKRAAWTMCGCY-----</td>
+<td>-----rGCGkawTtymCGCy</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m580_AT5G56840</td>
+<td>AT5G56840</td>
+<td>cluster_16</td>
+<td>D</td>
+<td>3</td>
+<td>4</td>
+<td>22</td>
+<td>---waycTTATCCAwwww----</td>
+<td>----WWWWTGGATAAGRTW---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m592_AT5G61620</td>
+<td>AT5G61620</td>
+<td>cluster_16</td>
+<td>R</td>
+<td>3</td>
+<td>4</td>
+<td>22</td>
+<td>---WWYYTTATCCAWWWW----</td>
+<td>----wwwwTGGATAArrww---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m562_AT5G47390</td>
+<td>AT5G47390</td>
+<td>cluster_16</td>
+<td>D</td>
+<td>1</td>
+<td>6</td>
+<td>22</td>
+<td>-wwwwycTTATCCAww------</td>
+<td>------WWTGGATAAGRWWWW-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m584_AT5G58900</td>
+<td>AT5G58900</td>
+<td>cluster_16</td>
+<td>R</td>
+<td>1</td>
+<td>6</td>
+<td>22</td>
+<td>-WWWWYCTTATCYWWW------</td>
+<td>------wwwrGATAAGrwwww-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m291_AT3G10580</td>
+<td>AT3G10580</td>
+<td>cluster_16</td>
+<td>R</td>
+<td>3</td>
+<td>4</td>
+<td>22</td>
+<td>---AWBCTTATCYWWWWT----</td>
+<td>----awwwwrGATAAGvwt---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m38_AT1G19000</td>
+<td>AT1G19000</td>
+<td>cluster_16</td>
+<td>R</td>
+<td>3</td>
+<td>5</td>
+<td>22</td>
+<td>---WWYCTTATCCAWWW-----</td>
+<td>-----wwwTGGATAAgrww---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m386_AT4G00250</td>
+<td>AT4G00250</td>
+<td>cluster_16</td>
+<td>D</td>
+<td>3</td>
+<td>6</td>
+<td>22</td>
+<td>---wwycTTATCCAww------</td>
+<td>------WWTGGATAAGRWW---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m294_AT3G11280</td>
+<td>AT3G11280</td>
+<td>cluster_16</td>
+<td>D</td>
+<td>3</td>
+<td>5</td>
+<td>22</td>
+<td>---awycTTATCtthwy-----</td>
+<td>-----RWDAAGATAAGRWT---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m484_AT5G05790</td>
+<td>AT5G05790</td>
+<td>cluster_16</td>
+<td>D</td>
+<td>3</td>
+<td>4</td>
+<td>22</td>
+<td>---awycTTATCytcwtm----</td>
+<td>----KAWGARGATAAGRWT---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m138_AT1G70000</td>
+<td>AT1G70000</td>
+<td>cluster_16</td>
+<td>R</td>
+<td>5</td>
+<td>7</td>
+<td>22</td>
+<td>-----YVTTATCCAW-------</td>
+<td>-------wTGGATAAbr-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m150_AT1G74840</td>
+<td>AT1G74840</td>
+<td>cluster_16</td>
+<td>R</td>
+<td>5</td>
+<td>6</td>
+<td>22</td>
+<td>-----YYTTATCCAWW------</td>
+<td>------wwTGGATAArr-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m91_AT1G49010</td>
+<td>AT1G49010</td>
+<td>cluster_16</td>
+<td>D</td>
+<td>0</td>
+<td>7</td>
+<td>22</td>
+<td>hwwwwyCTTATCywh-------</td>
+<td>-------DWRGATAAGRWWWWD</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m495_AT5G08520</td>
+<td>AT5G08520</td>
+<td>cluster_16</td>
+<td>R</td>
+<td>5</td>
+<td>4</td>
+<td>22</td>
+<td>-----YCTTATCYWHWWH----</td>
+<td>----dwwdwrGATAAGr-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m120_AT1G66420</td>
+<td>AT1G66420</td>
+<td>cluster_16</td>
+<td>D</td>
+<td>3</td>
+<td>0</td>
+<td>22</td>
+<td>---AacmTTATCCATwwmttak</td>
+<td>MTAAKWWATGGATAAKGTT---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m230_AT2G38090</td>
+<td>AT2G38090</td>
+<td>cluster_16</td>
+<td>R</td>
+<td>0</td>
+<td>1</td>
+<td>22</td>
+<td>HYYATYCTTATCYWWWHYTTT-</td>
+<td>-aaardwwwrGATAAgraTrrd</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m481_AT5G04760</td>
+<td>AT5G04760</td>
+<td>cluster_16</td>
+<td>R</td>
+<td>4</td>
+<td>8</td>
+<td>22</td>
+<td>----RCCTTATCHR--------</td>
+<td>--------ydGATAAGGy----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m99_AT1G51600</td>
+<td>AT1G51600</td>
+<td>cluster_17</td>
+<td>D</td>
+<td>6</td>
+<td>2</td>
+<td>27</td>
+<td>------CATCATCATCATCATCATC--</td>
+<td>--GATGATGATGATGATGATG------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m281_AT3G06740</td>
+<td>AT3G06740</td>
+<td>cluster_17</td>
+<td>D</td>
+<td>6</td>
+<td>2</td>
+<td>27</td>
+<td>------SATCATCATCATCATCATC--</td>
+<td>--GATGATGATGATGATGATS------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m318_AT3G21175</td>
+<td>AT3G21175</td>
+<td>cluster_17</td>
+<td>D</td>
+<td>8</td>
+<td>4</td>
+<td>27</td>
+<td>--------TCATCATCATCATCA----</td>
+<td>----TGATGATGATGATGA--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m328_AT3G24050</td>
+<td>AT3G24050</td>
+<td>cluster_17</td>
+<td>R</td>
+<td>9</td>
+<td>3</td>
+<td>27</td>
+<td>---------CAYCAYCAYCAYCAY---</td>
+<td>---rTGrTGrTGrTGrTG---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m566_AT5G49300</td>
+<td>AT5G49300</td>
+<td>cluster_17</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>27</td>
+<td>ATGATGATGATGATGATGATGATSATG</td>
+<td>CATsATCATCATCATCATCATCATCAT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m143_AT1G72050</td>
+<td>AT1G72050</td>
+<td>cluster_17</td>
+<td>D</td>
+<td>6</td>
+<td>2</td>
+<td>27</td>
+<td>------GAGGAGGAGGAGGAGGARG--</td>
+<td>--CyTCcTCcTCcTCCTCCTC------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m18_AT1G08810</td>
+<td>AT1G08810</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>6</td>
+<td>6</td>
+<td>31</td>
+<td>------RWRRARGTRGTTGRRRWWD------</td>
+<td>------hwwyyyCAACyACytyywy------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m349_AT3G47600</td>
+<td>AT3G47600</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>6</td>
+<td>6</td>
+<td>31</td>
+<td>------ddrdwrGTrGTTGrrrrdw------</td>
+<td>------WHYYYYCAACYACYWHYHH------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m512_AT5G16600</td>
+<td>AT5G16600</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>9</td>
+<td>9</td>
+<td>31</td>
+<td>---------awrkTwGGTrarr---------</td>
+<td>---------YYTYACCWAMYWT---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m597_AT5G62320</td>
+<td>AT5G62320</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>9</td>
+<td>9</td>
+<td>31</td>
+<td>---------DRRKTWGGTRRRD---------</td>
+<td>---------hyyyACCwAmyyh---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m503_AT5G12870</td>
+<td>AT5G12870</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>10</td>
+<td>11</td>
+<td>31</td>
+<td>----------aGkTAGGTrr-----------</td>
+<td>-----------YYACCTAMCT----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m567_AT5G49330</td>
+<td>AT5G49330</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>10</td>
+<td>11</td>
+<td>31</td>
+<td>----------dRkTAGGTrs-----------</td>
+<td>-----------SYACCTAMYH----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m12_AT1G06180</td>
+<td>AT1G06180</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>6</td>
+<td>10</td>
+<td>31</td>
+<td>------dwddkGGTwGGTGrr----------</td>
+<td>----------YYCACCWACCMHHWH------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m381_AT3G61250</td>
+<td>AT3G61250</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>6</td>
+<td>10</td>
+<td>31</td>
+<td>------wwdwwGGTAGGTrrr----------</td>
+<td>----------YYYACCTACCWWHWW------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m21_AT1G09540</td>
+<td>AT1G09540</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>6</td>
+<td>10</td>
+<td>31</td>
+<td>------DDKKTGGTWGKTRRR----------</td>
+<td>----------yyyAmCwACCammhh------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m397_AT4G05100</td>
+<td>AT4G05100</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>8</td>
+<td>9</td>
+<td>31</td>
+<td>--------DWWRKTAGGTRRRR---------</td>
+<td>---------yyyyACCTAmywwh--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m410_AT4G17785</td>
+<td>AT4G17785</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>8</td>
+<td>9</td>
+<td>31</td>
+<td>--------wawrkTAGGTrrra---------</td>
+<td>---------TYYYACCTAMYWTW--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m36_AT1G18570</td>
+<td>AT1G18570</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>10</td>
+<td>0</td>
+<td>31</td>
+<td>----------WRGTWGGTRRRWDWWWWDDWD</td>
+<td>hwhhwwwwhwyyyACCwACyw----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m326_AT3G23250</td>
+<td>AT3G23250</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>10</td>
+<td>0</td>
+<td>31</td>
+<td>----------KGGTWGGTGRRDRWDTTGRWG</td>
+<td>cwycaahwyhyyCACCWACcm----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m340_AT3G30210</td>
+<td>AT3G30210</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>8</td>
+<td>9</td>
+<td>31</td>
+<td>--------TYWTACCTAMCWWW---------</td>
+<td>---------wwwGKTAGGTawra--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m267_AT2G47460</td>
+<td>AT2G47460</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>10</td>
+<td>11</td>
+<td>31</td>
+<td>----------MGGTAGGTAW-----------</td>
+<td>-----------wTACCTACCk----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m300_AT3G12820</td>
+<td>AT3G12820</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>5</td>
+<td>10</td>
+<td>31</td>
+<td>-----YYYACCWAMCHHWHHH----------</td>
+<td>----------dddwddGKTWGGTRrr-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m468_AT4G38620</td>
+<td>AT4G38620</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>6</td>
+<td>10</td>
+<td>31</td>
+<td>------YYYACCWAMYWWWWW----------</td>
+<td>----------wwwwwrkTwGGTrrr------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m270_AT3G01530</td>
+<td>AT3G01530</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>7</td>
+<td>10</td>
+<td>31</td>
+<td>-------WAAAGTTAGGTARR----------</td>
+<td>----------yyTACCTAACTttw-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m363_AT3G53200</td>
+<td>AT3G53200</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>6</td>
+<td>10</td>
+<td>31</td>
+<td>------aaaAARTTAGGTAwa----------</td>
+<td>----------TWTACCTAAYTTTTT------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m48_AT1G22640</td>
+<td>AT1G22640</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>10</td>
+<td>10</td>
+<td>31</td>
+<td>----------TYTACCTACCY----------</td>
+<td>----------rGGTAGGTAra----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m578_AT5G56110</td>
+<td>AT5G56110</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>7</td>
+<td>9</td>
+<td>31</td>
+<td>-------KTYYACCTAMYTWTW---------</td>
+<td>---------wawArkTAGGTrram-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m51_AT1G25340</td>
+<td>AT1G25340</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>4</td>
+<td>12</td>
+<td>31</td>
+<td>----aamaawAgTTAGGyw------------</td>
+<td>------------WRCCTAACTWTTKTT----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m125_AT1G68320</td>
+<td>AT1G68320</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>5</td>
+<td>11</td>
+<td>31</td>
+<td>-----aawawarTTAGGyad-----------</td>
+<td>-----------HTRCCTAAYTWTWTT-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m435_AT4G28110</td>
+<td>AT4G28110</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>10</td>
+<td>6</td>
+<td>31</td>
+<td>----------ARKTAGGTRAACWAH------</td>
+<td>------dtwgttyACCTAmyt----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m577_AT5G54230</td>
+<td>AT5G54230</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>9</td>
+<td>7</td>
+<td>31</td>
+<td>---------WWRKTWGGTRRRMWA-------</td>
+<td>-------twkyyyACCWAmyww---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m508_AT5G14340</td>
+<td>AT5G14340</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>8</td>
+<td>10</td>
+<td>31</td>
+<td>--------RAWRKTWGGTRRR----------</td>
+<td>----------yyyACCwAmywty--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m338_AT3G28910</td>
+<td>AT3G28910</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>8</td>
+<td>8</td>
+<td>31</td>
+<td>--------GKTGGTRGTTGGKRR--------</td>
+<td>--------yymcCAACyACCamc--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m394_AT4G01680</td>
+<td>AT4G01680</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>8</td>
+<td>9</td>
+<td>31</td>
+<td>--------KGTGGTKGKTGRRR---------</td>
+<td>---------yyycAmCmACCacm--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m585_AT5G59780</td>
+<td>AT5G59780</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>10</td>
+<td>11</td>
+<td>31</td>
+<td>----------KKACCTAAYT-----------</td>
+<td>-----------arTTAGGTmm----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m149_AT1G74650</td>
+<td>AT1G74650</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>11</td>
+<td>5</td>
+<td>31</td>
+<td>-----------DKTRGKTGGKAGKTR-----</td>
+<td>-----yAmCtmCCAMCyAmh-----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m599_AT5G62470</td>
+<td>AT5G62470</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>8</td>
+<td>5</td>
+<td>31</td>
+<td>--------wdwdkTrGkTGGtrGtTr-----</td>
+<td>-----YAACYACCAMCYAMHWHW--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m273_AT3G02940</td>
+<td>AT3G02940</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>9</td>
+<td>4</td>
+<td>31</td>
+<td>---------ARWTWGYYCACCWAMYWW----</td>
+<td>----wwrkTwGGTgrrcwawyt---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m33_AT1G16490</td>
+<td>AT1G16490</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>8</td>
+<td>8</td>
+<td>31</td>
+<td>--------GTTYYACCWAMCMYH--------</td>
+<td>--------drkGKTWGGTRraac--------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m499_AT5G10280</td>
+<td>AT5G10280</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>11</td>
+<td>10</td>
+<td>31</td>
+<td>-----------YYYACCTAMC----------</td>
+<td>----------gKTAGGTrrr-----------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m280_AT3G06490</td>
+<td>AT3G06490</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>3</td>
+<td>13</td>
+<td>31</td>
+<td>---RCCWAAYTTWWCYWA-------------</td>
+<td>-------------twrgwwaarTTwGGy---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m282_AT3G08500</td>
+<td>AT3G08500</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>9</td>
+<td>11</td>
+<td>31</td>
+<td>---------gkkGTTGGTGr-----------</td>
+<td>-----------YCACCAACMMC---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m546_AT5G40330</td>
+<td>AT5G40330</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>9</td>
+<td>11</td>
+<td>31</td>
+<td>---------dwkkTwGTTGr-----------</td>
+<td>-----------YCAACWAMMWH---------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m37_AT1G18960</td>
+<td>AT1G18960</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>6</td>
+<td>3</td>
+<td>31</td>
+<td>------DDTRWTGTTGKTGWWDWTDTTR---</td>
+<td>---yaahawhwwCAmCAACawyahh------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m166_AT1G79180</td>
+<td>AT1G79180</td>
+<td>cluster_18</td>
+<td>R</td>
+<td>7</td>
+<td>3</td>
+<td>31</td>
+<td>-------DKGKGGTWGGTGRRRDWRKWR---</td>
+<td>---ywmywhyyyCACCwACCmcmh-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m78_AT1G34670</td>
+<td>AT1G34670</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>3</td>
+<td>7</td>
+<td>31</td>
+<td>---kwkkkddwrkTwGKTrrrmhw-------</td>
+<td>-------WDKYYYAMCWAMYWHHMMMWM---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m298_AT3G12720</td>
+<td>AT3G12720</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>0</td>
+<td>10</td>
+<td>31</td>
+<td>ddwrdddwdrtGkTwGGTrgr----------</td>
+<td>----------YCYACCWAMCAYHWHHHYWHH</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m354_AT3G49690</td>
+<td>AT3G49690</td>
+<td>cluster_18</td>
+<td>D</td>
+<td>7</td>
+<td>11</td>
+<td>31</td>
+<td>-------SCACCTACCCCCC-----------</td>
+<td>-----------gGGgGGTAGGTGs-------</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m254_AT2G45650</td>
+<td>AT2G45650</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>2</td>
+<td>0</td>
+<td>21</td>
+<td>--TTwCCaAAAAwRGaAAaww</td>
+<td>WWTTTTCYWTTTTTGGWAA--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m419_AT4G18960</td>
+<td>AT4G18960</td>
+<td>cluster_19</td>
+<td>R</td>
+<td>2</td>
+<td>0</td>
+<td>21</td>
+<td>--WWDCCAAAARWRGAAARWW</td>
+<td>wwyTTtCYwyTTttGGhww--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m67_AT1G31140</td>
+<td>AT1G31140</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>3</td>
+<td>3</td>
+<td>21</td>
+<td>---TkCCAAAAAtGGmAA---</td>
+<td>---TTKCCATTTTTGGMA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m364_AT3G54340</td>
+<td>AT3G54340</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>3</td>
+<td>3</td>
+<td>21</td>
+<td>---wwCCaAAArwrGaAA---</td>
+<td>---TTTCYWYTTTTGGWW---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m181_AT2G03710</td>
+<td>AT2G03710</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>1</td>
+<td>2</td>
+<td>21</td>
+<td>-skwwCCAwwwWwrGwwab--</td>
+<td>--VTWWCYWWWWWTGGWWMS-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m510_AT5G15800</td>
+<td>AT5G15800</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>1</td>
+<td>2</td>
+<td>21</td>
+<td>-hwtwCCAwWwwTrGwAak--</td>
+<td>--MTTWCYAWWWWTGGWAWD-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m369_AT3G57230</td>
+<td>AT3G57230</td>
+<td>cluster_19</td>
+<td>R</td>
+<td>3</td>
+<td>3</td>
+<td>21</td>
+<td>---TWCCHAAWAWGGAAA---</td>
+<td>---TTtCCwtWTTdGGwA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m379_AT3G61120</td>
+<td>AT3G61120</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>2</td>
+<td>1</td>
+<td>21</td>
+<td>--WTTTWCYWTTTTTRGWAW-</td>
+<td>-WTwCYaAAAAwrGwAAaw--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m50_AT1G24260</td>
+<td>AT1G24260</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>5</td>
+<td>3</td>
+<td>21</td>
+<td>-----CCaaAAAwRGaaA---</td>
+<td>---TTTCYWTTTTTGG-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m130_AT1G69120</td>
+<td>AT1G69120</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>5</td>
+<td>4</td>
+<td>21</td>
+<td>-----CyAAAWaTGGaA----</td>
+<td>----TTCCATWTTTRG-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m160_AT1G77080</td>
+<td>AT1G77080</td>
+<td>cluster_19</td>
+<td>R</td>
+<td>5</td>
+<td>1</td>
+<td>21</td>
+<td>-----MYMAAAWTRGAAAGW-</td>
+<td>-wcTTTCyAWTTtkrk-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m201_AT2G22540</td>
+<td>AT2G22540</td>
+<td>cluster_19</td>
+<td>R</td>
+<td>5</td>
+<td>1</td>
+<td>21</td>
+<td>-----CCMAAWAAGGAAARW-</td>
+<td>-wyTTtCCtTWTTkGG-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m523_AT5G20240</td>
+<td>AT5G20240</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>5</td>
+<td>2</td>
+<td>21</td>
+<td>-----mCaAAArwrGAAAr--</td>
+<td>--YTTTCYWYTTTTGK-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m498_AT5G10140</td>
+<td>AT5G10140</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>aawwwCymAAAAwrGAAAgww</td>
+<td>WWCTTTCYWTTTTKRGWWWTT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m506_AT5G13790</td>
+<td>AT5G13790</td>
+<td>cluster_19</td>
+<td>R</td>
+<td>0</td>
+<td>2</td>
+<td>21</td>
+<td>WSTTWCCMAAWAWRGAAAG--</td>
+<td>--cTTTCYwtWTTkGGwAAsw</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m373_AT3G58780</td>
+<td>AT3G58780</td>
+<td>cluster_19</td>
+<td>D</td>
+<td>1</td>
+<td>2</td>
+<td>21</td>
+<td>-YTTWCCCAWWWWGGHAAW--</td>
+<td>--wtTdCCwwwwtgGGwAar-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m312_AT3G16770</td>
+<td>AT3G16770</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>3</td>
+<td>4</td>
+<td>15</td>
+<td>---gCGCCGCm----</td>
+<td>----KGCGGCGC---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m426_AT4G23750</td>
+<td>AT4G23750</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>3</td>
+<td>4</td>
+<td>15</td>
+<td>---sCGCCGCC----</td>
+<td>----GGCGGCGS---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m11_AT1G06160</td>
+<td>AT1G06160</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>4</td>
+<td>3</td>
+<td>15</td>
+<td>----mGCCGCCr---</td>
+<td>---YGGCGGCK----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m58_AT1G28360</td>
+<td>AT1G28360</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>4</td>
+<td>3</td>
+<td>15</td>
+<td>----CGsCGCCr---</td>
+<td>---YGGCGSCG----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m90_AT1G47870</td>
+<td>AT1G47870</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>AwwwwGGCGCCAAAR</td>
+<td>YTTTGGCGCCWWWWT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m226_AT2G36010</td>
+<td>AT2G36010</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>1</td>
+<td>0</td>
+<td>15</td>
+<td>-wwwwGGCGCCAaaa</td>
+<td>TTTTGGCGCCWWWW-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m461_AT4G36900</td>
+<td>AT4G36900</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>2</td>
+<td>3</td>
+<td>15</td>
+<td>--AGGCGGCGCY---</td>
+<td>---rGCGCCGCCt--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m550_AT5G43410</td>
+<td>AT5G43410</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>15</td>
+<td>---DTGGCGGCKS--</td>
+<td>--smGCCGcCah---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m235_AT2G40220</td>
+<td>AT2G40220</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>4</td>
+<td>1</td>
+<td>15</td>
+<td>----GGGGGCRSCG-</td>
+<td>-CGsyGCcccc----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m524_AT5G22220</td>
+<td>AT5G22220</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>4</td>
+<td>1</td>
+<td>15</td>
+<td>----WWDGGCGCSC-</td>
+<td>-gsGCGCchww----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m387_AT4G00270</td>
+<td>AT4G00270</td>
+<td>cluster_20</td>
+<td>D</td>
+<td>2</td>
+<td>5</td>
+<td>15</td>
+<td>--GCGGCCGK-----</td>
+<td>-----mCGGCCGc--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m440_AT4G30080</td>
+<td>AT4G30080</td>
+<td>cluster_21</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>TTTACGkTTTTGGCGGrAAAA</td>
+<td>TTTTYCCGCCAAAAMCGTAAA</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m450_AT4G33280</td>
+<td>AT4G33280</td>
+<td>cluster_21</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>TTTaykkTTTTGGCGGGAAAA</td>
+<td>TTTTCCCGCCAAAAMMRTAAA</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m509_AT5G14960</td>
+<td>AT5G14960</td>
+<td>cluster_21</td>
+<td>D</td>
+<td>1</td>
+<td>0</td>
+<td>21</td>
+<td>-TTTTCCCGCCAAAAAHWWWW</td>
+<td>wwwwdtTTTTGGCGGGAAAA-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m351_AT3G48160</td>
+<td>AT3G48160</td>
+<td>cluster_21</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>TTTTGGCGGGAAAWWTWTWKT</td>
+<td>amwawawwTTTCCCGCCAAAA</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m10_AT1G06070</td>
+<td>AT1G06070</td>
+<td>cluster_22</td>
+<td>R</td>
+<td>1</td>
+<td>2</td>
+<td>14</td>
+<td>-TGMCAGCTGKM--</td>
+<td>--kmCAGCTGkCA-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m238_AT2G40620</td>
+<td>AT2G40620</td>
+<td>cluster_22</td>
+<td>R</td>
+<td>1</td>
+<td>2</td>
+<td>14</td>
+<td>-TGMCAGCTGKT--</td>
+<td>--amcAGCTGkCA-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m84_AT1G43700</td>
+<td>AT1G43700</td>
+<td>cluster_22</td>
+<td>D</td>
+<td>0</td>
+<td>2</td>
+<td>14</td>
+<td>wTGmCAGCTGkh--</td>
+<td>--DMCAGCTGKCAW</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m197_AT2G21230</td>
+<td>AT2G21230</td>
+<td>cluster_22</td>
+<td>D</td>
+<td>1</td>
+<td>3</td>
+<td>14</td>
+<td>-yGmCAGCTgk---</td>
+<td>---MCAGCTGKCR-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m186_AT2G17180</td>
+<td>AT2G17180</td>
+<td>cluster_22</td>
+<td>R</td>
+<td>2</td>
+<td>2</td>
+<td>14</td>
+<td>--SSCAGCTGSG--</td>
+<td>--csCAGCTGss--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m14_AT1G06850</td>
+<td>AT1G06850</td>
+<td>cluster_22</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>14</td>
+<td>WKAMMRGCTGKCAW</td>
+<td>wTGmCAGCykktmw</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m129_AT1G69010</td>
+<td>AT1G69010</td>
+<td>cluster_23</td>
+<td>R</td>
+<td>2</td>
+<td>9</td>
+<td>26</td>
+<td>--CGTGMRWGKCACGTG---------</td>
+<td>---------CACGTGmcwykcacg--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m441_AT4G30980</td>
+<td>AT4G30980</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>2</td>
+<td>9</td>
+<td>26</td>
+<td>--CgTGykwbgCACGTG---------</td>
+<td>---------CACGTGCVWMRCACG--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m23_AT1G10120</td>
+<td>AT1G10120</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>2</td>
+<td>3</td>
+<td>26</td>
+<td>--cgtgarwrkCACGTGmsaycw---</td>
+<td>---WGRTSKCACGTGMYWYTCACG--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m110_AT1G59640</td>
+<td>AT1G59640</td>
+<td>cluster_23</td>
+<td>R</td>
+<td>3</td>
+<td>2</td>
+<td>26</td>
+<td>---GWGWWWSVCACGTGYCWCMWS--</td>
+<td>--swkgwgrCACGTGbswwwcwc---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m493_AT5G08130</td>
+<td>AT5G08130</td>
+<td>cluster_23</td>
+<td>R</td>
+<td>3</td>
+<td>9</td>
+<td>26</td>
+<td>---GKGRRWGTCACGTG---------</td>
+<td>---------CACGTGAcwyycmc---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m202_AT2G22750</td>
+<td>AT2G22750</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>2</td>
+<td>7</td>
+<td>26</td>
+<td>--crYGtkwwhCACGTGky-------</td>
+<td>-------RMCACGTGDWWMACRYG--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m471_AT5G01380</td>
+<td>AT5G01380</td>
+<td>cluster_23</td>
+<td>R</td>
+<td>2</td>
+<td>7</td>
+<td>26</td>
+<td>--MAHWWTWWACACGTGYY-------</td>
+<td>-------rrCACGTGtwwaWwdtk--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m194_AT2G20180</td>
+<td>AT2G20180</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>4</td>
+<td>8</td>
+<td>26</td>
+<td>----rkrrggwCACGTGg--------</td>
+<td>--------CCACGTGWCCYYMY----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m590_AT5G61270</td>
+<td>AT5G61270</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>3</td>
+<td>8</td>
+<td>26</td>
+<td>---swkrrwsCCACGTGg--------</td>
+<td>--------CCACGTGGSWYYMWS---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m323_AT3G23210</td>
+<td>AT3G23210</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>3</td>
+<td>0</td>
+<td>26</td>
+<td>---gtgrwwgrCACGTGycarcwygw</td>
+<td>WCRWGYTGRCACGTGYCWWYCAC---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m327_AT3G23690</td>
+<td>AT3G23690</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>4</td>
+<td>7</td>
+<td>26</td>
+<td>----rwkwdgbCACGTGmk-------</td>
+<td>-------MKCACGTGVCHWMWY----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m541_AT5G38860</td>
+<td>AT5G38860</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>1</td>
+<td>7</td>
+<td>26</td>
+<td>-acgTgmwwstCACGTGmc-------</td>
+<td>-------GKCACGTGASWWKCACGT-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m86_AT1G45249</td>
+<td>AT1G45249</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>3</td>
+<td>5</td>
+<td>26</td>
+<td>---dawwwTGMCACGTswccw-----</td>
+<td>-----WGGWSACGTGKCAWWWTH---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m94_AT1G49720</td>
+<td>AT1G49720</td>
+<td>cluster_23</td>
+<td>R</td>
+<td>1</td>
+<td>6</td>
+<td>26</td>
+<td>-YCBBBYGKGCCACGTGKCC------</td>
+<td>------GgmCACGTGGCmcrvvvgr-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m152_AT1G75080</td>
+<td>AT1G75080</td>
+<td>cluster_23</td>
+<td>R</td>
+<td>0</td>
+<td>6</td>
+<td>26</td>
+<td>ADWRWRRKDYRCACGTGYGG------</td>
+<td>------cCrCACGTGyrhmyywywht</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m553_AT5G45300</td>
+<td>AT5G45300</td>
+<td>cluster_23</td>
+<td>R</td>
+<td>5</td>
+<td>6</td>
+<td>26</td>
+<td>-----AKTTSRCACGTGTGR------</td>
+<td>------yCACACGTGysaamt-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m423_AT4G21330</td>
+<td>AT4G21330</td>
+<td>cluster_23</td>
+<td>D</td>
+<td>4</td>
+<td>8</td>
+<td>26</td>
+<td>----TCACGTGWYTCAYK--------</td>
+<td>--------mrtgArwCACGTGA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m123_AT1G67710</td>
+<td>AT1G67710</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>4</td>
+<td>2</td>
+<td>16</td>
+<td>----CCGWATCTWT--</td>
+<td>--awAGATWCGg----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m404_AT4G16110</td>
+<td>AT4G16110</td>
+<td>cluster_24</td>
+<td>D</td>
+<td>4</td>
+<td>2</td>
+<td>16</td>
+<td>----smGwATCTtt--</td>
+<td>--AAAGATWCKS----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m171_AT2G01760</td>
+<td>AT2G01760</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>4</td>
+<td>4</td>
+<td>16</td>
+<td>----SCGWATCT----</td>
+<td>----AGATwCGs----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m446_AT4G31920</td>
+<td>AT4G31920</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>4</td>
+<td>4</td>
+<td>16</td>
+<td>----SMRDATCT----</td>
+<td>----AGAThyks----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m16_AT1G08010</td>
+<td>AT1G08010</td>
+<td>cluster_24</td>
+<td>D</td>
+<td>0</td>
+<td>1</td>
+<td>16</td>
+<td>rrawyyRGATCTgad-</td>
+<td>-HTCAGATCYRRWTYY</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m343_AT3G45170</td>
+<td>AT3G45170</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>0</td>
+<td>1</td>
+<td>16</td>
+<td>AAAAWYAGATCTAAA-</td>
+<td>-tttAGATCTrwtttt</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m482_AT5G05090</td>
+<td>AT5G05090</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>3</td>
+<td>2</td>
+<td>16</td>
+<td>---TYCGDATCTDT--</td>
+<td>--ahAGAThCgra---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m377_AT3G60530</td>
+<td>AT3G60530</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>1</td>
+<td>0</td>
+<td>16</td>
+<td>-RRWYYRGATCYRRRW</td>
+<td>wyyyrGATCyrrwyy-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m534_AT5G25830</td>
+<td>AT5G25830</td>
+<td>cluster_24</td>
+<td>D</td>
+<td>1</td>
+<td>2</td>
+<td>16</td>
+<td>-ratyyAGATCYra--</td>
+<td>--TYRGATCTRRATY-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m192_AT2G18380</td>
+<td>AT2G18380</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>0</td>
+<td>3</td>
+<td>16</td>
+<td>HTRATCMGATCRA---</td>
+<td>---tyGATCkGATyad</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m457_AT4G36620</td>
+<td>AT4G36620</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>2</td>
+<td>3</td>
+<td>16</td>
+<td>--RATCVGATCBR---</td>
+<td>---yvGATCbGATy--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m361_AT3G51080</td>
+<td>AT3G51080</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>0</td>
+<td>3</td>
+<td>16</td>
+<td>RRATCTAGATCTR---</td>
+<td>---yAGATCTAgAtyy</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m347_AT3G46640</td>
+<td>AT3G46640</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>1</td>
+<td>1</td>
+<td>16</td>
+<td>-TMASCRWATCTTDM-</td>
+<td>-khaAGATwYgstka-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m581_AT5G58080</td>
+<td>AT5G58080</td>
+<td>cluster_24</td>
+<td>R</td>
+<td>3</td>
+<td>0</td>
+<td>16</td>
+<td>---ABCRTATCTWKAT</td>
+<td>atmwAGATAyGvt---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m196_AT2G20570</td>
+<td>AT2G20570</td>
+<td>cluster_24</td>
+<td>D</td>
+<td>4</td>
+<td>2</td>
+<td>16</td>
+<td>----rAGAATCTgd--</td>
+<td>--HCAGATTCTY----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m329_AT3G24120</td>
+<td>AT3G24120</td>
+<td>cluster_24</td>
+<td>D</td>
+<td>5</td>
+<td>3</td>
+<td>16</td>
+<td>-----rGAATmTd---</td>
+<td>---HAKATTCY-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m449_AT4G32890</td>
+<td>AT4G32890</td>
+<td>cluster_24</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>16</td>
+<td>---tcyAGATCTrw--</td>
+<td>--WYAGATCTRGA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m15_AT1G08000</td>
+<td>AT1G08000</td>
+<td>cluster_24</td>
+<td>D</td>
+<td>5</td>
+<td>3</td>
+<td>16</td>
+<td>-----CAGATCTA---</td>
+<td>---TAGATCTG-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m158_AT1G76880</td>
+<td>AT1G76880</td>
+<td>cluster_25</td>
+<td>D</td>
+<td>3</td>
+<td>0</td>
+<td>19</td>
+<td>---acrGTAAAAawdwwww</td>
+<td>WWWWHWTTTTTACYGT---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m563_AT5G47660</td>
+<td>AT5G47660</td>
+<td>cluster_25</td>
+<td>R</td>
+<td>3</td>
+<td>1</td>
+<td>19</td>
+<td>---RCRGTWAAAAWDDWW-</td>
+<td>-wwhhwTTTTwACyGy---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m74_AT1G33240</td>
+<td>AT1G33240</td>
+<td>cluster_25</td>
+<td>D</td>
+<td>3</td>
+<td>6</td>
+<td>19</td>
+<td>---ayrGTAAAWa------</td>
+<td>------TWTTTACYRT---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m536_AT5G28300</td>
+<td>AT5G28300</td>
+<td>cluster_25</td>
+<td>D</td>
+<td>2</td>
+<td>7</td>
+<td>19</td>
+<td>--crCGGTAAaw-------</td>
+<td>-------WTTTACCGYG--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m159_AT1G76890</td>
+<td>AT1G76890</td>
+<td>cluster_25</td>
+<td>R</td>
+<td>0</td>
+<td>5</td>
+<td>19</td>
+<td>AHWRCRGTAAAWAW-----</td>
+<td>-----wtWTTTACygywdt</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m319_AT3G22170</td>
+<td>AT3G22170</td>
+<td>cluster_26</td>
+<td>D</td>
+<td>2</td>
+<td>1</td>
+<td>15</td>
+<td>--ywCACGCGCThw-</td>
+<td>-WDAGCGCGTGWR--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m496_AT5G09410</td>
+<td>AT5G09410</td>
+<td>cluster_26</td>
+<td>R</td>
+<td>2</td>
+<td>1</td>
+<td>15</td>
+<td>--YHMACGCGYTTT-</td>
+<td>-aAarCGCGTkdr--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m178_AT2G02820</td>
+<td>AT2G02820</td>
+<td>cluster_26</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>hmymcACGCkCCwcy</td>
+<td>RGWGGMGCGTGKRKD</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m403_AT4G15090</td>
+<td>AT4G15090</td>
+<td>cluster_26</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>ayyyCACGCGCytyy</td>
+<td>RRARGCGCGTGRRRT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m199_AT2G22300</td>
+<td>AT2G22300</td>
+<td>cluster_26</td>
+<td>D</td>
+<td>5</td>
+<td>1</td>
+<td>15</td>
+<td>-----cCGYGThvn-</td>
+<td>-NBDACRCGG-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m604_AT5G64220</td>
+<td>AT5G64220</td>
+<td>cluster_26</td>
+<td>R</td>
+<td>5</td>
+<td>1</td>
+<td>15</td>
+<td>-----ACRCGSHTW-</td>
+<td>-wadsCGyGT-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m103_AT1G52890</td>
+<td>AT1G52890</td>
+<td>cluster_27</td>
+<td>D</td>
+<td>3</td>
+<td>1</td>
+<td>16</td>
+<td>---tAyACGbAACyk-</td>
+<td>-MRGTTVCGTRTA---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m133_AT1G69490</td>
+<td>AT1G69490</td>
+<td>cluster_27</td>
+<td>D</td>
+<td>4</td>
+<td>1</td>
+<td>16</td>
+<td>----ayACGymAyyt-</td>
+<td>-ARRTKRCGTRT----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m141_AT1G71930</td>
+<td>AT1G71930</td>
+<td>cluster_27</td>
+<td>D</td>
+<td>2</td>
+<td>2</td>
+<td>16</td>
+<td>--rkacACGsMACy--</td>
+<td>--RGTKSCGTGTMY--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m383_AT3G61910</td>
+<td>AT3G61910</td>
+<td>cluster_27</td>
+<td>D</td>
+<td>2</td>
+<td>1</td>
+<td>16</td>
+<td>--swayACGCAAysw-</td>
+<td>-WSRTTGCGTRTWS--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m279_AT3G04070</td>
+<td>AT3G04070</td>
+<td>cluster_27</td>
+<td>R</td>
+<td>0</td>
+<td>1</td>
+<td>16</td>
+<td>WWHWAYACGTMWCYT-</td>
+<td>-argwkaCGTRtwdww</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m480_AT5G04410</td>
+<td>AT5G04410</td>
+<td>cluster_27</td>
+<td>D</td>
+<td>2</td>
+<td>2</td>
+<td>16</td>
+<td>--tarCAmGcmAva--</td>
+<td>--TBTKGCKTGYTA--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m72_AT1G32770</td>
+<td>AT1G32770</td>
+<td>cluster_27</td>
+<td>R</td>
+<td>2</td>
+<td>2</td>
+<td>16</td>
+<td>--DATTACGCAAYC--</td>
+<td>--GrTTGCGTAAth--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m244_AT2G42400</td>
+<td>AT2G42400</td>
+<td>cluster_27</td>
+<td>R</td>
+<td>4</td>
+<td>0</td>
+<td>16</td>
+<td>----DTACGCWACCBH</td>
+<td>dvGGTwGCGTAh----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m113_AT1G61110</td>
+<td>AT1G61110</td>
+<td>cluster_27</td>
+<td>D</td>
+<td>5</td>
+<td>3</td>
+<td>16</td>
+<td>-----RTTRCGTR---</td>
+<td>---yACGyAAy-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m193_AT2G20110</td>
+<td>AT2G20110</td>
+<td>cluster_28</td>
+<td>D</td>
+<td>1</td>
+<td>1</td>
+<td>17</td>
+<td>-wTTTrAATwTTtwAW-</td>
+<td>-WTWAAAWATTYAAAW-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m402_AT4G14770</td>
+<td>AT4G14770</td>
+<td>cluster_28</td>
+<td>R</td>
+<td>1</td>
+<td>1</td>
+<td>17</td>
+<td>-WTTYRAATTTTRAAW-</td>
+<td>-wTTyaAAATTyRAAw-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m321_AT3G22780</td>
+<td>AT3G22780</td>
+<td>cluster_28</td>
+<td>R</td>
+<td>2</td>
+<td>0</td>
+<td>17</td>
+<td>--TTTRAATTTTWAWWW</td>
+<td>wwwTwaAAATTYAAA--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m320_AT3G22760</td>
+<td>AT3G22760</td>
+<td>cluster_28</td>
+<td>D</td>
+<td>1</td>
+<td>8</td>
+<td>17</td>
+<td>-dTTTrAAw--------</td>
+<td>--------WTTYAAAH-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m438_AT4G29000</td>
+<td>AT4G29000</td>
+<td>cluster_28</td>
+<td>D</td>
+<td>0</td>
+<td>7</td>
+<td>17</td>
+<td>arTTTGAAyt-------</td>
+<td>-------ARTTCAAAYT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m228_AT2G36610</td>
+<td>AT2G36610</td>
+<td>cluster_28</td>
+<td>R</td>
+<td>1</td>
+<td>3</td>
+<td>17</td>
+<td>-AWWWAWATTATWA---</td>
+<td>---twATAATwtwwwt-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m172_AT2G01930</td>
+<td>AT2G01930</td>
+<td>cluster_29</td>
+<td>D</td>
+<td>1</td>
+<td>5</td>
+<td>30</td>
+<td>-GAGAGAGAGAGAGAGAGAGAGAGA-----</td>
+<td>-----TCTCTCTCTCTCTCTCTCTCTCTC-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m548_AT5G42520</td>
+<td>AT5G42520</td>
+<td>cluster_29</td>
+<td>R</td>
+<td>3</td>
+<td>6</td>
+<td>30</td>
+<td>---KAGAGAGAGAGAGAGAGAGAG------</td>
+<td>------CTCTCTCTCTCTCTCTCTCTm---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m469_AT4G38910</td>
+<td>AT4G38910</td>
+<td>cluster_29</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>30</td>
+<td>CTCTCTCTCTCTCTCTCTCTCTCTCTCTCT</td>
+<td>AGAGAGAGAGAGAGAGAGAGAGAGAGAGAG</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m55_AT1G27730</td>
+<td>AT1G27730</td>
+<td>cluster_30</td>
+<td>D</td>
+<td>1</td>
+<td>3</td>
+<td>15</td>
+<td>-yWsthhCASTm---</td>
+<td>---KASTGDDASWR-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m479_AT5G04390</td>
+<td>AT5G04390</td>
+<td>cluster_30</td>
+<td>R</td>
+<td>1</td>
+<td>3</td>
+<td>15</td>
+<td>-YWMYWWCACTH---</td>
+<td>---dAGTGwwrkwr-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m345_AT3G46070</td>
+<td>AT3G46070</td>
+<td>cluster_30</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>yywhyyTCACTcthh</td>
+<td>DDAGAGTGARRDWRR</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m346_AT3G46090</td>
+<td>AT3G46090</td>
+<td>cluster_30</td>
+<td>R</td>
+<td>2</td>
+<td>0</td>
+<td>15</td>
+<td>--CAGYACACTVDDK</td>
+<td>mhhbAGTGtrctg--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m478_AT5G04340</td>
+<td>AT5G04340</td>
+<td>cluster_30</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>15</td>
+<td>---KTAGTGTTAR--</td>
+<td>--yTAACACTAm---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m618_AT5G67450</td>
+<td>AT5G67450</td>
+<td>cluster_30</td>
+<td>R</td>
+<td>0</td>
+<td>4</td>
+<td>15</td>
+<td>WCACTSWCWCW----</td>
+<td>----wgwGwsAGTGw</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m372_AT3G58630</td>
+<td>AT3G58630</td>
+<td>cluster_31</td>
+<td>R</td>
+<td>1</td>
+<td>0</td>
+<td>16</td>
+<td>-YGTCGCCGGAGAWDT</td>
+<td>ahwtCTCCGGCGAcr-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m483_AT5G05550</td>
+<td>AT5G05550</td>
+<td>cluster_31</td>
+<td>R</td>
+<td>0</td>
+<td>1</td>
+<td>16</td>
+<td>WYRTCGCCGGARAWD-</td>
+<td>-hwtytCCGGCGayrw</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m304_AT3G14180</td>
+<td>AT3G14180</td>
+<td>cluster_31</td>
+<td>D</td>
+<td>3</td>
+<td>2</td>
+<td>16</td>
+<td>---WTYTCCGGYGA--</td>
+<td>--TCrCCGGArAw---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m57_AT1G28300</td>
+<td>AT1G28300</td>
+<td>cluster_32</td>
+<td>D</td>
+<td>3</td>
+<td>4</td>
+<td>15</td>
+<td>---mTGCATGC----</td>
+<td>----GCATGCAK---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m331_AT3G24650</td>
+<td>AT3G24650</td>
+<td>cluster_32</td>
+<td>D</td>
+<td>3</td>
+<td>3</td>
+<td>15</td>
+<td>---ytGCATGCa---</td>
+<td>---TGCATGCAR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m532_AT5G25475</td>
+<td>AT5G25475</td>
+<td>cluster_32</td>
+<td>R</td>
+<td>4</td>
+<td>5</td>
+<td>15</td>
+<td>----TGCTTG-----</td>
+<td>-----CAAGCA----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m335_AT3G26790</td>
+<td>AT3G26790</td>
+<td>cluster_32</td>
+<td>R</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>TRYWTGCATGYATDT</td>
+<td>ahatrCATGCAwrya</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m317_AT3G20840</td>
+<td>AT3G20840</td>
+<td>cluster_33</td>
+<td>R</td>
+<td>1</td>
+<td>1</td>
+<td>21</td>
+<td>-YYKYCTCGRRAWYCGTGCM-</td>
+<td>-kgCACGrwTyyCgAGrmrr-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m500_AT5G10510</td>
+<td>AT5G10510</td>
+<td>cluster_33</td>
+<td>D</td>
+<td>4</td>
+<td>2</td>
+<td>21</td>
+<td>----ymTcGrrAwyCGtGc--</td>
+<td>--GCACGRWTYYCGAKR----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m465_AT4G37750</td>
+<td>AT4G37750</td>
+<td>cluster_33</td>
+<td>R</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>TKCRCMTBGGGAWCYGTGCMM</td>
+<td>kkGCACrgwTCCCvAkGygma</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m610_AT5G65510</td>
+<td>AT5G65510</td>
+<td>cluster_33</td>
+<td>R</td>
+<td>5</td>
+<td>5</td>
+<td>21</td>
+<td>-----CTCGRRAWYCG-----</td>
+<td>-----CGrwTyyCgAG-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m19_AT1G09030</td>
+<td>AT1G09030</td>
+<td>cluster_34</td>
+<td>D</td>
+<td>1</td>
+<td>1</td>
+<td>9</td>
+<td>-TGAAAAs-</td>
+<td>-STTTTCA-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m241_AT2G41835</td>
+<td>AT2G41835</td>
+<td>cluster_34</td>
+<td>D</td>
+<td>0</td>
+<td>2</td>
+<td>9</td>
+<td>TTGAAAA--</td>
+<td>--TTTTCAA</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m302_AT3G13040</td>
+<td>AT3G13040</td>
+<td>cluster_34</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>TGTTTTCWT</td>
+<td>awGAAAACa</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m355_AT3G49930</td>
+<td>AT3G49930</td>
+<td>cluster_34</td>
+<td>D</td>
+<td>2</td>
+<td>0</td>
+<td>9</td>
+<td>--WGATTTC</td>
+<td>GAAATCw--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m145_AT1G72740</td>
+<td>AT1G72740</td>
+<td>cluster_35</td>
+<td>D</td>
+<td>5</td>
+<td>4</td>
+<td>24</td>
+<td>-----cctAAACCCTAAwyc----</td>
+<td>----GRWTTAGGGTTTAGG-----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m619_AT5G67580</td>
+<td>AT5G67580</td>
+<td>cluster_35</td>
+<td>D</td>
+<td>2</td>
+<td>3</td>
+<td>24</td>
+<td>--awwwhtwwrCCCTAAwtwy---</td>
+<td>---RWAWTTAGGGYWWADWWWT--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m220_AT2G33550</td>
+<td>AT2G33550</td>
+<td>cluster_35</td>
+<td>D</td>
+<td>0</td>
+<td>6</td>
+<td>24</td>
+<td>TTWAGGGYWWWTWTTTTW------</td>
+<td>------waaaawawwwrCCCTwAa</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m42_AT1G19790</td>
+<td>AT1G19790</td>
+<td>cluster_35</td>
+<td>D</td>
+<td>1</td>
+<td>0</td>
+<td>24</td>
+<td>-TTAGGGTTTAGGGTTTAGGGTTT</td>
+<td>AAACCCTAAACCCTAAACCCTAA-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m185_AT2G15740</td>
+<td>AT2G15740</td>
+<td>cluster_36</td>
+<td>D</td>
+<td>4</td>
+<td>0</td>
+<td>15</td>
+<td>----rwCGrygaCGw</td>
+<td>WCGTCRYCGWY----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m527_AT5G22990</td>
+<td>AT5G22990</td>
+<td>cluster_36</td>
+<td>R</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>YGAARWCGAWGWCGW</td>
+<td>wCGwcwTCGwyttcr</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m378_AT3G60580</td>
+<td>AT3G60580</td>
+<td>cluster_37</td>
+<td>D</td>
+<td>0</td>
+<td>1</td>
+<td>9</td>
+<td>wkwAGTAr-</td>
+<td>-YTACTWMW</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m455_AT4G35580</td>
+<td>AT4G35580</td>
+<td>cluster_37</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>TTAAGTAAT</td>
+<td>ATTACTTAA</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m32_AT1G15720</td>
+<td>AT1G15720</td>
+<td>cluster_38</td>
+<td>D</td>
+<td>3</td>
+<td>0</td>
+<td>11</td>
+<td>---yTAGGGCw</td>
+<td>WGCCCTAR---</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m95_AT1G49950</td>
+<td>AT1G49950</td>
+<td>cluster_38</td>
+<td>D</td>
+<td>2</td>
+<td>0</td>
+<td>11</td>
+<td>--wTTAGGkyG</td>
+<td>CRMCCTAAW--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m360_AT3G51060</td>
+<td>AT3G51060</td>
+<td>cluster_38</td>
+<td>D</td>
+<td>0</td>
+<td>1</td>
+<td>11</td>
+<td>VCCCTAGGGG-</td>
+<td>-cCCCTAGGGb</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m147_AT1G73730</td>
+<td>AT1G73730</td>
+<td>cluster_39</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>21</td>
+<td>ryGTCyAGrTtCAwwrwatht</td>
+<td>ADATWYWWTGAAYCTRGACRY</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m316_AT3G20770</td>
+<td>AT3G20770</td>
+<td>cluster_39</td>
+<td>D</td>
+<td>2</td>
+<td>4</td>
+<td>21</td>
+<td>--GtcyArrTwCAwTGw----</td>
+<td>----WCAWTGWAYYTRGAC--</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m29_AT1G13450</td>
+<td>AT1G13450</td>
+<td>cluster_40</td>
+<td>D</td>
+<td>0</td>
+<td>6</td>
+<td>25</td>
+<td>mmyTAACYrTrGTTaaawy------</td>
+<td>------RWTTTAACYAYRGTTARKK</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m333_AT3G25990</td>
+<td>AT3G25990</td>
+<td>cluster_40</td>
+<td>D</td>
+<td>4</td>
+<td>0</td>
+<td>25</td>
+<td>----AACCATGGTTAAawywtaacm</td>
+<td>KGTTAWRWTTTAACCATGGTT----</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m391_AT4G01500</td>
+<td>AT4G01500</td>
+<td>cluster_41</td>
+<td>D</td>
+<td>0</td>
+<td>3</td>
+<td>19</td>
+<td>yytkktCAGGTgwwwt---</td>
+<td>---AWWWCACCTGAMMARR</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m526_AT5G22890</td>
+<td>AT5G22890</td>
+<td>cluster_41</td>
+<td>R</td>
+<td>1</td>
+<td>0</td>
+<td>19</td>
+<td>-WWRKGYAGGTKTTATCTG</td>
+<td>cAGATAamACCTrcmyww-</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m286_AT3G10030</td>
+<td>AT3G10030</td>
+<td>cluster_42</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>14</td>
+<td>adtTAACGGCGtya</td>
+<td>TRACGCCGTTAAHT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m429_AT4G24470</td>
+<td>AT4G24470</td>
+<td>cluster_43</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>TCtyrrCCGTysrwT</td>
+<td>AWYSRACGGYYRAGA</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m77_AT1G34370</td>
+<td>AT1G34370</td>
+<td>cluster_44</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>aCCTtCmCCRGwTra</td>
+<td>TYAWCYGGKGAAGGT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m98_AT1G51220</td>
+<td>AT1G51220</td>
+<td>cluster_45</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>waCCTgsAGaAcAwr</td>
+<td>YWTGTTCTSCAGGTW</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m586_AT5G60120</td>
+<td>AT5G60120</td>
+<td>cluster_46</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>10</td>
+<td>wAACCTAcGw</td>
+<td>WCGTAGGTTW</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m405_AT4G16150</td>
+<td>AT4G16150</td>
+<td>cluster_47</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>18</td>
+<td>mcGyGTrwraavCGyGTk</td>
+<td>MACRCGBTTYWYACRCGK</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m148_AT1G74480</td>
+<td>AT1G74480</td>
+<td>cluster_48</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>19</td>
+<td>gyGaCkyTTCrtCTTCCyy</td>
+<td>RRGGAAGAYGAARMGTCRC</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m517_AT5G18090</td>
+<td>AT5G18090</td>
+<td>cluster_49</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>gawGATGAArmarad</td>
+<td>HTYTKYTTCATCWTC</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m157_AT1G76870</td>
+<td>AT1G76870</td>
+<td>cluster_50</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>14</td>
+<td>awmywAAACCrsww</td>
+<td>WWSYGGTTTWRKWT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m44_AT1G20640</td>
+<td>AT1G20640</td>
+<td>cluster_51</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>dhwgCAGCAgcrrsa</td>
+<td>TSYYGCTGCTGCWDH</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m31_AT1G14687</td>
+<td>AT1G14687</td>
+<td>cluster_52</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>11</td>
+<td>wwwCGhATwWT</td>
+<td>AWWATDCGWWW</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m184_AT2G06200</td>
+<td>AT2G06200</td>
+<td>cluster_53</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>14</td>
+<td>swrawwkTGTCAGA</td>
+<td>TCTGACAMWWTYWS</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m22_AT1G09770</td>
+<td>AT1G09770</td>
+<td>cluster_54</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>11</td>
+<td>rsCTCAGCGsg</td>
+<td>CSCGCTGAGSY</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m352_AT3G48430</td>
+<td>AT3G48430</td>
+<td>cluster_55</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>12</td>
+<td>arAAACAGAGyA</td>
+<td>TRCTCTGTTTYT</td>
+</tr>
+
+<tr valign='top'>
+<td>a.t_motifs_m593_AT5G61850</td>
+<td>AT5G61850</td>
+<td>cluster_56</td>
+<td>D</td>
+<td>0</td>
+<td>0</td>
+<td>19</td>
+<td>yATkrACCGsCGGTymATr</td>
+<td>YATKRACCGSCGGTYMATR</td>
+</tr>
+
+</table>
+
+<pre>
+</pre>
+</BODY></HTML>

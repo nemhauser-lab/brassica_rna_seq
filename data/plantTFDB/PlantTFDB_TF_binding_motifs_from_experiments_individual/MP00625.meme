@@ -1,0 +1,24 @@
+MEME version 4.4
+
+ALPHABET= ACGT
+
+strands: + -
+
+Background letter frequencies (from uniform background):
+A 0.25000 C 0.25000 G 0.25000 T 0.25000 
+
+MOTIF MP00625 PK02532.1
+
+letter-probability matrix: alength= 4 w= 9 nsites= 20 E= 0
+  0.250000	  0.250000	  0.250000	  0.250000	
+  0.995033	  0.001656	  0.001656	  0.001656	
+  0.001244	  0.001244	  0.996269	  0.001244	
+  0.996269	  0.001244	  0.001244	  0.001244	
+  0.001244	  0.001244	  0.001244	  0.996269	
+  0.996269	  0.001244	  0.001244	  0.001244	
+  0.001244	  0.001244	  0.001244	  0.996269	
+  0.001244	  0.001244	  0.001244	  0.996269	
+  0.497525	  0.002475	  0.002475	  0.497525	
+
+URL http://planttfdb.cbi.pku.edu.cn/tf.php?sp=Csa&did=PK02532.1#bind_motif
+

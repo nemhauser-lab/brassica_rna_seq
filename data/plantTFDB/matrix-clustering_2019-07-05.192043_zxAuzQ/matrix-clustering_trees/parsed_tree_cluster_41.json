@@ -1,0 +1,41 @@
+{
+"name": "",
+"children":[
+ {
+ "consensus" : "yhtkktCAGGTgwtwtCTg",
+ "branch" : 1,
+ "id" : "cluster_41_node_1",
+ "ic" : "9.06",
+ "size" : 19,
+ "name" : "cluster_41",
+ "image" : "matrix-clustering_aligned_logos/cluster_41_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_41_logo_rc.png",
+
+ "children": [
+ {
+ "label": "a.t_motifs_m391_AT4G01500", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m391_AT4G01500_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m391_AT4G01500_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m391_AT4G01500_logo.png",
+ "name" : "AT4G01500",
+ "ic" : "7.99",
+ "size" : 19,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "AWWWCACCTGAMMARR"
+},
+{
+ "label": "a.t_motifs_m526_AT5G22890", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m526_AT5G22890_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m526_AT5G22890_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m526_AT5G22890_logo.png",
+ "name" : "AT5G22890",
+ "ic" : "10.15",
+ "size" : 19,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "WWRKGYAGGTKTTATCTG"
+} 
+] 
+} 
+]}

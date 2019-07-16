@@ -1,0 +1,41 @@
+{
+"name": "",
+"children":[
+ {
+ "consensus" : "TTAAGTAAT",
+ "branch" : 1,
+ "id" : "cluster_37_node_1",
+ "ic" : "9.02",
+ "size" : 9,
+ "name" : "cluster_37",
+ "image" : "matrix-clustering_aligned_logos/cluster_37_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_37_logo_rc.png",
+
+ "children": [
+ {
+ "label": "a.t_motifs_m378_AT3G60580", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m378_AT3G60580_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m378_AT3G60580_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m378_AT3G60580_logo.png",
+ "name" : "AT3G60580",
+ "ic" : "6.48",
+ "size" : 9,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "YTACTWMW"
+},
+{
+ "label": "a.t_motifs_m455_AT4G35580", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m455_AT4G35580_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m455_AT4G35580_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m455_AT4G35580_logo.png",
+ "name" : "AT4G35580",
+ "ic" : "11.48",
+ "size" : 9,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "ATTACTTAA"
+} 
+] 
+} 
+]}

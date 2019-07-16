@@ -1,0 +1,61 @@
+AC  cluster_5_node_64_5motifs
+XX
+ID  cluster_5_node_64_5motifs
+XX
+DE  ---wywTGTCGGyw----------------
+P0       a     c     g     t
+1        0     0     0     0
+2        0     0     0     0
+3        0     0     0     0
+4      157    76    63   304
+5      158   393   155   513
+6     1533   393   320   973
+7       17   103    90  3009
+8        9     3  3201     6
+9       10    44     5  3160
+10       5  3084     3   127
+11       6    23  2846   344
+12     228   232  2718    41
+13     332  1438   207  1242
+14     188    50   116   245
+15       0     0     0     0
+16       0     0     0     0
+17       0     0     0     0
+18       0     0     0     0
+19       0     0     0     0
+20       0     0     0     0
+21       0     0     0     0
+22       0     0     0     0
+23       0     0     0     0
+24       0     0     0     0
+25       0     0     0     0
+26       0     0     0     0
+27       0     0     0     0
+28       0     0     0     0
+29       0     0     0     0
+30       0     0     0     0
+XX
+CC  program: transfac
+CC  matrix.nb: 1
+CC  accession: cluster_5_node_64_5motifs
+CC  AC: cluster_5_node_64_5motifs
+CC  id: cluster_5_node_64_5motifs
+CC  name: cluster_5_node_64_5motifs
+CC  version: 
+CC  name: cluster_5_node_64_5motifs
+CC  description: ---wywTGTCGGyw----------------
+CC  transfac_consensus: 
+CC  matrix.nb: 1
+CC  consensus.strict: ---ttaTGTCGGct----------------
+CC  consensus.strict.rc: ----------------AGCCGACATAA---
+CC  consensus.IUPAC: ---wywTGTCGGyw----------------
+CC  consensus.IUPAC.rc: ----------------WRCCGACAWRW---
+CC  consensus.regexp: ---[at][ct][at]TGTCGG[ct][at]----------------
+CC  consensus.regexp.rc: ----------------[AT][AG]CCGACA[AT][AG][AT]---
+CC  type: merge
+CC  merge_type: sum
+CC  merge_nb: 5
+CC  merged_AC: 'a.t_motifs:::AT1G59750,a.t_motifs:::AT1G63030,a.t_motifs:::AT5G62000,a.t_motifs:::AT1G19850,a.t_motifs:::AT5G37020'
+CC  merged_ID: 'AT1G59750,AT1G63030,AT5G62000,AT1G19850,AT5G37020'
+XX
+//

@@ -74,16 +74,11 @@ The filter criteria is to remove rows(genes) that have less than 3 samples havin
 ```{r}
 
 countsFile <- file.path(rootDir, "data", "raw_counts.csv")
-# old path: "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/raw_counts.csv"
 counts <- read.csv(countsFile, row.names="X")
 # rename S (for sensence) to D (for dark-treatment)
 colnames(counts) <- sub("_S", "_D", colnames(counts))
 
 group <- gsub("_\\d_", ".", colnames(counts))
-
-# group <- factor(c(rep("WT.P",4), rep("WT.24", 4), rep("WT.D", 4), rep("WT.R", 4),
-#            rep("phyB.P", 3), rep("phyB.24", 3), rep("phyB.D", 3), 
-#            rep("phyB.R", 3)))
 
 # create the DGEList object edgeR uses
 DGEdata <- DGEList(counts=counts, group=group)
@@ -1219,6 +1214,36 @@ for (row in 1:nrow(plotGenes)) {
               save=TRUE, saveDir=folder)
 }
 
+
+# CBA1 orthologs
+# BraA04002510, BraA07001020, BraA08002753 ()
+
+# LIGHT-HARVESTING CHLOROPHYLL B-BINDING PROTEIN 3 (BraA10000990), 
+# LIGHT HARVESTING COMPLEX PHOTOSYSTEM II SUBUNIT 6 (BraA09006187), 
+# LIGHT-HARVESTING CHLOROPHYLL-PROTEIN COMPLEX II SUBUNIT B1( BraA05001183).
+
+# LHCB3:  BraA10000990
+# LHCB6:  BraA09006187
+# LHB1B1: BraA05001183
+
+# GLK2 ortholog BraA0600312
+plotGenes2 <- tibble::tribble(
+  ~Gene_ID, ~shortName,
+  "BraA04002510", "CBA1",
+  "BraA07001020", "CBA1",
+  "BraA08002753", "CBA1",
+  "BraA06000312", "GLK2",
+  "BraA10000990", "LHCB3",
+  "BraA09006187", "LHCB6",
+  "BraA05001183", "LHB1B1"
+)
+
+folder <- file.path(rootDir, "results", "GenePlots", "newPlots_20190709")
+for (i in 1:nrow(plotGenes2)){
+  stylePlotDE(plotGenes2[i, ]$"Gene_ID", cpm(DGEdata), 
+              At_hom=plotGenes2[i, ]$"shortName",
+              save=TRUE, saveDir=folder)
+}
 
 
 ```

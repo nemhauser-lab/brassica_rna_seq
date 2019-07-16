@@ -1,0 +1,23 @@
+MEME version 4.4
+
+ALPHABET= ACGT
+
+strands: + -
+
+Background letter frequencies (from uniform background):
+A 0.25000 C 0.25000 G 0.25000 T 0.25000 
+
+MOTIF MP00036 AT5G48560
+
+letter-probability matrix: alength= 4 w= 8 nsites= 20 E= 0
+  0.009615	  0.009615	  0.971154	  0.009615	
+  0.009615	  0.971154	  0.009615	  0.009615	
+  0.971154	  0.009615	  0.009615	  0.009615	
+  0.009615	  0.971154	  0.009615	  0.009615	
+  0.009615	  0.009615	  0.971154	  0.009615	
+  0.009615	  0.009615	  0.009615	  0.971154	
+  0.009615	  0.009615	  0.971154	  0.009615	
+  0.009615	  0.971154	  0.009615	  0.009615	
+
+URL http://planttfdb.cbi.pku.edu.cn/tf.php?sp=Ath&did=AT5G48560.1#bind_motif
+

@@ -504,5 +504,5 @@ stylePlotDE <- function(geneId, normExpr, At_hom="", display=TRUE, save=FALSE, s
 }
 
 
-stylePlotDE("BraA02001861", cpm(DGEdata), At_hom="AT1G66200")
+# stylePlotDE("BraA02001861", cpm(DGEdata), At_hom="AT1G66200")
 # stylePlotDE("BraA02001861", cpm(DGEdata), At_hom="GSR2")

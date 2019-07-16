@@ -1,0 +1,57 @@
+AC  cluster_11_node_24_2motifs
+XX
+ID  cluster_11_node_24_2motifs
+XX
+DE  --gTTtCTTGtrsaaCAAGw------
+P0       a     c     g     t
+1        0     0     0     0
+2        0     0     0     0
+3      123    59   315   102
+4       30     0     0  1167
+5      130     0   136   931
+6      250    64   141   742
+7        0  1196     0     1
+8        1     2    84  1110
+9        0     0     0  1197
+10      20     2  1175     0
+11     248   287   289   373
+12     383   158   453   203
+13     272   304   426   195
+14     644   235   196   122
+15     770    54   289    84
+16      24   956   135    82
+17    1197     0     0     0
+18    1011   185     0     1
+19       0     1  1183    13
+20     217    89    48   244
+21       0     0     0     0
+22       0     0     0     0
+23       0     0     0     0
+24       0     0     0     0
+25       0     0     0     0
+26       0     0     0     0
+XX
+CC  program: transfac
+CC  matrix.nb: 1
+CC  accession: cluster_11_node_24_2motifs
+CC  AC: cluster_11_node_24_2motifs
+CC  id: cluster_11_node_24_2motifs
+CC  name: cluster_11_node_24_2motifs
+CC  version: 
+CC  name: cluster_11_node_24_2motifs
+CC  description: --gTTtCTTGtrsaaCAAGw------
+CC  transfac_consensus: 
+CC  matrix.nb: 1
+CC  consensus.strict: --gTTtCTTGtggaaCAAGt------
+CC  consensus.strict.rc: ------ACTTGTTCCACAAGAAAC--
+CC  consensus.IUPAC: --gTTtCTTGtrsaaCAAGw------
+CC  consensus.IUPAC.rc: ------WCTTGTTSYACAAGAAAC--
+CC  consensus.regexp: --gTTtCTTGt[ag][cg]aaCAAG[at]------
+CC  consensus.regexp.rc: ------[AT]CTTGTT[CG][CT]ACAAGAAAC--
+CC  type: merge
+CC  merge_type: sum
+CC  merge_nb: 2
+CC  merged_AC: 'a.t_motifs:::AT3G10500,a.t_motifs:::AT3G15510'
+CC  merged_ID: 'AT3G10500,AT3G15510'
+XX
+//

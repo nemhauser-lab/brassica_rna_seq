@@ -1,0 +1,9 @@
+;level	cluster	node
+1	a.t_motifs_m279_AT3G04070,a.t_motifs_m103_AT1G52890,a.t_motifs_m133_AT1G69490,a.t_motifs_m141_AT1G71930,a.t_motifs_m383_AT3G61910,a.t_motifs_m480_AT5G04410,a.t_motifs_m244_AT2G42400,a.t_motifs_m72_AT1G32770,a.t_motifs_m113_AT1G61110	node_8
+2	a.t_motifs_m279_AT3G04070,a.t_motifs_m103_AT1G52890,a.t_motifs_m133_AT1G69490,a.t_motifs_m141_AT1G71930,a.t_motifs_m383_AT3G61910,a.t_motifs_m480_AT5G04410,a.t_motifs_m244_AT2G42400,a.t_motifs_m72_AT1G32770	node_7
+3	a.t_motifs_m279_AT3G04070,a.t_motifs_m103_AT1G52890,a.t_motifs_m133_AT1G69490,a.t_motifs_m141_AT1G71930,a.t_motifs_m383_AT3G61910,a.t_motifs_m480_AT5G04410	node_5
+4	a.t_motifs_m279_AT3G04070,a.t_motifs_m103_AT1G52890,a.t_motifs_m133_AT1G69490,a.t_motifs_m141_AT1G71930,a.t_motifs_m383_AT3G61910	node_4
+5	a.t_motifs_m103_AT1G52890,a.t_motifs_m133_AT1G69490,a.t_motifs_m141_AT1G71930,a.t_motifs_m383_AT3G61910	node_3
+6	a.t_motifs_m103_AT1G52890,a.t_motifs_m133_AT1G69490,a.t_motifs_m141_AT1G71930	node_2
+7	a.t_motifs_m103_AT1G52890,a.t_motifs_m133_AT1G69490	node_1
+8	a.t_motifs_m244_AT2G42400,a.t_motifs_m72_AT1G32770	node_6

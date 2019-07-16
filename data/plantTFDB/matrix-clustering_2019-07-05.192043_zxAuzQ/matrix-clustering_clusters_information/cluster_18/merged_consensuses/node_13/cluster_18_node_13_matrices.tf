@@ -1,0 +1,46 @@
+AC  cluster_18
+XX
+ID  cluster_18
+XX
+DE  ----------aGKTAGGTrra----------
+P0       a     c     g     t
+1        0     0     0     0
+2        0     0     0     0
+3        0     0     0     0
+4        0     0     0     0
+5        0     0     0     0
+6        0     0     0     0
+7        0     0     0     0
+8        0     0     0     0
+9        0     0     0     0
+10       0     0     0     0
+11      26    15    20    20
+12      10     1    67     1
+13       0     0    55    24
+14       1     0     0    79
+15      71     1     0     7
+16       0     0    80     0
+17       0     0    74     5
+18       0     1     0    79
+19      53     3    21     4
+20      21    16    25    15
+21       6     5     5     5
+22       0     0     0     0
+23       0     0     0     0
+24       0     0     0     0
+25       0     0     0     0
+26       0     0     0     0
+27       0     0     0     0
+28       0     0     0     0
+29       0     0     0     0
+30       0     0     0     0
+31       0     0     0     0
+XX
+CC  consensus.strict: ----------aGGTAGGTaga----------
+CC  consensus.strict.rc: ----------TCTACCTACCT----------
+CC  consensus.IUPAC: ----------aGKTAGGTrra----------
+CC  consensus.IUPAC.rc: ----------TYYACCTAMCT----------
+CC  consensus.regexp: ----------aG[GT]TAGGT[ag][ag]a----------
+CC  consensus.regexp.rc: ----------T[CT][CT]ACCTA[AC]CT----------
+XX
+//

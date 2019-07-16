@@ -1,0 +1,141 @@
+{
+"name": "",
+"children":[
+ {
+ "consensus" : "rsCGraAAwtyCGsmrrarw",
+ "branch" : 5,
+ "id" : "cluster_15_node_5",
+ "ic" : "7.70",
+ "size" : 20,
+ "name" : "cluster_15",
+ "image" : "matrix-clustering_aligned_logos/cluster_15_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_15_logo_rc.png",
+
+ "children": [
+ {
+ "consensus" : "sCGraAAwwyCGGarrarw",
+ "branch" : 4,
+ "id" : "cluster_15_node_4",
+ "ic" : "7.93",
+ "size" : 20,
+ "name" : "cluster_15_node_4_5motifs",
+ "image" : "matrix-clustering_aligned_logos/cluster_15_node_4_5motifs_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_15_node_4_5motifs_logo_rc.png",
+
+ "children": [
+ {
+ "label": "a.t_motifs_m253_AT2G45420", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m253_AT2G45420_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m253_AT2G45420_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m253_AT2G45420_logo.png",
+ "name" : "AT2G45420",
+ "ic" : "8.09",
+ "size" : 20,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "SCGGAAAWTCCGSMGRARW"
+},
+{
+ "consensus" : "cCGraAAwwyCGGar",
+ "branch" : 3,
+ "id" : "cluster_15_node_3",
+ "ic" : "7.78",
+ "size" : 20,
+ "name" : "cluster_15_node_3_4motifs",
+ "image" : "matrix-clustering_aligned_logos/cluster_15_node_3_4motifs_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_15_node_3_4motifs_logo_rc.png",
+
+ "children": [
+ {
+ "consensus" : "CCggAAAwtccGGmr",
+ "branch" : 1,
+ "id" : "cluster_15_node_1",
+ "ic" : "8.26",
+ "size" : 20,
+ "name" : "cluster_15_node_1_2motifs",
+ "image" : "matrix-clustering_aligned_logos/cluster_15_node_1_2motifs_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_15_node_1_2motifs_logo_rc.png",
+
+ "children": [
+ {
+ "label": "a.t_motifs_m245_AT2G42430", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m245_AT2G42430_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m245_AT2G42430_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m245_AT2G42430_logo.png",
+ "name" : "AT2G42430",
+ "ic" : "7.91",
+ "size" : 20,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "YKCCGGAWTTTCCGG"
+},
+{
+ "label": "a.t_motifs_m252_AT2G45410", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m252_AT2G45410_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m252_AT2G45410_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m252_AT2G45410_logo.png",
+ "name" : "AT2G45410",
+ "ic" : "8.80",
+ "size" : 20,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "YTCCGGAWTTTCCGG"
+} 
+] 
+},
+{
+ "consensus" : "sCGAaAAwwtCGGar",
+ "branch" : 2,
+ "id" : "cluster_15_node_2",
+ "ic" : "8.98",
+ "size" : 20,
+ "name" : "cluster_15_node_2_2motifs",
+ "image" : "matrix-clustering_aligned_logos/cluster_15_node_2_2motifs_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_15_node_2_2motifs_logo_rc.png",
+
+ "children": [
+ {
+ "label": "a.t_motifs_m13_AT1G06280", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m13_AT1G06280_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m13_AT1G06280_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m13_AT1G06280_logo.png",
+ "name" : "AT1G06280",
+ "ic" : "7.82",
+ "size" : 20,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "CTCCGATWTYTTCGS"
+},
+{
+ "label": "a.t_motifs_m124_AT1G68200", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m124_AT1G68200_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m124_AT1G68200_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m124_AT1G68200_logo.png",
+ "name" : "AT1G68200",
+ "ic" : "10.90",
+ "size" : 20,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "YTCCGAWWTTTTCGG"
+} 
+] 
+} 
+] 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m334_AT3G26620", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m334_AT3G26620_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m334_AT3G26620_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m334_AT3G26620_logo.png",
+ "name" : "AT3G26620",
+ "ic" : "8.20",
+ "size" : 20,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "RGCGKRAAWTMCGCY"
+} 
+] 
+} 
+]}

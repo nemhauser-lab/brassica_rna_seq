@@ -1,0 +1,7687 @@
+<html>
+<header>
+<title>/var/www/html/rsat/public_html/tmp/apache/2019/07/05/matrix-clustering_2019-07-05.192043_zxAuzQ/matrix-clustering_tables/pairwise_compa_matrix_descriptions.tab</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" /><META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+
+<script type="text/javascript">
+ <!-- 
+var stIsIE = /*@cc_on!@*/false;
+
+sorttable = {
+  init: function() {
+    // quit if this function has already been called
+    if (arguments.callee.done) return;
+    // flag this function so we don't do the same thing twice
+    arguments.callee.done = true;
+    // kill the timer
+    if (_timer) clearInterval(_timer);
+    
+    if (!document.createElement || !document.getElementsByTagName) return;
+    
+    sorttable.DATE_RE = /^(\d\d?)[\/\.-](\d\d?)[\/\.-]((\d\d)?\d\d)$/;
+    
+    forEach(document.getElementsByTagName('table'), function(table) {
+      if (table.className.search(/\bsortable\b/) != -1) {
+        sorttable.makeSortable(table);
+      }
+    });
+    
+  },
+  
+  makeSortable: function(table) {
+    if (table.getElementsByTagName('thead').length == 0) {
+      // table doesn't have a tHead. Since it should have, create one and
+      // put the first table row in it.
+      the = document.createElement('thead');
+      the.appendChild(table.rows[0]);
+      table.insertBefore(the,table.firstChild);
+    }
+    // Safari doesn't support table.tHead, sigh
+    if (table.tHead == null) table.tHead = table.getElementsByTagName('thead')[0];
+    
+    if (table.tHead.rows.length != 1) return; // can't cope with two header rows
+    
+    // Sorttable v1 put rows with a class of "sortbottom" at the bottom (as
+    // "total" rows, for example). This is B&R, since what you're supposed
+    // to do is put them in a tfoot. So, if there are sortbottom rows,
+    // for backwards compatibility, move them to tfoot (creating it if needed).
+    sortbottomrows = [];
+    for (var i=0; i<table.rows.length; i++) {
+      if (table.rows[i].className.search(/\bsortbottom\b/) != -1) {
+        sortbottomrows[sortbottomrows.length] = table.rows[i];
+      }
+    }
+    if (sortbottomrows) {
+      if (table.tFoot == null) {
+        // table doesn't have a tfoot. Create one.
+        tfo = document.createElement('tfoot');
+        table.appendChild(tfo);
+      }
+      for (var i=0; i<sortbottomrows.length; i++) {
+        tfo.appendChild(sortbottomrows[i]);
+      }
+      delete sortbottomrows;
+    }
+    
+    // work through each column and calculate its type
+    headrow = table.tHead.rows[0].cells;
+    for (var i=0; i<headrow.length; i++) {
+      // manually override the type with a sorttable_type attribute
+      if (!headrow[i].className.match(/\bsorttable_nosort\b/)) { // skip this col
+        mtch = headrow[i].className.match(/\bsorttable_([a-z0-9]+)\b/);
+        if (mtch) { override = mtch[1]; }
+	      if (mtch && typeof sorttable["sort_"+override] == 'function') {
+	        headrow[i].sorttable_sortfunction = sorttable["sort_"+override];
+	      } else {
+	        headrow[i].sorttable_sortfunction = sorttable.guessType(table,i);
+	      }
+	      // make it clickable to sort
+	      headrow[i].sorttable_columnindex = i;
+	      headrow[i].sorttable_tbody = table.tBodies[0];
+	      dean_addEvent(headrow[i],"click", function(e) {
+
+          if (this.className.search(/\bsorttable_sorted\b/) != -1) {
+            // if we're already sorted by this column, just 
+            // reverse the table, which is quicker
+            sorttable.reverse(this.sorttable_tbody);
+            this.className = this.className.replace('sorttable_sorted',
+                                                    'sorttable_sorted_reverse');
+            this.removeChild(document.getElementById('sorttable_sortfwdind'));
+            sortrevind = document.createElement('span');
+            sortrevind.id = "sorttable_sortrevind";
+            sortrevind.innerHTML = stIsIE ? '&nbsp<font face="webdings">5</font>' : '&nbsp;&#x25B4;';
+            this.appendChild(sortrevind);
+            return;
+          }
+          if (this.className.search(/\bsorttable_sorted_reverse\b/) != -1) {
+            // if we're already sorted by this column in reverse, just 
+            // re-reverse the table, which is quicker
+            sorttable.reverse(this.sorttable_tbody);
+            this.className = this.className.replace('sorttable_sorted_reverse',
+                                                    'sorttable_sorted');
+            this.removeChild(document.getElementById('sorttable_sortrevind'));
+            sortfwdind = document.createElement('span');
+            sortfwdind.id = "sorttable_sortfwdind";
+            sortfwdind.innerHTML = stIsIE ? '&nbsp<font face="webdings">6</font>' : '&nbsp;&#x25BE;';
+            this.appendChild(sortfwdind);
+            return;
+          }
+          
+          // remove sorttable_sorted classes
+          theadrow = this.parentNode;
+          forEach(theadrow.childNodes, function(cell) {
+            if (cell.nodeType == 1) { // an element
+              cell.className = cell.className.replace('sorttable_sorted_reverse','');
+              cell.className = cell.className.replace('sorttable_sorted','');
+            }
+          });
+          sortfwdind = document.getElementById('sorttable_sortfwdind');
+          if (sortfwdind) { sortfwdind.parentNode.removeChild(sortfwdind); }
+          sortrevind = document.getElementById('sorttable_sortrevind');
+          if (sortrevind) { sortrevind.parentNode.removeChild(sortrevind); }
+          
+          this.className += ' sorttable_sorted';
+          sortfwdind = document.createElement('span');
+          sortfwdind.id = "sorttable_sortfwdind";
+          sortfwdind.innerHTML = stIsIE ? '&nbsp<font face="webdings">6</font>' : '&nbsp;&#x25BE;';
+          this.appendChild(sortfwdind);
+
+	        // build an array to sort. This is a Schwartzian transform thing,
+	        // i.e., we "decorate" each row with the actual sort key,
+	        // sort based on the sort keys, and then put the rows back in order
+	        // which is a lot faster because you only do getInnerText once per row
+	        row_array = [];
+	        col = this.sorttable_columnindex;
+	        rows = this.sorttable_tbody.rows;
+	        for (var j=0; j<rows.length; j++) {
+	          row_array[row_array.length] = [sorttable.getInnerText(rows[j].cells[col]), rows[j]];
+	        }
+	        /* If you want a stable sort, uncomment the following line */
+	        //sorttable.shaker_sort(row_array, this.sorttable_sortfunction);
+	        /* and comment out this one */
+	        row_array.sort(this.sorttable_sortfunction);
+	        
+	        tb = this.sorttable_tbody;
+	        for (var j=0; j<row_array.length; j++) {
+	          tb.appendChild(row_array[j][1]);
+	        }
+	        
+	        delete row_array;
+	      });
+	    }
+    }
+  },
+  
+  guessType: function(table, column) {
+    // guess the type of a column based on its first non-blank row
+    sortfn = sorttable.sort_alpha;
+    for (var i=0; i<table.tBodies[0].rows.length; i++) {
+      text = sorttable.getInnerText(table.tBodies[0].rows[i].cells[column]);
+      if (text != '') {
+        if (text.match(/^-?[£$¤]?[\d,.]+%?$/)||text.match(/^\d+((\.|,)\d+)?(E|e)(\+|\-)\d+/)) {
+          return sorttable.sort_numeric;
+        }
+        // check for a date: dd/mm/yyyy or dd/mm/yy 
+        // can have / or . or - as separator
+        // can be mm/dd as well
+        possdate = text.match(sorttable.DATE_RE)
+        if (possdate) {
+          // looks like a date
+          first = parseInt(possdate[1]);
+          second = parseInt(possdate[2]);
+          if (first > 12) {
+            // definitely dd/mm
+            return sorttable.sort_ddmm;
+          } else if (second > 12) {
+            return sorttable.sort_mmdd;
+          } else {
+            // looks like a date, but we can't tell which, so assume
+            // that it's dd/mm (English imperialism!) and keep looking
+            sortfn = sorttable.sort_ddmm;
+          }
+        }
+      }
+    }
+    return sortfn;
+  },
+  
+  getInnerText: function(node) {
+    // gets the text we want to use for sorting for a cell.
+    // strips leading and trailing whitespace.
+    // this is *not* a generic getInnerText function; it's special to sorttable.
+    // for example, you can override the cell text with a customkey attribute.
+    // it also gets .value for <input> fields.
+    
+    hasInputs = (typeof node.getElementsByTagName == 'function') &&
+                 node.getElementsByTagName('input').length;
+    
+    if (node.getAttribute("sorttable_customkey") != null) {
+      return node.getAttribute("sorttable_customkey");
+    }
+    else if (typeof node.textContent != 'undefined' && !hasInputs) {
+      return node.textContent.replace(/^\s+|\s+$/g, '');
+    }
+    else if (typeof node.innerText != 'undefined' && !hasInputs) {
+      return node.innerText.replace(/^\s+|\s+$/g, '');
+    }
+    else if (typeof node.text != 'undefined' && !hasInputs) {
+      return node.text.replace(/^\s+|\s+$/g, '');
+    }
+    else {
+      switch (node.nodeType) {
+        case 3:
+          if (node.nodeName.toLowerCase() == 'input') {
+            return node.value.replace(/^\s+|\s+$/g, '');
+          }
+        case 4:
+          return node.nodeValue.replace(/^\s+|\s+$/g, '');
+          break;
+        case 1:
+        case 11:
+          var innerText = '';
+          for (var i = 0; i < node.childNodes.length; i++) {
+            innerText += sorttable.getInnerText(node.childNodes[i]);
+          }
+          return innerText.replace(/^\s+|\s+$/g, '');
+          break;
+        default:
+          return '';
+      }
+    }
+  },
+  
+  reverse: function(tbody) {
+    // reverse the rows in a tbody
+    newrows = [];
+    for (var i=0; i<tbody.rows.length; i++) {
+      newrows[newrows.length] = tbody.rows[i];
+    }
+    for (var i=newrows.length-1; i>=0; i--) {
+       tbody.appendChild(newrows[i]);
+    }
+    delete newrows;
+  },
+  
+  /* sort functions
+     each sort function takes two parameters, a and b
+     you are comparing a[0] and b[0] */
+  /* Numeric order */
+  sort_numeric: function(a,b) {
+	aa = parseFloat(a[0].replace(/[^0-9.\-eE]/g,''));
+	if (isNaN(aa)) aa = 0;
+	bb = parseFloat(b[0].replace(/[^0-9.\-eE]/g,''));
+	if (isNaN(bb)) bb = 0;
+	return aa-bb;
+    },
+//   sort_numeric: function(a,b) {
+//     aa = parseFloat(a[0].replace(/[^0-9.-eE]/g,''));
+//     if (isNaN(aa)) aa = 0;
+//     bb = parseFloat(b[0].replace(/[^0-9.-eE]/g,'')); 
+//     if (isNaN(bb)) bb = 0;    
+//     return aa-bb;
+//   },
+
+  /* alphabetical order */
+  sort_alpha: function(a,b) {
+    if (a[0]==b[0]) return 0;
+    if (a[0]<b[0]) return -1;
+    return 1;
+  },
+
+  /* sort dates formatted as ddmm (day first, month after) */
+  sort_ddmm: function(a,b) {
+    mtch = a[0].match(sorttable.DATE_RE);
+    y = mtch[3]; m = mtch[2]; d = mtch[1];
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt1 = y+m+d;
+    mtch = b[0].match(sorttable.DATE_RE);
+    y = mtch[3]; m = mtch[2]; d = mtch[1];
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt2 = y+m+d;
+    if (dt1==dt2) return 0;
+    if (dt1<dt2) return -1;
+    return 1;
+  },
+
+  /* sort dates formatted as mmdd (month first, day after) */
+  sort_mmdd: function(a,b) {
+    mtch = a[0].match(sorttable.DATE_RE);
+    y = mtch[3]; d = mtch[2]; m = mtch[1];
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt1 = y+m+d;
+    mtch = b[0].match(sorttable.DATE_RE);
+    y = mtch[3]; d = mtch[2]; m = mtch[1];
+    if (m.length == 1) m = '0'+m;
+    if (d.length == 1) d = '0'+d;
+    dt2 = y+m+d;
+    if (dt1==dt2) return 0;
+    if (dt1<dt2) return -1;
+    return 1;
+  },
+  
+  shaker_sort: function(list, comp_func) {
+    // A stable sort function to allow multi-level sorting of data
+    // see: http://en.wikipedia.org/wiki/Cocktail_sort
+    // thanks to Joseph Nahmias
+    var b = 0;
+    var t = list.length - 1;
+    var swap = true;
+
+    while(swap) {
+        swap = false;
+        for(var i = b; i < t; ++i) {
+            if ( comp_func(list[i], list[i+1]) > 0 ) {
+                var q = list[i]; list[i] = list[i+1]; list[i+1] = q;
+                swap = true;
+            }
+        } // for
+        t--;
+
+        if (!swap) break;
+
+        for(var i = t; i > b; --i) {
+            if ( comp_func(list[i], list[i-1]) < 0 ) {
+                var q = list[i]; list[i] = list[i-1]; list[i-1] = q;
+                swap = true;
+            }
+        } // for
+        b++;
+
+    } // while(swap)
+  }  
+}
+
+/* ******************************************************************
+   Supporting functions: bundled here to avoid depending on a library
+   ****************************************************************** */
+
+// Dean Edwards/Matthias Miller/John Resig
+
+/* for Mozilla/Opera9 */
+if (document.addEventListener) {
+    document.addEventListener("DOMContentLoaded", sorttable.init, false);
+}
+
+/* for Internet Explorer */
+/*@cc_on @*/
+/*@if (@_win32)
+    document.write("<script id=__ie_onload defer src=javascript:void(0)><\/script>");
+    var script = document.getElementById("__ie_onload");
+    script.onreadystatechange = function() {
+        if (this.readyState == "complete") {
+            sorttable.init(); // call the onload handler
+        }
+    };
+/*@end @*/
+
+/* for Safari */
+if (/WebKit/i.test(navigator.userAgent)) { // sniff
+    var _timer = setInterval(function() {
+        if (/loaded|complete/.test(document.readyState)) {
+            sorttable.init(); // call the onload handler
+        }
+    }, 10);
+}
+
+/* for other browsers */
+window.onload = sorttable.init;
+
+// written by Dean Edwards, 2005
+// with input from Tino Zijdel, Matthias Miller, Diego Perini
+
+// http://dean.edwards.name/weblog/2005/10/add-event/
+
+function dean_addEvent(element, type, handler) {
+	if (element.addEventListener) {
+		element.addEventListener(type, handler, false);
+	} else {
+		// assign each event handler a unique ID
+		if (!handler.$$guid) handler.$$guid = dean_addEvent.guid++;
+		// create a hash table of event types for the element
+		if (!element.events) element.events = {};
+		// create a hash table of event handlers for each element/event pair
+		var handlers = element.events[type];
+		if (!handlers) {
+			handlers = element.events[type] = {};
+			// store the existing event handler (if there is one)
+			if (element["on" + type]) {
+				handlers[0] = element["on" + type];
+			}
+		}
+		// store the event handler in the hash table
+		handlers[handler.$$guid] = handler;
+		// assign a global event handler to do all the work
+		element["on" + type] = handleEvent;
+	}
+};
+// a counter used to create unique IDs
+dean_addEvent.guid = 1;
+
+function removeEvent(element, type, handler) {
+	if (element.removeEventListener) {
+		element.removeEventListener(type, handler, false);
+	} else {
+		// delete the event handler from the hash table
+		if (element.events && element.events[type]) {
+			delete element.events[type][handler.$$guid];
+		}
+	}
+};
+
+function handleEvent(event) {
+	var returnValue = true;
+	// grab the event object (IE uses a global event object)
+	event = event || fixEvent(((this.ownerDocument || this.document || this).parentWindow || window).event);
+	// get a reference to the hash table of event handlers
+	var handlers = this.events[event.type];
+	// execute each event handler
+	for (var i in handlers) {
+		this.$$handleEvent = handlers[i];
+		if (this.$$handleEvent(event) === false) {
+			returnValue = false;
+		}
+	}
+	return returnValue;
+};
+
+function fixEvent(event) {
+	// add W3C standard event methods
+	event.preventDefault = fixEvent.preventDefault;
+	event.stopPropagation = fixEvent.stopPropagation;
+	return event;
+};
+fixEvent.preventDefault = function() {
+	this.returnValue = false;
+};
+fixEvent.stopPropagation = function() {
+  this.cancelBubble = true;
+}
+
+// Dean's forEach: http://dean.edwards.name/base/forEach.js
+/*
+	forEach, version 1.0
+	Copyright 2006, Dean Edwards
+	License: http://www.opensource.org/licenses/mit-license.php
+*/
+
+// array-like enumeration
+if (!Array.forEach) { // mozilla already supports this
+	Array.forEach = function(array, block, context) {
+		for (var i = 0; i < array.length; i++) {
+			block.call(context, array[i], i, array);
+		}
+	};
+}
+
+// generic enumeration
+Function.prototype.forEach = function(object, block, context) {
+	for (var key in object) {
+		if (typeof this.prototype[key] == "undefined") {
+			block.call(context, object[key], key, object);
+		}
+	}
+};
+
+// character enumeration
+String.forEach = function(string, block, context) {
+	Array.forEach(string.split(""), function(chr, index) {
+		block.call(context, chr, index, string);
+	});
+};
+
+// globally resolve forEach enumeration
+var forEach = function(object, block, context) {
+	if (object) {
+		var resolve = Object; // default
+		if (object instanceof Function) {
+			// functions have a "length" property
+			resolve = Function;
+		} else if (object.forEach instanceof Function) {
+			// the object implements a custom forEach method so use that
+			object.forEach(block, context);
+			return;
+		} else if (typeof object == "string") {
+			// the object is a string
+			resolve = String;
+		} else if (typeof object.length == "number") {
+			// the object is array-like
+			resolve = Array;
+		}
+		resolve.forEach(object, block, context);
+	}
+}
+
+// --> 
+</script>
+<style type='text/css'>
+/* Style sheet for the HTML formatting of RSAT results */
+
+/* BODY  */
+body {
+       font-family: Verdana, Helvetica, Arial, sans-serif;
+       font-size: 70%;
+       margin-top: 2px;
+       margin-left: 20px;
+       text-align: justify;
+       background: #ffffff;
+       margin-right: 20px;
+/*       background: #0D73A7 url(images/bullet2-normal.gif) no-repeat 7px 7px;*/
+}
+
+
+/* div for menu */
+
+#Menu_space {
+	margin-top:120px;
+	margin-bottom:300px;
+}
+#Menu_wait {
+	position:absolute;
+	top:120px;
+	left:50%;
+	width:400px;
+	margin-left: -200px;
+	padding:10px;
+	text-align:center;
+	}
+
+#Menu {
+	position:absolute;
+	top:120px;
+	left:50%;
+	width:800px;
+	margin-left: -400px;
+	padding:10px;
+	background-color:#eee;
+	border:1px dashed #999;
+	line-height:17px;
+	font-size: 110%;
+	voice-family: "\"}\"";
+	voice-family:inherit;
+	text-align:left;
+	}
+
+#Menu h3 {
+	margin:0;
+	text-align:center;
+	padding-bottom:5px;
+}
+
+#Menu ul {
+	list-style-type:none;
+}
+
+/* TABLE */
+#Menu table {
+	margin: 10px 10px 10px;
+}
+
+#Menu  td, th {
+	font-size: 70%;
+	padding: 2px 10px;
+	vertical-align:top;
+}
+
+.menulink a:link,a:visited {
+	color:#cc6600;
+	background: transparent;
+	text-decoration: none;
+	}
+
+.menulink a:visited {
+	color:#cc6600;
+	background: transparent;
+	text-decoration: none;
+	}
+
+.menulink A:active {
+	color: #cc6600;
+	background: transparent;
+	text-decoration: none
+}
+
+.menulink A:hover {
+	text-decoration: underline;
+	color: #cc6600;
+}
+
+
+/* Links  */
+
+A:link,A:visited {
+	color: #0D73A7;
+	background: transparent;
+	text-decoration: none;
+}
+
+A:active {
+	color: #ff0000;
+	background: transparent;
+	text-decoration: none
+}
+
+A:hover {
+	text-decoration: underline;
+	color: #cc6600;
+}
+
+/* Headers  */
+
+h1 {
+	margin-top: 10px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	margin-bottom: 0px;
+	padding-left: 10px;
+	border: 1px solid #2D282E;
+	background-color: #0D73A7;
+	font-size: 16px;
+	color: #D6EEFA;
+}
+h1 a:link, h1 a:visited {
+	color: #D6EEFA;
+}
+
+h1 a:hover {
+	color: #ffffff;
+}
+
+h2 {
+	margin-top: 10px;
+	padding-top: 15px;
+	margin-bottom: 0px;
+	color: #002266;
+	font-size: 15px;
+}
+
+h3 {
+	margin-top: 6px;
+	padding-top: 6px;
+	margin-bottom: 0px;
+	color: #002266;
+	font-size: 11px;
+}
+
+h4 {
+	margin-top: 4px;
+	padding-top: 4px;
+	margin-bottom: 0px;
+	color : #2D282E;
+	font-size: 11px;
+}
+
+h2.motif {
+	margin-top: 3px;
+	padding-top: 0px;
+	margin-bottom: 4px;
+	color : #2D282E;
+	font-size: 12px;
+}
+
+/* Other tag formatting  */
+hr {
+	border: 1px dotted #2D282E;
+	height: 1px;
+}
+
+hr.solid {
+	border: 1px solid #2D282E;
+	height: 1px;
+}
+
+pre,tt {
+         font-size: 12px;
+}
+
+pre { 
+      background:#EEEEEE;
+ }
+
+
+center {
+	margin-top: 5px;
+	margin-bottom: 20px;
+	font-weight: bold;
+}
+
+blockquote {
+	color : #cc6600;
+	font-size: 12px;
+}
+
+body blockquote.information {
+	color : #009900;
+	font-size: 12px;
+}
+
+body blockquote.warning {
+	color : #aa0000;
+	font-size: 12px;
+}
+
+blockquote.demo {
+	color : #000000;
+	font-size: 12px;
+	font-style:italic;
+}
+
+
+
+/* TABLE */
+table.simple {
+	margin: 10px 20px 20px;
+	color: #000000;
+}
+
+table.simple td,table.list th {
+	font-size: 70%;
+	padding: 2px 10px;
+	background-color: #FFFFFF;
+	page-break-inside: auto;
+}
+
+table.simple th {
+	font-size: 70%;
+	background-color: #F6E6CA;
+}
+
+/* TABLE */
+
+/* table with white bg and small fonts */
+table.whitebg {
+	margin: 10px 20px 20px;
+	color: #000000;
+	border-left: 1px solid #cbcbb4;
+	border-top: 1px solid #cbcbb4;
+	border-spacing: 0px;
+}
+
+table.whitebg td,table.whitebg th {
+	font-size: 70%;
+	border-right: 1px solid #cbcbb4;
+	border-bottom: 1px solid #cbcbb4;
+	padding: 2px 10px;
+	background-color: #FFFFFF;
+	page-break-inside: auto;
+}
+
+
+/* table with blue bg and small font */
+table.whitebg th {
+	font-size: 70%;
+	background-color: #F6E6CA;
+}
+
+table.bluebg {
+	color: #333333;
+	border-left: 1px solid #cbcbb4;
+	border-top: 1px solid #cbcbb4;
+	}
+
+table.bluebg td,table.bluebg th {
+	font-size: 70%;
+	border-right: 1px solid #cbcbb4;
+	border-bottom: 1px solid #cbcbb4;
+	background-color: #D6EEFA;
+	page-break-inside: auto;
+}
+
+table.bluebg th {
+	background-color: #0D73A7;
+	color: #D6EEFA;
+}
+	
+/* Table on result pages - compatible with the sorttable type defined by javascript */
+
+table.sortable {
+	margin: 10px 20px 20px;
+	color: #000000;
+	border-left: 1px solid #cbcbb4;
+	border-right: 1px solid #cbcbb4;
+	border-top: 1px solid #cbcbb4;
+	border-bottom: 1px solid #cbcbb4;
+	border-spacing: 0px;
+}
+
+table.sortable td,table.sortable th {
+	padding: 2px 10px;
+	font-size: 70%;
+	border-right: 1px solid #cbcbb4;
+	border-bottom: 1px solid #cbcbb4;
+	padding: 2px 10px;
+	background-color: #FFFFFF;
+	page-break-inside: auto;
+}
+
+table.sortable th {
+	font-size: 70%;
+	background-color: #0D73A7;
+	color: #D6EEFA;
+}
+
+
+/* LINK TABLE ON RESULTS PAGES */
+table.resultlink {
+	margin-left:5px;
+	width : 90%;
+	color: #2D282E;
+	background-color: #D6EEFA;
+}
+
+
+table.resultlink td, table.resultlink th {
+	font-size: 70%;
+	padding-left:5px;
+	padding-right:3px;
+	text-align :left;
+	page-break-inside: auto;
+}
+
+/* COLLAPSIBLE MENUS */
+
+.menu_heading_open {
+	background: url(images_html/arrow_box_down.gif) no-repeat 5px 7px;
+	text-decoration: none;
+	padding: 0px 6px 4px 21px;
+	margin: 0;
+	cursor: pointer;
+	font-weight: bold;
+	display: block;
+}
+
+.menu_heading_closed {
+	background: url(images_html/arrow_box.gif) no-repeat 5px 7px;
+	text-decoration: underline; 
+	display: block;
+	padding:0px 6px 4px 21px;
+	margin: 0;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.menu_collapsible {
+	display: none;
+	margin-bottom: 10px;
+	margin-left: 30px;
+}
+
+.menu_collapsible_display {
+   display: block;
+   margin-bottom: 10px;
+   margin-left: 30px;
+}
+</style>
+<header>
+<body bgcolor='#ffffff'>
+<pre></pre>
+
+<table  class="sortable"  cellspacing='1' cellpadding='3' border='1'>
+<tr valign='top'>
+<th align='left' >n</th>
+<th align='left'>id</th>
+<th align='left'>name</th>
+<th align='left'>width</th>
+<th align='left'>consensus</th>
+<th align='left'>rc_consensus</th>
+<th align='left'>label</th>
+<th align='left'>IC</th>
+<th align='left'>nb_sites</th>
+</tr>
+
+<tr valign='top'>
+<td>1</td>
+<td>a.t_motifs_m1_AT1G01060</td>
+<td>AT1G01060</td>
+<td>10</td>
+<td>AGATATTTwt</td>
+<td>AWAAATATCT</td>
+<td>10.42</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>2</td>
+<td>a.t_motifs_m2_AT1G01250</td>
+<td>AT1G01250</td>
+<td>15</td>
+<td>rdwwkTGTCGGTGrh</td>
+<td>DYCACCGACAMWWHY</td>
+<td>10.28</td>
+<td>572</td>
+</tr>
+
+<tr valign='top'>
+<td>3</td>
+<td>a.t_motifs_m3_AT1G01260</td>
+<td>AT1G01260</td>
+<td>8</td>
+<td>rCACGTGC</td>
+<td>GCACGTGY</td>
+<td>8.49</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>4</td>
+<td>a.t_motifs_m4_AT1G01720</td>
+<td>AT1G01720</td>
+<td>22</td>
+<td>kaCGTrwwkraywygkmwwctt</td>
+<td>AAGWWKMCRWRTYMWWYACGTM</td>
+<td>7.70</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>5</td>
+<td>a.t_motifs_m5_AT1G02065</td>
+<td>AT1G02065</td>
+<td>16</td>
+<td>wwwwwyGTACywywww</td>
+<td>WWWRWRGTACRWWWWW</td>
+<td>8.83</td>
+<td>30</td>
+</tr>
+
+<tr valign='top'>
+<td>6</td>
+<td>a.t_motifs_m6_AT1G02230</td>
+<td>AT1G02230</td>
+<td>14</td>
+<td>CTTsYtywryAAGt</td>
+<td>ACTTRYWRARSAAG</td>
+<td>11.04</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>7</td>
+<td>a.t_motifs_m7_AT1G02250</td>
+<td>AT1G02250</td>
+<td>19</td>
+<td>TwrCTTsttywayAAGtww</td>
+<td>WWACTTRTWRAASAAGYWA</td>
+<td>11.88</td>
+<td>590</td>
+</tr>
+
+<tr valign='top'>
+<td>8</td>
+<td>a.t_motifs_m8_AT1G03800</td>
+<td>AT1G03800</td>
+<td>21</td>
+<td>wccrcckycdcCGCCGCCryh</td>
+<td>DRYGGCGGCGGHGRMGGYGGW</td>
+<td>10.37</td>
+<td>571</td>
+</tr>
+
+<tr valign='top'>
+<td>9</td>
+<td>a.t_motifs_m9_AT1G03840</td>
+<td>AT1G03840</td>
+<td>20</td>
+<td>hasaAAAmGACAAAAawaww</td>
+<td>WWTWTTTTTGTCKTTTTSTD</td>
+<td>13.31</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>10</td>
+<td>a.t_motifs_m10_AT1G06070</td>
+<td>AT1G06070</td>
+<td>11</td>
+<td>kmCAGCTGkCA</td>
+<td>TGMCAGCTGKM</td>
+<td>11.15</td>
+<td>202</td>
+</tr>
+
+<tr valign='top'>
+<td>11</td>
+<td>a.t_motifs_m11_AT1G06160</td>
+<td>AT1G06160</td>
+<td>8</td>
+<td>mGCCGCCr</td>
+<td>YGGCGGCK</td>
+<td>8.31</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>12</td>
+<td>a.t_motifs_m12_AT1G06180</td>
+<td>AT1G06180</td>
+<td>15</td>
+<td>dwddkGGTwGGTGrr</td>
+<td>YYCACCWACCMHHWH</td>
+<td>9.36</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>13</td>
+<td>a.t_motifs_m13_AT1G06280</td>
+<td>AT1G06280</td>
+<td>15</td>
+<td>sCGAarAwatCGGag</td>
+<td>CTCCGATWTYTTCGS</td>
+<td>7.82</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>14</td>
+<td>a.t_motifs_m14_AT1G06850</td>
+<td>AT1G06850</td>
+<td>14</td>
+<td>wTGmCAGCykktmw</td>
+<td>WKAMMRGCTGKCAW</td>
+<td>8.78</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>15</td>
+<td>a.t_motifs_m15_AT1G08000</td>
+<td>AT1G08000</td>
+<td>8</td>
+<td>TAGATCTG</td>
+<td>CAGATCTA</td>
+<td>8.12</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>16</td>
+<td>a.t_motifs_m16_AT1G08010</td>
+<td>AT1G08010</td>
+<td>15</td>
+<td>rrawyyRGATCTgad</td>
+<td>HTCAGATCYRRWTYY</td>
+<td>9.74</td>
+<td>584</td>
+</tr>
+
+<tr valign='top'>
+<td>17</td>
+<td>a.t_motifs_m17_AT1G08320</td>
+<td>AT1G08320</td>
+<td>11</td>
+<td>GmTGACGTCAy</td>
+<td>RTGACGTCAKC</td>
+<td>11.27</td>
+<td>592</td>
+</tr>
+
+<tr valign='top'>
+<td>18</td>
+<td>a.t_motifs_m18_AT1G08810</td>
+<td>AT1G08810</td>
+<td>19</td>
+<td>hwwyyyCAACyACytyywy</td>
+<td>RWRRARGTRGTTGRRRWWD</td>
+<td>9.54</td>
+<td>442</td>
+</tr>
+
+<tr valign='top'>
+<td>19</td>
+<td>a.t_motifs_m19_AT1G09030</td>
+<td>AT1G09030</td>
+<td>7</td>
+<td>TGAAAAs</td>
+<td>STTTTCA</td>
+<td>8.33</td>
+<td>95</td>
+</tr>
+
+<tr valign='top'>
+<td>20</td>
+<td>a.t_motifs_m20_AT1G09530</td>
+<td>AT1G09530</td>
+<td>10</td>
+<td>dgCCACGTGr</td>
+<td>YCACGTGGCH</td>
+<td>8.89</td>
+<td>527</td>
+</tr>
+
+<tr valign='top'>
+<td>21</td>
+<td>a.t_motifs_m21_AT1G09540</td>
+<td>AT1G09540</td>
+<td>15</td>
+<td>yyyAmCwACCammhh</td>
+<td>DDKKTGGTWGKTRRR</td>
+<td>8.40</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>22</td>
+<td>a.t_motifs_m22_AT1G09770</td>
+<td>AT1G09770</td>
+<td>11</td>
+<td>rsCTCAGCGsg</td>
+<td>CSCGCTGAGSY</td>
+<td>8.22</td>
+<td>100</td>
+</tr>
+
+<tr valign='top'>
+<td>23</td>
+<td>a.t_motifs_m23_AT1G10120</td>
+<td>AT1G10120</td>
+<td>21</td>
+<td>cgtgarwrkCACGTGmsaycw</td>
+<td>WGRTSKCACGTGMYWYTCACG</td>
+<td>9.88</td>
+<td>198</td>
+</tr>
+
+<tr valign='top'>
+<td>24</td>
+<td>a.t_motifs_m24_AT1G12260</td>
+<td>AT1G12260</td>
+<td>15</td>
+<td>CkTraaawwyAmGCA</td>
+<td>TGCKTRWWTTTYAMG</td>
+<td>9.22</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>25</td>
+<td>a.t_motifs_m25_AT1G12610</td>
+<td>AT1G12610</td>
+<td>15</td>
+<td>ygATGTCGrCrrmrr</td>
+<td>YYKYYGYCGACATCR</td>
+<td>10.52</td>
+<td>311</td>
+</tr>
+
+<tr valign='top'>
+<td>26</td>
+<td>a.t_motifs_m26_AT1G12630</td>
+<td>AT1G12630</td>
+<td>21</td>
+<td>ygycryydyykyyrCCGACAm</td>
+<td>KTGTCGGYRRMRRHRRYGRCR</td>
+<td>8.98</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>27</td>
+<td>a.t_motifs_m27_AT1G13260</td>
+<td>AT1G13260</td>
+<td>17</td>
+<td>mwgrTdwwtTyTGTTGb</td>
+<td>VCAACARAAWWHAYCWK</td>
+<td>9.26</td>
+<td>590</td>
+</tr>
+
+<tr valign='top'>
+<td>28</td>
+<td>a.t_motifs_m28_AT1G13300</td>
+<td>AT1G13300</td>
+<td>15</td>
+<td>agwatcgAAkATTCy</td>
+<td>RGAATMTTCGATWCT</td>
+<td>9.18</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>29</td>
+<td>a.t_motifs_m29_AT1G13450</td>
+<td>AT1G13450</td>
+<td>19</td>
+<td>mmyTAACYrTrGTTaaawy</td>
+<td>RWTTTAACYAYRGTTARKK</td>
+<td>10.43</td>
+<td>437</td>
+</tr>
+
+<tr valign='top'>
+<td>30</td>
+<td>a.t_motifs_m30_AT1G14580</td>
+<td>AT1G14580</td>
+<td>20</td>
+<td>wwtwtTTTTGTCgTTTWsYk</td>
+<td>MRSWAAACGACAAAAAWAWW</td>
+<td>13.56</td>
+<td>242</td>
+</tr>
+
+<tr valign='top'>
+<td>31</td>
+<td>a.t_motifs_m31_AT1G14687</td>
+<td>AT1G14687</td>
+<td>11</td>
+<td>wwwCGhATwWT</td>
+<td>AWWATDCGWWW</td>
+<td>7.84</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>32</td>
+<td>a.t_motifs_m32_AT1G15720</td>
+<td>AT1G15720</td>
+<td>8</td>
+<td>yTAGGGCw</td>
+<td>WGCCCTAR</td>
+<td>8.86</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>33</td>
+<td>a.t_motifs_m33_AT1G16490</td>
+<td>AT1G16490</td>
+<td>15</td>
+<td>drkGKTWGGTRraac</td>
+<td>GTTYYACCWAMCMYH</td>
+<td>9.05</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>34</td>
+<td>a.t_motifs_m34_AT1G17950</td>
+<td>AT1G17950</td>
+<td>11</td>
+<td>ydwwACCGTTA</td>
+<td>TAACGGTWWHR</td>
+<td>8.76</td>
+<td>109</td>
+</tr>
+
+<tr valign='top'>
+<td>35</td>
+<td>a.t_motifs_m35_AT1G18330</td>
+<td>AT1G18330</td>
+<td>12</td>
+<td>rWAAATATCTwa</td>
+<td>TWAGATATTTWY</td>
+<td>11.61</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>36</td>
+<td>a.t_motifs_m36_AT1G18570</td>
+<td>AT1G18570</td>
+<td>21</td>
+<td>hwhhwwwwhwyyyACCwACyw</td>
+<td>WRGTWGGTRRRWDWWWWDDWD</td>
+<td>9.12</td>
+<td>553</td>
+</tr>
+
+<tr valign='top'>
+<td>37</td>
+<td>a.t_motifs_m37_AT1G18960</td>
+<td>AT1G18960</td>
+<td>22</td>
+<td>yaahawhwwCAmCAACawyahh</td>
+<td>DDTRWTGTTGKTGWWDWTDTTR</td>
+<td>9.29</td>
+<td>171</td>
+</tr>
+
+<tr valign='top'>
+<td>38</td>
+<td>a.t_motifs_m38_AT1G19000</td>
+<td>AT1G19000</td>
+<td>14</td>
+<td>wwwTGGATAAgrww</td>
+<td>WWYCTTATCCAWWW</td>
+<td>10.23</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>39</td>
+<td>a.t_motifs_m39_AT1G19040</td>
+<td>AT1G19040</td>
+<td>16</td>
+<td>wwrCTTGsrgmrCAAG</td>
+<td>CTTGYKCYSCAAGYWW</td>
+<td>11.38</td>
+<td>581</td>
+</tr>
+
+<tr valign='top'>
+<td>40</td>
+<td>a.t_motifs_m40_AT1G19210</td>
+<td>AT1G19210</td>
+<td>14</td>
+<td>dtgGwCGGyGrhgr</td>
+<td>YCDYCRCCGWCCAH</td>
+<td>8.68</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>41</td>
+<td>a.t_motifs_m41_AT1G19350</td>
+<td>AT1G19350</td>
+<td>11</td>
+<td>crCACGTGksv</td>
+<td>BSMCACGTGYG</td>
+<td>9.10</td>
+<td>99</td>
+</tr>
+
+<tr valign='top'>
+<td>42</td>
+<td>a.t_motifs_m42_AT1G19790</td>
+<td>AT1G19790</td>
+<td>23</td>
+<td>AAACCCTAAACCCTAAACCCTAA</td>
+<td>TTAGGGTTTAGGGTTTAGGGTTT</td>
+<td>24.28</td>
+<td>25</td>
+</tr>
+
+<tr valign='top'>
+<td>43</td>
+<td>a.t_motifs_m43_AT1G19850</td>
+<td>AT1G19850</td>
+<td>10</td>
+<td>rCCGACAArw</td>
+<td>WYTTGTCGGY</td>
+<td>7.66</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>44</td>
+<td>a.t_motifs_m44_AT1G20640</td>
+<td>AT1G20640</td>
+<td>15</td>
+<td>dhwgCAGCAgcrrsa</td>
+<td>TSYYGCTGCTGCWDH</td>
+<td>7.73</td>
+<td>365</td>
+</tr>
+
+<tr valign='top'>
+<td>45</td>
+<td>a.t_motifs_m45_AT1G20980</td>
+<td>AT1G20980</td>
+<td>11</td>
+<td>tCCGTACaaww</td>
+<td>WWTTGTACGGA</td>
+<td>8.82</td>
+<td>583</td>
+</tr>
+
+<tr valign='top'>
+<td>46</td>
+<td>a.t_motifs_m46_AT1G21910</td>
+<td>AT1G21910</td>
+<td>20</td>
+<td>ycwccwycwccdCCACCGmC</td>
+<td>GKCGGTGGHGGWGRWGGWGR</td>
+<td>10.03</td>
+<td>568</td>
+</tr>
+
+<tr valign='top'>
+<td>47</td>
+<td>a.t_motifs_m47_AT1G22070</td>
+<td>AT1G22070</td>
+<td>14</td>
+<td>drTGACGTCAkCaw</td>
+<td>WTGMTGACGTCAYH</td>
+<td>11.82</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>48</td>
+<td>a.t_motifs_m48_AT1G22640</td>
+<td>AT1G22640</td>
+<td>11</td>
+<td>rGGTAGGTAra</td>
+<td>TYTACCTACCY</td>
+<td>8.91</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>49</td>
+<td>a.t_motifs_m49_AT1G22810</td>
+<td>AT1G22810</td>
+<td>15</td>
+<td>GgyggyGgCGGTGGh</td>
+<td>DCCACCGCCRCCRCC</td>
+<td>9.70</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>50</td>
+<td>a.t_motifs_m50_AT1G24260</td>
+<td>AT1G24260</td>
+<td>13</td>
+<td>CCaaAAAwRGaaA</td>
+<td>TTTCYWTTTTTGG</td>
+<td>8.57</td>
+<td>297</td>
+</tr>
+
+<tr valign='top'>
+<td>51</td>
+<td>a.t_motifs_m51_AT1G25340</td>
+<td>AT1G25340</td>
+<td>15</td>
+<td>aamaawAgTTAGGyw</td>
+<td>WRCCTAACTWTTKTT</td>
+<td>9.52</td>
+<td>240</td>
+</tr>
+
+<tr valign='top'>
+<td>52</td>
+<td>a.t_motifs_m52_AT1G25550</td>
+<td>AT1G25550</td>
+<td>11</td>
+<td>rGAATmTTcwd</td>
+<td>HWGAAKATTCY</td>
+<td>8.59</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>53</td>
+<td>a.t_motifs_m53_AT1G25560</td>
+<td>AT1G25560</td>
+<td>8</td>
+<td>wMTGTTGC</td>
+<td>GCAACAKW</td>
+<td>8.13</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>54</td>
+<td>a.t_motifs_m54_AT1G27360</td>
+<td>AT1G27360</td>
+<td>11</td>
+<td>adwmAGTACAa</td>
+<td>TTGTACTKWHT</td>
+<td>7.99</td>
+<td>442</td>
+</tr>
+
+<tr valign='top'>
+<td>55</td>
+<td>a.t_motifs_m55_AT1G27730</td>
+<td>AT1G27730</td>
+<td>11</td>
+<td>yWsthhCASTm</td>
+<td>KASTGDDASWR</td>
+<td>6.49</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>56</td>
+<td>a.t_motifs_m56_AT1G28160</td>
+<td>AT1G28160</td>
+<td>15</td>
+<td>ygrCGGCGGmGrhgg</td>
+<td>CCDYCKCCGCCGYCR</td>
+<td>10.27</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>57</td>
+<td>a.t_motifs_m57_AT1G28300</td>
+<td>AT1G28300</td>
+<td>8</td>
+<td>mTGCATGC</td>
+<td>GCATGCAK</td>
+<td>10.44</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>58</td>
+<td>a.t_motifs_m58_AT1G28360</td>
+<td>AT1G28360</td>
+<td>8</td>
+<td>CGsCGCCr</td>
+<td>YGGCGSCG</td>
+<td>9.75</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>59</td>
+<td>a.t_motifs_m59_AT1G28370</td>
+<td>AT1G28370</td>
+<td>15</td>
+<td>ccwcCkCCGCCGyca</td>
+<td>TGRCGGCGGMGGWGG</td>
+<td>10.13</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>60</td>
+<td>a.t_motifs_m60_AT1G28470</td>
+<td>AT1G28470</td>
+<td>15</td>
+<td>wrCkTrwdgawsAMG</td>
+<td>CKTSWTCHWYAMGYW</td>
+<td>9.19</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>61</td>
+<td>a.t_motifs_m61_AT1G29160</td>
+<td>AT1G29160</td>
+<td>21</td>
+<td>aaaaaaaarAAAAAGtraaaa</td>
+<td>TTTTYACTTTTTYTTTTTTTT</td>
+<td>9.89</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>62</td>
+<td>a.t_motifs_m62_AT1G29280</td>
+<td>AT1G29280</td>
+<td>11</td>
+<td>aaAAGTCAACG</td>
+<td>CGTTGACTTTT</td>
+<td>10.05</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>63</td>
+<td>a.t_motifs_m63_AT1G29860</td>
+<td>AT1G29860</td>
+<td>11</td>
+<td>aAAAGTCAAMg</td>
+<td>CKTTGACTTTT</td>
+<td>10.50</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>64</td>
+<td>a.t_motifs_m64_AT1G30210</td>
+<td>AT1G30210</td>
+<td>12</td>
+<td>rtkGGGACCACh</td>
+<td>DGTGGTCCCMAY</td>
+<td>10.19</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>65</td>
+<td>a.t_motifs_m65_AT1G30490</td>
+<td>AT1G30490</td>
+<td>15</td>
+<td>rTmATCATTAywwty</td>
+<td>RAWWRTAATGATKAY</td>
+<td>10.90</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>66</td>
+<td>a.t_motifs_m66_AT1G30650</td>
+<td>AT1G30650</td>
+<td>13</td>
+<td>aAAAGTCAACgmy</td>
+<td>RKCGTTGACTTTT</td>
+<td>10.62</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>67</td>
+<td>a.t_motifs_m67_AT1G31140</td>
+<td>AT1G31140</td>
+<td>15</td>
+<td>TkCCAAAAAtGGmAA</td>
+<td>TTKCCATTTTTGGMA</td>
+<td>11.50</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>68</td>
+<td>a.t_motifs_m68_AT1G32150</td>
+<td>AT1G32150</td>
+<td>15</td>
+<td>tGCCACGTsasmwwh</td>
+<td>DWWKSTSACGTGGCA</td>
+<td>10.39</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>69</td>
+<td>a.t_motifs_m69_AT1G32240</td>
+<td>AT1G32240</td>
+<td>15</td>
+<td>wtwagaATATTCTyt</td>
+<td>ARAGAATATTCTWAW</td>
+<td>10.08</td>
+<td>214</td>
+</tr>
+
+<tr valign='top'>
+<td>70</td>
+<td>a.t_motifs_m70_AT1G32510</td>
+<td>AT1G32510</td>
+<td>21</td>
+<td>rTwrCTTGyrdywsAAGcAAc</td>
+<td>GTTGCTTSWRHYRCAAGYWAY</td>
+<td>13.75</td>
+<td>228</td>
+</tr>
+
+<tr valign='top'>
+<td>71</td>
+<td>a.t_motifs_m71_AT1G32640</td>
+<td>AT1G32640</td>
+<td>8</td>
+<td>rCACGTGy</td>
+<td>RCACGTGY</td>
+<td>7.27</td>
+<td>100</td>
+</tr>
+
+<tr valign='top'>
+<td>72</td>
+<td>a.t_motifs_m72_AT1G32770</td>
+<td>AT1G32770</td>
+<td>12</td>
+<td>GrTTGCGTAAth</td>
+<td>DATTACGCAAYC</td>
+<td>10.60</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>73</td>
+<td>a.t_motifs_m73_AT1G32870</td>
+<td>AT1G32870</td>
+<td>16</td>
+<td>CTTGsrgarCAAGyaA</td>
+<td>TTRCTTGYTCYSCAAG</td>
+<td>11.33</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>74</td>
+<td>a.t_motifs_m74_AT1G33240</td>
+<td>AT1G33240</td>
+<td>10</td>
+<td>ayrGTAAAWa</td>
+<td>TWTTTACYRT</td>
+<td>8.36</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>75</td>
+<td>a.t_motifs_m75_AT1G34180</td>
+<td>AT1G34180</td>
+<td>15</td>
+<td>CkTGsrgmaCAmGba</td>
+<td>TVCKTGTKCYSCAMG</td>
+<td>9.86</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>76</td>
+<td>a.t_motifs_m76_AT1G34190</td>
+<td>AT1G34190</td>
+<td>19</td>
+<td>adkTTwCTTGbwsmaCAmG</td>
+<td>CKTGTKSWVCAAGWAAMHT</td>
+<td>12.29</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>77</td>
+<td>a.t_motifs_m77_AT1G34370</td>
+<td>AT1G34370</td>
+<td>15</td>
+<td>aCCTtCmCCRGwTra</td>
+<td>TYAWCYGGKGAAGGT</td>
+<td>7.48</td>
+<td>579</td>
+</tr>
+
+<tr valign='top'>
+<td>78</td>
+<td>a.t_motifs_m78_AT1G34670</td>
+<td>AT1G34670</td>
+<td>21</td>
+<td>kwkkkddwrkTwGKTrrrmhw</td>
+<td>WDKYYYAMCWAMYWHHMMMWM</td>
+<td>8.60</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>79</td>
+<td>a.t_motifs_m79_AT1G35460</td>
+<td>AT1G35460</td>
+<td>11</td>
+<td>tGCAAGTkGcw</td>
+<td>WGCMACTTGCA</td>
+<td>10.04</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>80</td>
+<td>a.t_motifs_m80_AT1G35560</td>
+<td>AT1G35560</td>
+<td>10</td>
+<td>GGGGCCCACA</td>
+<td>TGTGGGCCCC</td>
+<td>11.26</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>81</td>
+<td>a.t_motifs_m81_AT1G36060</td>
+<td>AT1G36060</td>
+<td>14</td>
+<td>wtkGkCGGTGghgr</td>
+<td>YCDCCACCGMCMAW</td>
+<td>8.96</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>82</td>
+<td>a.t_motifs_m82_AT1G42990</td>
+<td>AT1G42990</td>
+<td>10</td>
+<td>rTGACGTCAy</td>
+<td>RTGACGTCAY</td>
+<td>8.14</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>83</td>
+<td>a.t_motifs_m83_AT1G43160</td>
+<td>AT1G43160</td>
+<td>15</td>
+<td>tkrCGGCGGmGghgg</td>
+<td>CCDCCKCCGCCGYMA</td>
+<td>10.21</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>84</td>
+<td>a.t_motifs_m84_AT1G43700</td>
+<td>AT1G43700</td>
+<td>12</td>
+<td>wTGmCAGCTGkh</td>
+<td>DMCAGCTGKCAW</td>
+<td>9.98</td>
+<td>554</td>
+</tr>
+
+<tr valign='top'>
+<td>85</td>
+<td>a.t_motifs_m85_AT1G44830</td>
+<td>AT1G44830</td>
+<td>15</td>
+<td>ccwcCkCCACCGmCa</td>
+<td>TGKCGGTGGMGGWGG</td>
+<td>10.58</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>86</td>
+<td>a.t_motifs_m86_AT1G45249</td>
+<td>AT1G45249</td>
+<td>18</td>
+<td>dawwwTGMCACGTswccw</td>
+<td>WGGWSACGTGKCAWWWTH</td>
+<td>11.67</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>87</td>
+<td>a.t_motifs_m87_AT1G46264</td>
+<td>AT1G46264</td>
+<td>15</td>
+<td>AGAAgcTTCTAGAAg</td>
+<td>CTTCTAGAAGCTTCT</td>
+<td>13.65</td>
+<td>200</td>
+</tr>
+
+<tr valign='top'>
+<td>88</td>
+<td>a.t_motifs_m88_AT1G46768</td>
+<td>AT1G46768</td>
+<td>13</td>
+<td>dtGkCGGYGghgr</td>
+<td>YCDCCRCCGMCAH</td>
+<td>9.29</td>
+<td>590</td>
+</tr>
+
+<tr valign='top'>
+<td>89</td>
+<td>a.t_motifs_m89_AT1G47655</td>
+<td>AT1G47655</td>
+<td>11</td>
+<td>rsawAAAGTrr</td>
+<td>YYACTTTWTSY</td>
+<td>7.70</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>90</td>
+<td>a.t_motifs_m90_AT1G47870</td>
+<td>AT1G47870</td>
+<td>15</td>
+<td>AwwwwGGCGCCAAAR</td>
+<td>YTTTGGCGCCWWWWT</td>
+<td>12.68</td>
+<td>23</td>
+</tr>
+
+<tr valign='top'>
+<td>91</td>
+<td>a.t_motifs_m91_AT1G49010</td>
+<td>AT1G49010</td>
+<td>15</td>
+<td>hwwwwyCTTATCywh</td>
+<td>DWRGATAAGRWWWWD</td>
+<td>8.91</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>92</td>
+<td>a.t_motifs_m92_AT1G49480</td>
+<td>AT1G49480</td>
+<td>15</td>
+<td>ramAAAAAAAAAaAa</td>
+<td>TTTTTTTTTTTTKTY</td>
+<td>11.75</td>
+<td>573</td>
+</tr>
+
+<tr valign='top'>
+<td>93</td>
+<td>a.t_motifs_m93_AT1G49560</td>
+<td>AT1G49560</td>
+<td>11</td>
+<td>ATcaaAGATTC</td>
+<td>GAATCTTTGAT</td>
+<td>8.88</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>94</td>
+<td>a.t_motifs_m94_AT1G49720</td>
+<td>AT1G49720</td>
+<td>19</td>
+<td>GgmCACGTGGCmcrvvvgr</td>
+<td>YCBBBYGKGCCACGTGKCC</td>
+<td>12.91</td>
+<td>44</td>
+</tr>
+
+<tr valign='top'>
+<td>95</td>
+<td>a.t_motifs_m95_AT1G49950</td>
+<td>AT1G49950</td>
+<td>9</td>
+<td>wTTAGGkyG</td>
+<td>CRMCCTAAW</td>
+<td>8.33</td>
+<td>370</td>
+</tr>
+
+<tr valign='top'>
+<td>96</td>
+<td>a.t_motifs_m96_AT1G50640</td>
+<td>AT1G50640</td>
+<td>15</td>
+<td>ygrCGGCGGmGrhgg</td>
+<td>CCDYCKCCGCCGYCR</td>
+<td>10.13</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>97</td>
+<td>a.t_motifs_m97_AT1G51140</td>
+<td>AT1G51140</td>
+<td>14</td>
+<td>ttdkCmACTTGcmw</td>
+<td>WKGCAAGTKGMHAA</td>
+<td>9.36</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>98</td>
+<td>a.t_motifs_m98_AT1G51220</td>
+<td>AT1G51220</td>
+<td>15</td>
+<td>waCCTgsAGaAcAwr</td>
+<td>YWTGTTCTSCAGGTW</td>
+<td>7.36</td>
+<td>557</td>
+</tr>
+
+<tr valign='top'>
+<td>99</td>
+<td>a.t_motifs_m99_AT1G51600</td>
+<td>AT1G51600</td>
+<td>19</td>
+<td>CATCATCATCATCATCATC</td>
+<td>GATGATGATGATGATGATG</td>
+<td>18.20</td>
+<td>201</td>
+</tr>
+
+<tr valign='top'>
+<td>100</td>
+<td>a.t_motifs_m100_AT1G51700</td>
+<td>AT1G51700</td>
+<td>21</td>
+<td>aaaaaraAAAAGtaraaaawr</td>
+<td>YWTTTTYTACTTTTTYTTTTT</td>
+<td>9.51</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>101</td>
+<td>a.t_motifs_m101_AT1G52150</td>
+<td>AT1G52150</td>
+<td>15</td>
+<td>rawwrTAATGATkAy</td>
+<td>RTMATCATTAYWWTY</td>
+<td>10.93</td>
+<td>590</td>
+</tr>
+
+<tr valign='top'>
+<td>102</td>
+<td>a.t_motifs_m102_AT1G52880</td>
+<td>AT1G52880</td>
+<td>19</td>
+<td>wwdCgtrwwwwayACGtmA</td>
+<td>TKACGTRTWWWWYACGHWW</td>
+<td>8.60</td>
+<td>588</td>
+</tr>
+
+<tr valign='top'>
+<td>103</td>
+<td>a.t_motifs_m103_AT1G52890</td>
+<td>AT1G52890</td>
+<td>12</td>
+<td>tAyACGbAACyk</td>
+<td>MRGTTVCGTRTA</td>
+<td>8.84</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>104</td>
+<td>a.t_motifs_m104_AT1G53160</td>
+<td>AT1G53160</td>
+<td>10</td>
+<td>khGTACGGhh</td>
+<td>DDCCGTACDM</td>
+<td>6.20</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>105</td>
+<td>a.t_motifs_m105_AT1G53170</td>
+<td>AT1G53170</td>
+<td>15</td>
+<td>kycdcCkCCGCCGym</td>
+<td>KRCGGCGGMGGHGRM</td>
+<td>9.85</td>
+<td>589</td>
+</tr>
+
+<tr valign='top'>
+<td>106</td>
+<td>a.t_motifs_m106_AT1G53230</td>
+<td>AT1G53230</td>
+<td>13</td>
+<td>rtkGGGACCAChw</td>
+<td>WDGTGGTCCCMAY</td>
+<td>10.55</td>
+<td>582</td>
+</tr>
+
+<tr valign='top'>
+<td>107</td>
+<td>a.t_motifs_m107_AT1G53910</td>
+<td>AT1G53910</td>
+<td>21</td>
+<td>cgghgrwrryGGCGGCGgmgr</td>
+<td>YCKCCGCCGCCRYYWYCDCCG</td>
+<td>10.59</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>108</td>
+<td>a.t_motifs_m108_AT1G54330</td>
+<td>AT1G54330</td>
+<td>21</td>
+<td>TTrCKTGttyhaCAmGywAyc</td>
+<td>GRTWRCKTGTDRAACAMGYAA</td>
+<td>12.77</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>109</td>
+<td>a.t_motifs_m109_AT1G55110</td>
+<td>AT1G55110</td>
+<td>18</td>
+<td>mrsAAAAcGACAAAAawa</td>
+<td>TWTTTTTGTCGTTTTSYK</td>
+<td>12.91</td>
+<td>585</td>
+</tr>
+
+<tr valign='top'>
+<td>110</td>
+<td>a.t_motifs_m110_AT1G59640</td>
+<td>AT1G59640</td>
+<td>21</td>
+<td>swkgwgrCACGTGbswwwcwc</td>
+<td>GWGWWWSVCACGTGYCWCMWS</td>
+<td>8.98</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>111</td>
+<td>a.t_motifs_m111_AT1G59750</td>
+<td>AT1G59750</td>
+<td>8</td>
+<td>RCCGACAw</td>
+<td>WTGTCGGY</td>
+<td>8.47</td>
+<td>1001</td>
+</tr>
+
+<tr valign='top'>
+<td>112</td>
+<td>a.t_motifs_m112_AT1G60920</td>
+<td>AT1G60920</td>
+<td>6</td>
+<td>TCACCA</td>
+<td>TGGTGA</td>
+<td>7.92</td>
+<td>90</td>
+</tr>
+
+<tr valign='top'>
+<td>113</td>
+<td>a.t_motifs_m113_AT1G61110</td>
+<td>AT1G61110</td>
+<td>8</td>
+<td>yACGyAAy</td>
+<td>RTTRCGTR</td>
+<td>7.84</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>114</td>
+<td>a.t_motifs_m114_AT1G62300</td>
+<td>AT1G62300</td>
+<td>19</td>
+<td>CGTTGACYwwkkywdwyhh</td>
+<td>DDRWHWRMMWWRGTCAACG</td>
+<td>10.26</td>
+<td>285</td>
+</tr>
+
+<tr valign='top'>
+<td>115</td>
+<td>a.t_motifs_m115_AT1G63030</td>
+<td>AT1G63030</td>
+<td>8</td>
+<td>ATGTCGGC</td>
+<td>GCCGACAT</td>
+<td>9.60</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>116</td>
+<td>a.t_motifs_m116_AT1G64620</td>
+<td>AT1G64620</td>
+<td>19</td>
+<td>wwaaaamAAAAAGkwaaww</td>
+<td>WWTTWMCTTTTTKTTTTWW</td>
+<td>9.81</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>117</td>
+<td>a.t_motifs_m117_AT1G65620</td>
+<td>AT1G65620</td>
+<td>21</td>
+<td>yckcCgCCGymwyykcCGsCG</td>
+<td>CGSCGGMRRWKRCGGCGGMGR</td>
+<td>10.58</td>
+<td>439</td>
+</tr>
+
+<tr valign='top'>
+<td>118</td>
+<td>a.t_motifs_m118_AT1G65910</td>
+<td>AT1G65910</td>
+<td>16</td>
+<td>CTTstkyydCAmGywA</td>
+<td>TWRCKTGHRRMASAAG</td>
+<td>10.07</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>119</td>
+<td>a.t_motifs_m119_AT1G66370</td>
+<td>AT1G66370</td>
+<td>11</td>
+<td>wAkTymGTTAt</td>
+<td>ATAACKRAMTW</td>
+<td>8.14</td>
+<td>586</td>
+</tr>
+
+<tr valign='top'>
+<td>120</td>
+<td>a.t_motifs_m120_AT1G66420</td>
+<td>AT1G66420</td>
+<td>19</td>
+<td>AacmTTATCCATwwmttak</td>
+<td>MTAAKWWATGGATAAKGTT</td>
+<td>11.89</td>
+<td>53</td>
+</tr>
+
+<tr valign='top'>
+<td>121</td>
+<td>a.t_motifs_m121_AT1G66600</td>
+<td>AT1G66600</td>
+<td>8</td>
+<td>yGGTCAAc</td>
+<td>GTTGACCR</td>
+<td>8.08</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>122</td>
+<td>a.t_motifs_m122_AT1G67260</td>
+<td>AT1G67260</td>
+<td>30</td>
+<td>wGTGGGyCCCmcctcyycwstykkkmyyay</td>
+<td>RTRRKMMMRASWGRRGAGGKGGGRCCCACW</td>
+<td>12.32</td>
+<td>95</td>
+</tr>
+
+<tr valign='top'>
+<td>123</td>
+<td>a.t_motifs_m123_AT1G67710</td>
+<td>AT1G67710</td>
+<td>10</td>
+<td>awAGATWCGg</td>
+<td>CCGWATCTWT</td>
+<td>9.13</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>124</td>
+<td>a.t_motifs_m124_AT1G68200</td>
+<td>AT1G68200</td>
+<td>15</td>
+<td>CCGAaAAwwTCGGar</td>
+<td>YTCCGAWWTTTTCGG</td>
+<td>10.90</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>125</td>
+<td>a.t_motifs_m125_AT1G68320</td>
+<td>AT1G68320</td>
+<td>15</td>
+<td>aawawarTTAGGyad</td>
+<td>HTRCCTAAYTWTWTT</td>
+<td>8.94</td>
+<td>440</td>
+</tr>
+
+<tr valign='top'>
+<td>126</td>
+<td>a.t_motifs_m126_AT1G68550</td>
+<td>AT1G68550</td>
+<td>15</td>
+<td>ccdcCkCCGCCGYcr</td>
+<td>YGRCGGCGGMGGHGG</td>
+<td>10.17</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>127</td>
+<td>a.t_motifs_m127_AT1G68670</td>
+<td>AT1G68670</td>
+<td>13</td>
+<td>gaATcaaAGATTC</td>
+<td>GAATCTTTGATTC</td>
+<td>8.52</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>128</td>
+<td>a.t_motifs_m128_AT1G68840</td>
+<td>AT1G68840</td>
+<td>8</td>
+<td>kATGTTGC</td>
+<td>GCAACATM</td>
+<td>8.64</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>129</td>
+<td>a.t_motifs_m129_AT1G69010</td>
+<td>AT1G69010</td>
+<td>15</td>
+<td>CACGTGmcwykcacg</td>
+<td>CGTGMRWGKCACGTG</td>
+<td>9.91</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>130</td>
+<td>a.t_motifs_m130_AT1G69120</td>
+<td>AT1G69120</td>
+<td>12</td>
+<td>CyAAAWaTGGaA</td>
+<td>TTCCATWTTTRG</td>
+<td>8.13</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>131</td>
+<td>a.t_motifs_m131_AT1G69180</td>
+<td>AT1G69180</td>
+<td>8</td>
+<td>wATGATwA</td>
+<td>TWATCATW</td>
+<td>8.16</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>132</td>
+<td>a.t_motifs_m132_AT1G69310</td>
+<td>AT1G69310</td>
+<td>10</td>
+<td>awrGTCAAmg</td>
+<td>CKTTGACYWT</td>
+<td>5.48</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>133</td>
+<td>a.t_motifs_m133_AT1G69490</td>
+<td>AT1G69490</td>
+<td>11</td>
+<td>ayACGymAyyt</td>
+<td>ARRTKRCGTRT</td>
+<td>7.37</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>134</td>
+<td>a.t_motifs_m134_AT1G69560</td>
+<td>AT1G69560</td>
+<td>13</td>
+<td>wthwwwACCGTTA</td>
+<td>TAACGGTWWWDAW</td>
+<td>9.96</td>
+<td>95</td>
+</tr>
+
+<tr valign='top'>
+<td>135</td>
+<td>a.t_motifs_m135_AT1G69570</td>
+<td>AT1G69570</td>
+<td>27</td>
+<td>ttttyaCTTTTtyyTTTtttttttttw</td>
+<td>WAAAAAAAAAAAARRAAAAAGTRAAAA</td>
+<td>12.19</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>136</td>
+<td>a.t_motifs_m136_AT1G69690</td>
+<td>AT1G69690</td>
+<td>13</td>
+<td>wkGTGGGmCCcAc</td>
+<td>GTGGGKCCCACMW</td>
+<td>10.25</td>
+<td>580</td>
+</tr>
+
+<tr valign='top'>
+<td>137</td>
+<td>a.t_motifs_m137_AT1G69780</td>
+<td>AT1G69780</td>
+<td>11</td>
+<td>tyAATAATTrw</td>
+<td>WYAATTATTRA</td>
+<td>9.17</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>138</td>
+<td>a.t_motifs_m138_AT1G70000</td>
+<td>AT1G70000</td>
+<td>10</td>
+<td>wTGGATAAbr</td>
+<td>YVTTATCCAW</td>
+<td>8.04</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>139</td>
+<td>a.t_motifs_m139_AT1G70920</td>
+<td>AT1G70920</td>
+<td>11</td>
+<td>yyAATyATTrk</td>
+<td>MYAATRATTRR</td>
+<td>9.39</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>140</td>
+<td>a.t_motifs_m140_AT1G71450</td>
+<td>AT1G71450</td>
+<td>20</td>
+<td>cwcCrcCrcCdyCrCCGyCr</td>
+<td>YGRCGGYGRHGGYGGYGGWG</td>
+<td>9.58</td>
+<td>568</td>
+</tr>
+
+<tr valign='top'>
+<td>141</td>
+<td>a.t_motifs_m141_AT1G71930</td>
+<td>AT1G71930</td>
+<td>12</td>
+<td>rkacACGsMACy</td>
+<td>RGTKSCGTGTMY</td>
+<td>7.11</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>142</td>
+<td>a.t_motifs_m142_AT1G72010</td>
+<td>AT1G72010</td>
+<td>13</td>
+<td>wwGTGGGmCCCAy</td>
+<td>RTGGGKCCCACWW</td>
+<td>10.51</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>143</td>
+<td>a.t_motifs_m143_AT1G72050</td>
+<td>AT1G72050</td>
+<td>19</td>
+<td>CyTCcTCcTCcTCCTCCTC</td>
+<td>GAGGAGGAGGAGGAGGARG</td>
+<td>11.89</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>144</td>
+<td>a.t_motifs_m144_AT1G72360</td>
+<td>AT1G72360</td>
+<td>21</td>
+<td>ycdyckCCGCCGCCryhdycr</td>
+<td>YGRHDRYGGCGGCGGMGRHGR</td>
+<td>11.18</td>
+<td>563</td>
+</tr>
+
+<tr valign='top'>
+<td>145</td>
+<td>a.t_motifs_m145_AT1G72740</td>
+<td>AT1G72740</td>
+<td>15</td>
+<td>cctAAACCCTAAwyc</td>
+<td>GRWTTAGGGTTTAGG</td>
+<td>12.28</td>
+<td>291</td>
+</tr>
+
+<tr valign='top'>
+<td>146</td>
+<td>a.t_motifs_m146_AT1G73360</td>
+<td>AT1G73360</td>
+<td>11</td>
+<td>kCATTwAwTry</td>
+<td>RYAWTWAATGM</td>
+<td>9.93</td>
+<td>590</td>
+</tr>
+
+<tr valign='top'>
+<td>147</td>
+<td>a.t_motifs_m147_AT1G73730</td>
+<td>AT1G73730</td>
+<td>21</td>
+<td>ryGTCyAGrTtCAwwrwatht</td>
+<td>ADATWYWWTGAAYCTRGACRY</td>
+<td>11.11</td>
+<td>94</td>
+</tr>
+
+<tr valign='top'>
+<td>148</td>
+<td>a.t_motifs_m148_AT1G74480</td>
+<td>AT1G74480</td>
+<td>19</td>
+<td>gyGaCkyTTCrtCTTCCyy</td>
+<td>RRGGAAGAYGAARMGTCRC</td>
+<td>10.95</td>
+<td>587</td>
+</tr>
+
+<tr valign='top'>
+<td>149</td>
+<td>a.t_motifs_m149_AT1G74650</td>
+<td>AT1G74650</td>
+<td>15</td>
+<td>yAmCtmCCAMCyAmh</td>
+<td>DKTRGKTGGKAGKTR</td>
+<td>9.09</td>
+<td>592</td>
+</tr>
+
+<tr valign='top'>
+<td>150</td>
+<td>a.t_motifs_m150_AT1G74840</td>
+<td>AT1G74840</td>
+<td>11</td>
+<td>wwTGGATAArr</td>
+<td>YYTTATCCAWW</td>
+<td>9.15</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>151</td>
+<td>a.t_motifs_m151_AT1G74930</td>
+<td>AT1G74930</td>
+<td>10</td>
+<td>crCCGACCAa</td>
+<td>TTGGTCGGYG</td>
+<td>9.52</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>152</td>
+<td>a.t_motifs_m152_AT1G75080</td>
+<td>AT1G75080</td>
+<td>20</td>
+<td>cCrCACGTGyrhmyywywht</td>
+<td>ADWRWRRKDYRCACGTGYGG</td>
+<td>10.66</td>
+<td>588</td>
+</tr>
+
+<tr valign='top'>
+<td>153</td>
+<td>a.t_motifs_m153_AT1G75240</td>
+<td>AT1G75240</td>
+<td>11</td>
+<td>ayrTrATTAry</td>
+<td>RYTAATYAYRT</td>
+<td>8.18</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>154</td>
+<td>a.t_motifs_m154_AT1G75390</td>
+<td>AT1G75390</td>
+<td>15</td>
+<td>dwwGmTGACGTGGCa</td>
+<td>TGCCACGTCAKCWWH</td>
+<td>12.59</td>
+<td>528</td>
+</tr>
+
+<tr valign='top'>
+<td>155</td>
+<td>a.t_motifs_m155_AT1G75490</td>
+<td>AT1G75490</td>
+<td>15</td>
+<td>ccrcckCCRCCGcCw</td>
+<td>WGGCGGYGGMGGYGG</td>
+<td>9.69</td>
+<td>557</td>
+</tr>
+
+<tr valign='top'>
+<td>156</td>
+<td>a.t_motifs_m156_AT1G76420</td>
+<td>AT1G76420</td>
+<td>18</td>
+<td>rCGTRwrraACAmGyaAy</td>
+<td>RTTRCKTGTTYYWYACGY</td>
+<td>10.92</td>
+<td>569</td>
+</tr>
+
+<tr valign='top'>
+<td>157</td>
+<td>a.t_motifs_m157_AT1G76870</td>
+<td>AT1G76870</td>
+<td>14</td>
+<td>awmywAAACCrsww</td>
+<td>WWSYGGTTTWRKWT</td>
+<td>8.23</td>
+<td>456</td>
+</tr>
+
+<tr valign='top'>
+<td>158</td>
+<td>a.t_motifs_m158_AT1G76880</td>
+<td>AT1G76880</td>
+<td>16</td>
+<td>acrGTAAAAawdwwww</td>
+<td>WWWWHWTTTTTACYGT</td>
+<td>9.24</td>
+<td>480</td>
+</tr>
+
+<tr valign='top'>
+<td>159</td>
+<td>a.t_motifs_m159_AT1G76890</td>
+<td>AT1G76890</td>
+<td>14</td>
+<td>wtWTTTACygywdt</td>
+<td>AHWRCRGTAAAWAW</td>
+<td>8.53</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>160</td>
+<td>a.t_motifs_m160_AT1G77080</td>
+<td>AT1G77080</td>
+<td>15</td>
+<td>wcTTTCyAWTTtkrk</td>
+<td>MYMAAAWTRGAAAGW</td>
+<td>11.65</td>
+<td>1001</td>
+</tr>
+
+<tr valign='top'>
+<td>161</td>
+<td>a.t_motifs_m161_AT1G77200</td>
+<td>AT1G77200</td>
+<td>14</td>
+<td>yCRCCGACAmwwwy</td>
+<td>RWWWKTGTCGGYGR</td>
+<td>9.91</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>162</td>
+<td>a.t_motifs_m162_AT1G77640</td>
+<td>AT1G77640</td>
+<td>21</td>
+<td>grwggygrhdkTGtCGGTGgw</td>
+<td>WCCACCGACAMHDYCRCCWYC</td>
+<td>10.34</td>
+<td>541</td>
+</tr>
+
+<tr valign='top'>
+<td>163</td>
+<td>a.t_motifs_m163_AT1G77920</td>
+<td>AT1G77920</td>
+<td>17</td>
+<td>tGmTGACGTCAyywtyy</td>
+<td>RRAWRRTGACGTCAKCA</td>
+<td>11.79</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>164</td>
+<td>a.t_motifs_m164_AT1G78080</td>
+<td>AT1G78080</td>
+<td>10</td>
+<td>crCCGaCmwh</td>
+<td>DWKGTCGGYG</td>
+<td>5.31</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>165</td>
+<td>a.t_motifs_m165_AT1G78700</td>
+<td>AT1G78700</td>
+<td>11</td>
+<td>yRCACGTGtgr</td>
+<td>YCACACGTGYR</td>
+<td>10.55</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>166</td>
+<td>a.t_motifs_m166_AT1G79180</td>
+<td>AT1G79180</td>
+<td>21</td>
+<td>ywmywhyyyCACCwACCmcmh</td>
+<td>DKGKGGTWGGTGRRRDWRKWR</td>
+<td>10.05</td>
+<td>593</td>
+</tr>
+
+<tr valign='top'>
+<td>167</td>
+<td>a.t_motifs_m167_AT1G79580</td>
+<td>AT1G79580</td>
+<td>21</td>
+<td>grTwrCKTrwrwhwcAMGyaA</td>
+<td>TTRCKTGWDWYWYAMGYWAYC</td>
+<td>11.40</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>168</td>
+<td>a.t_motifs_m168_AT1G80840</td>
+<td>AT1G80840</td>
+<td>15</td>
+<td>dwykTTGACTTttty</td>
+<td>RAAAAAGTCAAMRWH</td>
+<td>9.35</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>169</td>
+<td>a.t_motifs_m169_AT2G01060</td>
+<td>AT2G01060</td>
+<td>13</td>
+<td>aaarGAATATTCy</td>
+<td>RGAATATTCYTTT</td>
+<td>10.08</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>170</td>
+<td>a.t_motifs_m170_AT2G01570</td>
+<td>AT2G01570</td>
+<td>20</td>
+<td>vAgAaaraGAsAAArraarr</td>
+<td>YYTTYYTTTSTCTYTTTCTB</td>
+<td>9.01</td>
+<td>230</td>
+</tr>
+
+<tr valign='top'>
+<td>171</td>
+<td>a.t_motifs_m171_AT2G01760</td>
+<td>AT2G01760</td>
+<td>8</td>
+<td>AGATwCGs</td>
+<td>SCGWATCT</td>
+<td>8.20</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>172</td>
+<td>a.t_motifs_m172_AT2G01930</td>
+<td>AT2G01930</td>
+<td>24</td>
+<td>GAGAGAGAGAGAGAGAGAGAGAGA</td>
+<td>TCTCTCTCTCTCTCTCTCTCTCTC</td>
+<td>22.26</td>
+<td>539</td>
+</tr>
+
+<tr valign='top'>
+<td>173</td>
+<td>a.t_motifs_m173_AT2G01940</td>
+<td>AT2G01940</td>
+<td>15</td>
+<td>araAwAAGACAAAAw</td>
+<td>WTTTTGTCTTWTTYT</td>
+<td>11.90</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>174</td>
+<td>a.t_motifs_m174_AT2G02070</td>
+<td>AT2G02070</td>
+<td>16</td>
+<td>wTTTTGTCGTTTwsyg</td>
+<td>CRSWAAACGACAAAAW</td>
+<td>12.87</td>
+<td>160</td>
+</tr>
+
+<tr valign='top'>
+<td>175</td>
+<td>a.t_motifs_m175_AT2G02080</td>
+<td>AT2G02080</td>
+<td>17</td>
+<td>mAsAAAAmGACAAAAww</td>
+<td>WWTTTTGTCKTTTTSTK</td>
+<td>13.31</td>
+<td>591</td>
+</tr>
+
+<tr valign='top'>
+<td>176</td>
+<td>a.t_motifs_m176_AT2G02450</td>
+<td>AT2G02450</td>
+<td>19</td>
+<td>CsTrwyywayACGkmAhyt</td>
+<td>ARDTKMCGTRTWRRWYASG</td>
+<td>8.73</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>177</td>
+<td>a.t_motifs_m177_AT2G02540</td>
+<td>AT2G02540</td>
+<td>14</td>
+<td>rcamCAATwATTgr</td>
+<td>YCAATWATTGKTGY</td>
+<td>10.14</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>178</td>
+<td>a.t_motifs_m178_AT2G02820</td>
+<td>AT2G02820</td>
+<td>15</td>
+<td>hmymcACGCkCCwcy</td>
+<td>RGWGGMGCGTGKRKD</td>
+<td>8.23</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>179</td>
+<td>a.t_motifs_m179_AT2G03340</td>
+<td>AT2G03340</td>
+<td>11</td>
+<td>aaaAGTCAAmg</td>
+<td>CKTTGACTTTT</td>
+<td>9.71</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>180</td>
+<td>a.t_motifs_m180_AT2G03500</td>
+<td>AT2G03500</td>
+<td>11</td>
+<td>rGAATATtCyr</td>
+<td>YRGAATATTCY</td>
+<td>9.28</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>181</td>
+<td>a.t_motifs_m181_AT2G03710</td>
+<td>AT2G03710</td>
+<td>18</td>
+<td>skwwCCAwwwWwrGwwab</td>
+<td>VTWWCYWWWWWTGGWWMS</td>
+<td>9.17</td>
+<td>95</td>
+</tr>
+
+<tr valign='top'>
+<td>182</td>
+<td>a.t_motifs_m182_AT2G04038</td>
+<td>AT2G04038</td>
+<td>14</td>
+<td>KCCACGTCAGCawh</td>
+<td>DWTGCTGACGTGGM</td>
+<td>12.63</td>
+<td>453</td>
+</tr>
+
+<tr valign='top'>
+<td>183</td>
+<td>a.t_motifs_m183_AT2G04880</td>
+<td>AT2G04880</td>
+<td>11</td>
+<td>TTGACCGaGyy</td>
+<td>RRCTCGGTCAA</td>
+<td>10.14</td>
+<td>50</td>
+</tr>
+
+<tr valign='top'>
+<td>184</td>
+<td>a.t_motifs_m184_AT2G06200</td>
+<td>AT2G06200</td>
+<td>14</td>
+<td>swrawwkTGTCAGA</td>
+<td>TCTGACAMWWTYWS</td>
+<td>8.83</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>185</td>
+<td>a.t_motifs_m185_AT2G15740</td>
+<td>AT2G15740</td>
+<td>11</td>
+<td>rwCGrygaCGw</td>
+<td>WCGTCRYCGWY</td>
+<td>6.79</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>186</td>
+<td>a.t_motifs_m186_AT2G17180</td>
+<td>AT2G17180</td>
+<td>10</td>
+<td>csCAGCTGss</td>
+<td>SSCAGCTGSG</td>
+<td>6.02</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>187</td>
+<td>a.t_motifs_m187_AT2G17950</td>
+<td>AT2G17950</td>
+<td>11</td>
+<td>TCAwTCAwTyA</td>
+<td>TRAWTGAWTGA</td>
+<td>10.02</td>
+<td>81</td>
+</tr>
+
+<tr valign='top'>
+<td>188</td>
+<td>a.t_motifs_m188_AT2G18060</td>
+<td>AT2G18060</td>
+<td>13</td>
+<td>CkTgwwwtwyAmG</td>
+<td>CKTRWAWWWCAMG</td>
+<td>7.61</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>189</td>
+<td>a.t_motifs_m189_AT2G18160</td>
+<td>AT2G18160</td>
+<td>15</td>
+<td>dwwGcTGACGTGGCa</td>
+<td>TGCCACGTCAGCWWH</td>
+<td>12.04</td>
+<td>576</td>
+</tr>
+
+<tr valign='top'>
+<td>190</td>
+<td>a.t_motifs_m190_AT2G18300</td>
+<td>AT2G18300</td>
+<td>12</td>
+<td>cgkGCACGTGct</td>
+<td>AGCACGTGCMCG</td>
+<td>8.23</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>191</td>
+<td>a.t_motifs_m191_AT2G18350</td>
+<td>AT2G18350</td>
+<td>15</td>
+<td>wawhrTRATTArtdw</td>
+<td>WHAYTAATYAYDWTW</td>
+<td>9.27</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>192</td>
+<td>a.t_motifs_m192_AT2G18380</td>
+<td>AT2G18380</td>
+<td>13</td>
+<td>tyGATCkGATyad</td>
+<td>HTRATCMGATCRA</td>
+<td>7.48</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>193</td>
+<td>a.t_motifs_m193_AT2G20110</td>
+<td>AT2G20110</td>
+<td>15</td>
+<td>wTTTrAATwTTtwAW</td>
+<td>WTWAAAWATTYAAAW</td>
+<td>12.14</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>194</td>
+<td>a.t_motifs_m194_AT2G20180</td>
+<td>AT2G20180</td>
+<td>14</td>
+<td>rkrrggwCACGTGg</td>
+<td>CCACGTGWCCYYMY</td>
+<td>9.10</td>
+<td>114</td>
+</tr>
+
+<tr valign='top'>
+<td>195</td>
+<td>a.t_motifs_m195_AT2G20400</td>
+<td>AT2G20400</td>
+<td>15</td>
+<td>aarGAATATTCbrww</td>
+<td>WWYVGAATATTCYTT</td>
+<td>11.11</td>
+<td>578</td>
+</tr>
+
+<tr valign='top'>
+<td>196</td>
+<td>a.t_motifs_m196_AT2G20570</td>
+<td>AT2G20570</td>
+<td>10</td>
+<td>rAGAATCTgd</td>
+<td>HCAGATTCTY</td>
+<td>7.31</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>197</td>
+<td>a.t_motifs_m197_AT2G21230</td>
+<td>AT2G21230</td>
+<td>10</td>
+<td>yGmCAGCTgk</td>
+<td>MCAGCTGKCR</td>
+<td>7.02</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>198</td>
+<td>a.t_motifs_m198_AT2G21900</td>
+<td>AT2G21900</td>
+<td>12</td>
+<td>mawwAGTCAAmr</td>
+<td>YKTTGACTWWTK</td>
+<td>9.03</td>
+<td>173</td>
+</tr>
+
+<tr valign='top'>
+<td>199</td>
+<td>a.t_motifs_m199_AT2G22300</td>
+<td>AT2G22300</td>
+<td>9</td>
+<td>cCGYGThvn</td>
+<td>NBDACRCGG</td>
+<td>6.03</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>200</td>
+<td>a.t_motifs_m200_AT2G22430</td>
+<td>AT2G22430</td>
+<td>11</td>
+<td>yAATmATthwy</td>
+<td>RWDAATKATTR</td>
+<td>7.89</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>201</td>
+<td>a.t_motifs_m201_AT2G22540</td>
+<td>AT2G22540</td>
+<td>15</td>
+<td>wyTTtCCtTWTTkGG</td>
+<td>CCMAAWAAGGAAARW</td>
+<td>10.99</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>202</td>
+<td>a.t_motifs_m202_AT2G22750</td>
+<td>AT2G22750</td>
+<td>17</td>
+<td>crYGtkwwhCACGTGky</td>
+<td>RMCACGTGDWWMACRYG</td>
+<td>10.73</td>
+<td>201</td>
+</tr>
+
+<tr valign='top'>
+<td>203</td>
+<td>a.t_motifs_m203_AT2G23290</td>
+<td>AT2G23290</td>
+<td>14</td>
+<td>tAACsGwawwAAcy</td>
+<td>RGTTWWTWCSGTTA</td>
+<td>8.25</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>204</td>
+<td>a.t_motifs_m204_AT2G23320</td>
+<td>AT2G23320</td>
+<td>11</td>
+<td>aaAAGTCAACg</td>
+<td>CGTTGACTTTT</td>
+<td>9.51</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>205</td>
+<td>a.t_motifs_m205_AT2G23340</td>
+<td>AT2G23340</td>
+<td>17</td>
+<td>wwwTGTCGGTGrhkrhr</td>
+<td>YDYMDYCACCGACAWWW</td>
+<td>10.47</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>206</td>
+<td>a.t_motifs_m206_AT2G24260</td>
+<td>AT2G24260</td>
+<td>10</td>
+<td>hsCACGTGsd</td>
+<td>HSCACGTGSD</td>
+<td>6.61</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>207</td>
+<td>a.t_motifs_m207_AT2G24430</td>
+<td>AT2G24430</td>
+<td>18</td>
+<td>TwrCkTGtdkwacAmGww</td>
+<td>WWCKTGTWMHACAMGYWA</td>
+<td>9.93</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>208</td>
+<td>a.t_motifs_m208_AT2G24570</td>
+<td>AT2G24570</td>
+<td>14</td>
+<td>aaAAAGTCAACgvy</td>
+<td>RBCGTTGACTTTTT</td>
+<td>10.90</td>
+<td>127</td>
+</tr>
+
+<tr valign='top'>
+<td>209</td>
+<td>a.t_motifs_m209_AT2G25000</td>
+<td>AT2G25000</td>
+<td>11</td>
+<td>vyGGTCAAmst</td>
+<td>ASKTTGACCRB</td>
+<td>8.63</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>210</td>
+<td>a.t_motifs_m210_AT2G26960</td>
+<td>AT2G26960</td>
+<td>11</td>
+<td>sTAACcGwwTy</td>
+<td>RAWWCGGTTAS</td>
+<td>7.39</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>211</td>
+<td>a.t_motifs_m211_AT2G27300</td>
+<td>AT2G27300</td>
+<td>19</td>
+<td>kTTyCTTCwyyytsARGwA</td>
+<td>TWCYTSARRRWGAAGRAAM</td>
+<td>10.60</td>
+<td>591</td>
+</tr>
+
+<tr valign='top'>
+<td>212</td>
+<td>a.t_motifs_m212_AT2G28550</td>
+<td>AT2G28550</td>
+<td>10</td>
+<td>WCCTCGTACh</td>
+<td>DGTACGAGGW</td>
+<td>9.72</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>213</td>
+<td>a.t_motifs_m213_AT2G28810</td>
+<td>AT2G28810</td>
+<td>21</td>
+<td>ttyttttttttTwaCTTTTTb</td>
+<td>VAAAAAGTWAAAAAAAAARAA</td>
+<td>10.28</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>214</td>
+<td>a.t_motifs_m214_AT2G30250</td>
+<td>AT2G30250</td>
+<td>11</td>
+<td>aawRGTCAAMg</td>
+<td>CKTTGACYWTT</td>
+<td>9.53</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>215</td>
+<td>a.t_motifs_m215_AT2G30340</td>
+<td>AT2G30340</td>
+<td>17</td>
+<td>cGsCGgarwwkrCGGcG</td>
+<td>CGCCGYMWWYTCCGSCG</td>
+<td>9.51</td>
+<td>583</td>
+</tr>
+
+<tr valign='top'>
+<td>216</td>
+<td>a.t_motifs_m216_AT2G30590</td>
+<td>AT2G30590</td>
+<td>11</td>
+<td>aAAAGTCAACg</td>
+<td>CGTTGACTTTT</td>
+<td>10.82</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>217</td>
+<td>a.t_motifs_m217_AT2G31220</td>
+<td>AT2G31220</td>
+<td>14</td>
+<td>rrwwkTGTCGGTGr</td>
+<td>YCACCGACAMWWYY</td>
+<td>9.41</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>218</td>
+<td>a.t_motifs_m218_AT2G31230</td>
+<td>AT2G31230</td>
+<td>15</td>
+<td>cdccdcMGCCGCCry</td>
+<td>RYGGCGGCKGHGGHG</td>
+<td>10.29</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>219</td>
+<td>a.t_motifs_m219_AT2G32460</td>
+<td>AT2G32460</td>
+<td>15</td>
+<td>aamyrwAACCGwawy</td>
+<td>RWTWCGGTTWYRKTT</td>
+<td>7.85</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>220</td>
+<td>a.t_motifs_m220_AT2G33550</td>
+<td>AT2G33550</td>
+<td>18</td>
+<td>waaaawawwwrCCCTwAa</td>
+<td>TTWAGGGYWWWTWTTTTW</td>
+<td>7.81</td>
+<td>338</td>
+</tr>
+
+<tr valign='top'>
+<td>221</td>
+<td>a.t_motifs_m221_AT2G33710</td>
+<td>AT2G33710</td>
+<td>15</td>
+<td>ccdcCkCCGCCGymr</td>
+<td>YKRCGGCGGMGGHGG</td>
+<td>10.31</td>
+<td>583</td>
+</tr>
+
+<tr valign='top'>
+<td>222</td>
+<td>a.t_motifs_m222_AT2G33810</td>
+<td>AT2G33810</td>
+<td>8</td>
+<td>tCCGTACa</td>
+<td>TGTACGGA</td>
+<td>8.83</td>
+<td>158</td>
+</tr>
+
+<tr valign='top'>
+<td>223</td>
+<td>a.t_motifs_m223_AT2G33860</td>
+<td>AT2G33860</td>
+<td>10</td>
+<td>tTGTCGGaah</td>
+<td>DTTCCGACAA</td>
+<td>8.98</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>224</td>
+<td>a.t_motifs_m224_AT2G35530</td>
+<td>AT2G35530</td>
+<td>15</td>
+<td>dwwksysACGTGGCA</td>
+<td>TGCCACGTSRSMWWH</td>
+<td>11.38</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>225</td>
+<td>a.t_motifs_m225_AT2G35700</td>
+<td>AT2G35700</td>
+<td>15</td>
+<td>TGTCGGYGrhgrhgr</td>
+<td>YCDYCDYCRCCGACA</td>
+<td>9.29</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>226</td>
+<td>a.t_motifs_m226_AT2G36010</td>
+<td>AT2G36010</td>
+<td>14</td>
+<td>wwwwGGCGCCAaaa</td>
+<td>TTTTGGCGCCWWWW</td>
+<td>10.05</td>
+<td>580</td>
+</tr>
+
+<tr valign='top'>
+<td>227</td>
+<td>a.t_motifs_m227_AT2G36270</td>
+<td>AT2G36270</td>
+<td>18</td>
+<td>wdrwgrwsACGTGKCarw</td>
+<td>WYTGMCACGTSWYCWYHW</td>
+<td>11.61</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>228</td>
+<td>a.t_motifs_m228_AT2G36610</td>
+<td>AT2G36610</td>
+<td>13</td>
+<td>twATAATwtwwwt</td>
+<td>AWWWAWATTATWA</td>
+<td>6.21</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>229</td>
+<td>a.t_motifs_m229_AT2G37590</td>
+<td>AT2G37590</td>
+<td>15</td>
+<td>wwwtTTwaCTTTTTk</td>
+<td>MAAAAAGTWAAAWWW</td>
+<td>9.65</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>230</td>
+<td>a.t_motifs_m230_AT2G38090</td>
+<td>AT2G38090</td>
+<td>21</td>
+<td>aaardwwwrGATAAgraTrrd</td>
+<td>HYYATYCTTATCYWWWHYTTT</td>
+<td>11.38</td>
+<td>64</td>
+</tr>
+
+<tr valign='top'>
+<td>231</td>
+<td>a.t_motifs_m231_AT2G38300</td>
+<td>AT2G38300</td>
+<td>11</td>
+<td>aArrGAATdTt</td>
+<td>AAHATTCYYTT</td>
+<td>8.51</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>232</td>
+<td>a.t_motifs_m232_AT2G38340</td>
+<td>AT2G38340</td>
+<td>17</td>
+<td>ywyhthmACCGMCwTwr</td>
+<td>YWAWGKCGGTKDADRWR</td>
+<td>9.82</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>233</td>
+<td>a.t_motifs_m233_AT2G38470</td>
+<td>AT2G38470</td>
+<td>11</td>
+<td>aawAGTCAAmg</td>
+<td>CKTTGACTWTT</td>
+<td>9.67</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>234</td>
+<td>a.t_motifs_m234_AT2G38880</td>
+<td>AT2G38880</td>
+<td>9</td>
+<td>TCCATCAwc</td>
+<td>GWTGATGGA</td>
+<td>9.88</td>
+<td>145</td>
+</tr>
+
+<tr valign='top'>
+<td>235</td>
+<td>a.t_motifs_m235_AT2G40220</td>
+<td>AT2G40220</td>
+<td>10</td>
+<td>CGsyGCcccc</td>
+<td>GGGGGCRSCG</td>
+<td>6.75</td>
+<td>49</td>
+</tr>
+
+<tr valign='top'>
+<td>236</td>
+<td>a.t_motifs_m236_AT2G40260</td>
+<td>AT2G40260</td>
+<td>15</td>
+<td>twwwwAyATTCyyTt</td>
+<td>AARRGAATRTWWWWA</td>
+<td>9.20</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>237</td>
+<td>a.t_motifs_m237_AT2G40340</td>
+<td>AT2G40340</td>
+<td>21</td>
+<td>gGmGGyGghggyGGyGGtGGw</td>
+<td>WCCACCRCCRCCDCCRCCKCC</td>
+<td>11.69</td>
+<td>259</td>
+</tr>
+
+<tr valign='top'>
+<td>238</td>
+<td>a.t_motifs_m238_AT2G40620</td>
+<td>AT2G40620</td>
+<td>11</td>
+<td>amcAGCTGkCA</td>
+<td>TGMCAGCTGKT</td>
+<td>8.69</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>239</td>
+<td>a.t_motifs_m239_AT2G40740</td>
+<td>AT2G40740</td>
+<td>12</td>
+<td>dgCGTTGACTtt</td>
+<td>AAAGTCAACGCH</td>
+<td>9.81</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>240</td>
+<td>a.t_motifs_m240_AT2G41690</td>
+<td>AT2G41690</td>
+<td>15</td>
+<td>cTTCTAGAakcTTcy</td>
+<td>RGAAGMTTCTAGAAG</td>
+<td>9.88</td>
+<td>100</td>
+</tr>
+
+<tr valign='top'>
+<td>241</td>
+<td>a.t_motifs_m241_AT2G41835</td>
+<td>AT2G41835</td>
+<td>7</td>
+<td>TTGAAAA</td>
+<td>TTTTCAA</td>
+<td>9.47</td>
+<td>192</td>
+</tr>
+
+<tr valign='top'>
+<td>242</td>
+<td>a.t_motifs_m242_AT2G42200</td>
+<td>AT2G42200</td>
+<td>11</td>
+<td>awtGTACkkwy</td>
+<td>RWMMGTACAWT</td>
+<td>7.03</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>243</td>
+<td>a.t_motifs_m243_AT2G42280</td>
+<td>AT2G42280</td>
+<td>11</td>
+<td>dkCmACTTGcm</td>
+<td>KGCAAGTKGMH</td>
+<td>9.36</td>
+<td>185</td>
+</tr>
+
+<tr valign='top'>
+<td>244</td>
+<td>a.t_motifs_m244_AT2G42400</td>
+<td>AT2G42400</td>
+<td>12</td>
+<td>dvGGTwGCGTAh</td>
+<td>DTACGCWACCBH</td>
+<td>9.90</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>245</td>
+<td>a.t_motifs_m245_AT2G42430</td>
+<td>AT2G42430</td>
+<td>15</td>
+<td>cCggAAAwtccGGmr</td>
+<td>YKCCGGAWTTTCCGG</td>
+<td>7.91</td>
+<td>573</td>
+</tr>
+
+<tr valign='top'>
+<td>246</td>
+<td>a.t_motifs_m246_AT2G43000</td>
+<td>AT2G43000</td>
+<td>20</td>
+<td>ygCCGTrwhhtyymCGyyry</td>
+<td>RYRRCGKRRADDWYACGGCR</td>
+<td>9.11</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>247</td>
+<td>a.t_motifs_m247_AT2G43010</td>
+<td>AT2G43010</td>
+<td>9</td>
+<td>tCACRTGgc</td>
+<td>GCCAYGTGA</td>
+<td>8.07</td>
+<td>347</td>
+</tr>
+
+<tr valign='top'>
+<td>248</td>
+<td>a.t_motifs_m248_AT2G44745</td>
+<td>AT2G44745</td>
+<td>10</td>
+<td>yCGTTGACCk</td>
+<td>MGGTCAACGR</td>
+<td>7.97</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>249</td>
+<td>a.t_motifs_m249_AT2G44840</td>
+<td>AT2G44840</td>
+<td>15</td>
+<td>ctcmGCCGCCrttwy</td>
+<td>RWAAYGGCGGCKGAG</td>
+<td>10.11</td>
+<td>570</td>
+</tr>
+
+<tr valign='top'>
+<td>250</td>
+<td>a.t_motifs_m250_AT2G44940</td>
+<td>AT2G44940</td>
+<td>15</td>
+<td>hwkTGTCGGTGrhrd</td>
+<td>HYDYCACCGACAMWD</td>
+<td>9.55</td>
+<td>560</td>
+</tr>
+
+<tr valign='top'>
+<td>251</td>
+<td>a.t_motifs_m251_AT2G45190</td>
+<td>AT2G45190</td>
+<td>10</td>
+<td>ywATmATAAt</td>
+<td>ATTATKATWR</td>
+<td>5.74</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>252</td>
+<td>a.t_motifs_m252_AT2G45410</td>
+<td>AT2G45410</td>
+<td>15</td>
+<td>CCggAAAwtccGGar</td>
+<td>YTCCGGAWTTTCCGG</td>
+<td>8.80</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>253</td>
+<td>a.t_motifs_m253_AT2G45420</td>
+<td>AT2G45420</td>
+<td>19</td>
+<td>wytycksCggawTTTCcGs</td>
+<td>SCGGAAAWTCCGSMGRARW</td>
+<td>8.09</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>254</td>
+<td>a.t_motifs_m254_AT2G45650</td>
+<td>AT2G45650</td>
+<td>19</td>
+<td>TTwCCaAAAAwRGaAAaww</td>
+<td>WWTTTTCYWTTTTTGGWAA</td>
+<td>13.38</td>
+<td>482</td>
+</tr>
+
+<tr valign='top'>
+<td>255</td>
+<td>a.t_motifs_m255_AT2G45660</td>
+<td>AT2G45660</td>
+<td>21</td>
+<td>yyTytyYtTyTyTyTyTyTyt</td>
+<td>ARARARARARARAARRARARR</td>
+<td>10.69</td>
+<td>806</td>
+</tr>
+
+<tr valign='top'>
+<td>256</td>
+<td>a.t_motifs_m256_AT2G45680</td>
+<td>AT2G45680</td>
+<td>21</td>
+<td>ccattwgyyGTGGGtCCCACm</td>
+<td>KGTGGGACCCACRRCWAATGG</td>
+<td>13.17</td>
+<td>395</td>
+</tr>
+
+<tr valign='top'>
+<td>257</td>
+<td>a.t_motifs_m257_AT2G46130</td>
+<td>AT2G46130</td>
+<td>14</td>
+<td>dtCGTTGACTTTtt</td>
+<td>AAAAAGTCAACGAH</td>
+<td>10.19</td>
+<td>506</td>
+</tr>
+
+<tr valign='top'>
+<td>258</td>
+<td>a.t_motifs_m258_AT2G46270</td>
+<td>AT2G46270</td>
+<td>15</td>
+<td>TGCCACGTsasmwwh</td>
+<td>DWWKSTSACGTGGCA</td>
+<td>11.51</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>259</td>
+<td>a.t_motifs_m259_AT2G46400</td>
+<td>AT2G46400</td>
+<td>11</td>
+<td>maAAGTCAACG</td>
+<td>CGTTGACTTTK</td>
+<td>9.68</td>
+<td>130</td>
+</tr>
+
+<tr valign='top'>
+<td>260</td>
+<td>a.t_motifs_m260_AT2G46510</td>
+<td>AT2G46510</td>
+<td>8</td>
+<td>GCACGTGC</td>
+<td>GCACGTGC</td>
+<td>8.84</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>261</td>
+<td>a.t_motifs_m261_AT2G46590</td>
+<td>AT2G46590</td>
+<td>11</td>
+<td>sAAAAAGkdra</td>
+<td>TYHMCTTTTTS</td>
+<td>8.43</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>262</td>
+<td>a.t_motifs_m262_AT2G46680</td>
+<td>AT2G46680</td>
+<td>13</td>
+<td>tcAATGATTGrwt</td>
+<td>AWYCAATCATTGA</td>
+<td>10.43</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>263</td>
+<td>a.t_motifs_m263_AT2G46770</td>
+<td>AT2G46770</td>
+<td>17</td>
+<td>TwrCkTraawwwcAMGc</td>
+<td>GCKTGWWWTTYAMGYWA</td>
+<td>9.79</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>264</td>
+<td>a.t_motifs_m264_AT2G46830</td>
+<td>AT2G46830</td>
+<td>8</td>
+<td>AAATATCT</td>
+<td>AGATATTT</td>
+<td>9.69</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>265</td>
+<td>a.t_motifs_m265_AT2G47070</td>
+<td>AT2G47070</td>
+<td>10</td>
+<td>dCCGTACGGa</td>
+<td>TCCGTACGGH</td>
+<td>10.19</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>266</td>
+<td>a.t_motifs_m266_AT2G47260</td>
+<td>AT2G47260</td>
+<td>8</td>
+<td>RGTCAACG</td>
+<td>CGTTGACY</td>
+<td>9.24</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>267</td>
+<td>a.t_motifs_m267_AT2G47460</td>
+<td>AT2G47460</td>
+<td>10</td>
+<td>wTACCTACCk</td>
+<td>MGGTAGGTAW</td>
+<td>9.72</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>268</td>
+<td>a.t_motifs_m268_AT3G01220</td>
+<td>AT3G01220</td>
+<td>11</td>
+<td>hyAATAATTra</td>
+<td>TYAATTATTRD</td>
+<td>10.34</td>
+<td>230</td>
+</tr>
+
+<tr valign='top'>
+<td>269</td>
+<td>a.t_motifs_m269_AT3G01470</td>
+<td>AT3G01470</td>
+<td>11</td>
+<td>wyAATAATTrw</td>
+<td>WYAATTATTRW</td>
+<td>9.92</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>270</td>
+<td>a.t_motifs_m270_AT3G01530</td>
+<td>AT3G01530</td>
+<td>14</td>
+<td>yyTACCTAACTttw</td>
+<td>WAAAGTTAGGTARR</td>
+<td>11.58</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>271</td>
+<td>a.t_motifs_m271_AT3G01970</td>
+<td>AT3G01970</td>
+<td>12</td>
+<td>ckTTGACTTTtt</td>
+<td>AAAAAGTCAAMG</td>
+<td>11.29</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>272</td>
+<td>a.t_motifs_m272_AT3G02150</td>
+<td>AT3G02150</td>
+<td>13</td>
+<td>GTGGGGACCACww</td>
+<td>WWGTGGTCCCCAC</td>
+<td>11.74</td>
+<td>130</td>
+</tr>
+
+<tr valign='top'>
+<td>273</td>
+<td>a.t_motifs_m273_AT3G02940</td>
+<td>AT3G02940</td>
+<td>18</td>
+<td>wwrkTwGGTgrrcwawyt</td>
+<td>ARWTWGYYCACCWAMYWW</td>
+<td>8.78</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>274</td>
+<td>a.t_motifs_m274_AT3G02990</td>
+<td>AT3G02990</td>
+<td>13</td>
+<td>rGAAgcTTCTAGA</td>
+<td>TCTAGAAGCTTCY</td>
+<td>12.02</td>
+<td>508</td>
+</tr>
+
+<tr valign='top'>
+<td>275</td>
+<td>a.t_motifs_m275_AT3G03200</td>
+<td>AT3G03200</td>
+<td>16</td>
+<td>CkTGwrgwwsAAGyAA</td>
+<td>TTRCTTSWWCYWCAMG</td>
+<td>10.26</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>276</td>
+<td>a.t_motifs_m276_AT3G03660</td>
+<td>AT3G03660</td>
+<td>11</td>
+<td>ArTTAATTArt</td>
+<td>AYTAATTAAYT</td>
+<td>9.35</td>
+<td>263</td>
+</tr>
+
+<tr valign='top'>
+<td>277</td>
+<td>a.t_motifs_m277_AT3G04030</td>
+<td>AT3G04030</td>
+<td>14</td>
+<td>aadrGAATmTTytt</td>
+<td>AARAAKATTCYHTT</td>
+<td>9.00</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>278</td>
+<td>a.t_motifs_m278_AT3G04060</td>
+<td>AT3G04060</td>
+<td>21</td>
+<td>TwrCKTGtrrmACAmGyaAhc</td>
+<td>GDTTRCKTGTKYYACAMGYWA</td>
+<td>12.36</td>
+<td>576</td>
+</tr>
+
+<tr valign='top'>
+<td>279</td>
+<td>a.t_motifs_m279_AT3G04070</td>
+<td>AT3G04070</td>
+<td>15</td>
+<td>argwkaCGTRtwdww</td>
+<td>WWHWAYACGTMWCYT</td>
+<td>7.71</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>280</td>
+<td>a.t_motifs_m280_AT3G06490</td>
+<td>AT3G06490</td>
+<td>15</td>
+<td>twrgwwaarTTwGGy</td>
+<td>RCCWAAYTTWWCYWA</td>
+<td>8.52</td>
+<td>592</td>
+</tr>
+
+<tr valign='top'>
+<td>281</td>
+<td>a.t_motifs_m281_AT3G06740</td>
+<td>AT3G06740</td>
+<td>19</td>
+<td>SATCATCATCATCATCATC</td>
+<td>GATGATGATGATGATGATS</td>
+<td>16.53</td>
+<td>342</td>
+</tr>
+
+<tr valign='top'>
+<td>282</td>
+<td>a.t_motifs_m282_AT3G08500</td>
+<td>AT3G08500</td>
+<td>11</td>
+<td>gkkGTTGGTGr</td>
+<td>YCACCAACMMC</td>
+<td>7.57</td>
+<td>423</td>
+</tr>
+
+<tr valign='top'>
+<td>283</td>
+<td>a.t_motifs_m283_AT3G09230</td>
+<td>AT3G09230</td>
+<td>19</td>
+<td>dtwaCsGTTwwwdhtsttd</td>
+<td>HAASADHWWWAACSGTWAH</td>
+<td>9.14</td>
+<td>144</td>
+</tr>
+
+<tr valign='top'>
+<td>284</td>
+<td>a.t_motifs_m284_AT3G09600</td>
+<td>AT3G09600</td>
+<td>12</td>
+<td>AGATATTTttwt</td>
+<td>AWAAAAATATCT</td>
+<td>10.76</td>
+<td>593</td>
+</tr>
+
+<tr valign='top'>
+<td>285</td>
+<td>a.t_motifs_m285_AT3G09735</td>
+<td>AT3G09735</td>
+<td>15</td>
+<td>rGAAgmTTCTAGAAr</td>
+<td>YTTCTAGAAKCTTCY</td>
+<td>12.78</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>286</td>
+<td>a.t_motifs_m286_AT3G10030</td>
+<td>AT3G10030</td>
+<td>14</td>
+<td>adtTAACGGCGtya</td>
+<td>TRACGCCGTTAAHT</td>
+<td>9.67</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>287</td>
+<td>a.t_motifs_m287_AT3G10113</td>
+<td>AT3G10113</td>
+<td>15</td>
+<td>wawawAAATATCtwa</td>
+<td>TWAGATATTTWTWTW</td>
+<td>10.39</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>288</td>
+<td>a.t_motifs_m288_AT3G10480</td>
+<td>AT3G10480</td>
+<td>16</td>
+<td>CTTGyrwhrCAMGtwA</td>
+<td>TWACKTGYDWYRCAAG</td>
+<td>11.74</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>289</td>
+<td>a.t_motifs_m289_AT3G10490</td>
+<td>AT3G10490</td>
+<td>20</td>
+<td>gTttCTTGgvmmrCAmGywA</td>
+<td>TWRCKTGYKKBCCAAGAAAC</td>
+<td>11.58</td>
+<td>160</td>
+</tr>
+
+<tr valign='top'>
+<td>290</td>
+<td>a.t_motifs_m290_AT3G10500</td>
+<td>AT3G10500</td>
+<td>17</td>
+<td>TTtCTTGkrgarCAAGw</td>
+<td>WCTTGYTCYMCAAGAAA</td>
+<td>12.90</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>291</td>
+<td>a.t_motifs_m291_AT3G10580</td>
+<td>AT3G10580</td>
+<td>15</td>
+<td>awwwwrGATAAGvwt</td>
+<td>AWBCTTATCYWWWWT</td>
+<td>9.69</td>
+<td>140</td>
+</tr>
+
+<tr valign='top'>
+<td>292</td>
+<td>a.t_motifs_m292_AT3G10800</td>
+<td>AT3G10800</td>
+<td>15</td>
+<td>dwwgrtsACGTGKCa</td>
+<td>TGMCACGTSAYCWWH</td>
+<td>9.97</td>
+<td>548</td>
+</tr>
+
+<tr valign='top'>
+<td>293</td>
+<td>a.t_motifs_m293_AT3G11020</td>
+<td>AT3G11020</td>
+<td>21</td>
+<td>wgrydrwGkCGGTGgwgrwrr</td>
+<td>YYWYCWCCACCGMCWYHRYCW</td>
+<td>9.49</td>
+<td>581</td>
+</tr>
+
+<tr valign='top'>
+<td>294</td>
+<td>a.t_motifs_m294_AT3G11280</td>
+<td>AT3G11280</td>
+<td>14</td>
+<td>awycTTATCtthwy</td>
+<td>RWDAAGATAAGRWT</td>
+<td>8.99</td>
+<td>582</td>
+</tr>
+
+<tr valign='top'>
+<td>295</td>
+<td>a.t_motifs_m295_AT3G11440</td>
+<td>AT3G11440</td>
+<td>13</td>
+<td>ayyrTAACcGhmw</td>
+<td>WKDCGGTTAYRRT</td>
+<td>7.37</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>296</td>
+<td>a.t_motifs_m296_AT3G12130</td>
+<td>AT3G12130</td>
+<td>14</td>
+<td>aawsAAAAAGkwra</td>
+<td>TYWMCTTTTTSWTT</td>
+<td>7.88</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>297</td>
+<td>a.t_motifs_m297_AT3G12250</td>
+<td>AT3G12250</td>
+<td>15</td>
+<td>drTGACGTCAkCawy</td>
+<td>RWTGMTGACGTCAYH</td>
+<td>11.76</td>
+<td>580</td>
+</tr>
+
+<tr valign='top'>
+<td>298</td>
+<td>a.t_motifs_m298_AT3G12720</td>
+<td>AT3G12720</td>
+<td>21</td>
+<td>ddwrdddwdrtGkTwGGTrgr</td>
+<td>YCYACCWAMCAYHWHHHYWHH</td>
+<td>9.11</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>299</td>
+<td>a.t_motifs_m299_AT3G12730</td>
+<td>AT3G12730</td>
+<td>14</td>
+<td>aaArrGAATATTCy</td>
+<td>RGAATATTCYYTTT</td>
+<td>11.62</td>
+<td>105</td>
+</tr>
+
+<tr valign='top'>
+<td>300</td>
+<td>a.t_motifs_m300_AT3G12820</td>
+<td>AT3G12820</td>
+<td>16</td>
+<td>dddwddGKTWGGTRrr</td>
+<td>YYYACCWAMCHHWHHH</td>
+<td>9.51</td>
+<td>585</td>
+</tr>
+
+<tr valign='top'>
+<td>301</td>
+<td>a.t_motifs_m301_AT3G12910</td>
+<td>AT3G12910</td>
+<td>17</td>
+<td>yGsCGKrradwygmCGk</td>
+<td>MCGKCRWHTYYMCGSCR</td>
+<td>9.73</td>
+<td>97</td>
+</tr>
+
+<tr valign='top'>
+<td>302</td>
+<td>a.t_motifs_m302_AT3G13040</td>
+<td>AT3G13040</td>
+<td>9</td>
+<td>awGAAAACa</td>
+<td>TGTTTTCWT</td>
+<td>8.63</td>
+<td>157</td>
+</tr>
+
+<tr valign='top'>
+<td>303</td>
+<td>a.t_motifs_m303_AT3G13810</td>
+<td>AT3G13810</td>
+<td>21</td>
+<td>tttttwttTTTGTCkTtTtyt</td>
+<td>ARAAAAMGACAAAAAWAAAAA</td>
+<td>10.46</td>
+<td>574</td>
+</tr>
+
+<tr valign='top'>
+<td>304</td>
+<td>a.t_motifs_m304_AT3G14180</td>
+<td>AT3G14180</td>
+<td>11</td>
+<td>TCrCCGGArAw</td>
+<td>WTYTCCGGYGA</td>
+<td>9.51</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>305</td>
+<td>a.t_motifs_m305_AT3G15030</td>
+<td>AT3G15030</td>
+<td>8</td>
+<td>GGGACCAC</td>
+<td>GTGGTCCC</td>
+<td>10.03</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>306</td>
+<td>a.t_motifs_m306_AT3G15170</td>
+<td>AT3G15170</td>
+<td>16</td>
+<td>CkTGtdraacAMGtaA</td>
+<td>TTACKTGTTYHACAMG</td>
+<td>10.28</td>
+<td>577</td>
+</tr>
+
+<tr valign='top'>
+<td>307</td>
+<td>a.t_motifs_m307_AT3G15210</td>
+<td>AT3G15210</td>
+<td>15</td>
+<td>yCkCCGCCGCCryhw</td>
+<td>WDRYGGCGGCGGMGR</td>
+<td>10.76</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>308</td>
+<td>a.t_motifs_m308_AT3G15270</td>
+<td>AT3G15270</td>
+<td>12</td>
+<td>aayyGTACGGAh</td>
+<td>DTCCGTACRRTT</td>
+<td>10.30</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>309</td>
+<td>a.t_motifs_m309_AT3G15500</td>
+<td>AT3G15500</td>
+<td>21</td>
+<td>wktcdwrtwhwwYACGkmWyy</td>
+<td>RRWKMCGTRWWDWAYWHGAMW</td>
+<td>8.96</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>310</td>
+<td>a.t_motifs_m310_AT3G15510</td>
+<td>AT3G15510</td>
+<td>17</td>
+<td>CTTGttsyrCAAGaAAc</td>
+<td>GTTTCTTGYRSAACAAG</td>
+<td>12.80</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>311</td>
+<td>a.t_motifs_m311_AT3G16280</td>
+<td>AT3G16280</td>
+<td>14</td>
+<td>wwkTGTCGGTGrhr</td>
+<td>YDYCACCGACAMWW</td>
+<td>8.68</td>
+<td>561</td>
+</tr>
+
+<tr valign='top'>
+<td>312</td>
+<td>a.t_motifs_m312_AT3G16770</td>
+<td>AT3G16770</td>
+<td>8</td>
+<td>gCGCCGCm</td>
+<td>KGCGGCGC</td>
+<td>6.59</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>313</td>
+<td>a.t_motifs_m313_AT3G17730</td>
+<td>AT3G17730</td>
+<td>17</td>
+<td>wrCkTGtrkhaCAMGyA</td>
+<td>TRCKTGTDMYACAMGYW</td>
+<td>10.06</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>314</td>
+<td>a.t_motifs_m314_AT3G18400</td>
+<td>AT3G18400</td>
+<td>16</td>
+<td>CkTGtrmmaCAmGywA</td>
+<td>TWRCKTGTKKYACAMG</td>
+<td>10.48</td>
+<td>591</td>
+</tr>
+
+<tr valign='top'>
+<td>315</td>
+<td>a.t_motifs_m315_AT3G20310</td>
+<td>AT3G20310</td>
+<td>21</td>
+<td>ycdycgccdyCkCCGCCGyca</td>
+<td>TGRCGGCGGMGRHGGCGRHGR</td>
+<td>9.91</td>
+<td>593</td>
+</tr>
+
+<tr valign='top'>
+<td>316</td>
+<td>a.t_motifs_m316_AT3G20770</td>
+<td>AT3G20770</td>
+<td>15</td>
+<td>GtcyArrTwCAwTGw</td>
+<td>WCAWTGWAYYTRGAC</td>
+<td>8.00</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>317</td>
+<td>a.t_motifs_m317_AT3G20840</td>
+<td>AT3G20840</td>
+<td>19</td>
+<td>kgCACGrwTyyCgAGrmrr</td>
+<td>YYKYCTCGRRAWYCGTGCM</td>
+<td>10.05</td>
+<td>195</td>
+</tr>
+
+<tr valign='top'>
+<td>318</td>
+<td>a.t_motifs_m318_AT3G21175</td>
+<td>AT3G21175</td>
+<td>15</td>
+<td>TCATCATCATCATCA</td>
+<td>TGATGATGATGATGA</td>
+<td>17.29</td>
+<td>509</td>
+</tr>
+
+<tr valign='top'>
+<td>319</td>
+<td>a.t_motifs_m319_AT3G22170</td>
+<td>AT3G22170</td>
+<td>12</td>
+<td>ywCACGCGCThw</td>
+<td>WDAGCGCGTGWR</td>
+<td>8.31</td>
+<td>235</td>
+</tr>
+
+<tr valign='top'>
+<td>320</td>
+<td>a.t_motifs_m320_AT3G22760</td>
+<td>AT3G22760</td>
+<td>8</td>
+<td>dTTTrAAw</td>
+<td>WTTYAAAH</td>
+<td>7.27</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>321</td>
+<td>a.t_motifs_m321_AT3G22780</td>
+<td>AT3G22780</td>
+<td>15</td>
+<td>wwwTwaAAATTYAAA</td>
+<td>TTTRAATTTTWAWWW</td>
+<td>12.27</td>
+<td>264</td>
+</tr>
+
+<tr valign='top'>
+<td>322</td>
+<td>a.t_motifs_m322_AT3G22830</td>
+<td>AT3G22830</td>
+<td>15</td>
+<td>rGAAsmTTCTAGAAg</td>
+<td>CTTCTAGAAKSTTCY</td>
+<td>10.84</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>323</td>
+<td>a.t_motifs_m323_AT3G23210</td>
+<td>AT3G23210</td>
+<td>23</td>
+<td>gtgrwwgrCACGTGycarcwygw</td>
+<td>WCRWGYTGRCACGTGYCWWYCAC</td>
+<td>8.89</td>
+<td>567</td>
+</tr>
+
+<tr valign='top'>
+<td>324</td>
+<td>a.t_motifs_m324_AT3G23220</td>
+<td>AT3G23220</td>
+<td>15</td>
+<td>ygryGGCGGCGGmGg</td>
+<td>CCKCCGCCGCCRYCR</td>
+<td>10.61</td>
+<td>591</td>
+</tr>
+
+<tr valign='top'>
+<td>325</td>
+<td>a.t_motifs_m325_AT3G23240</td>
+<td>AT3G23240</td>
+<td>28</td>
+<td>cykymwymGCCGCCryyrchrcygycky</td>
+<td>RMGRCRGYDGYRRYGGCGGCKRWKRMRG</td>
+<td>11.05</td>
+<td>581</td>
+</tr>
+
+<tr valign='top'>
+<td>326</td>
+<td>a.t_motifs_m326_AT3G23250</td>
+<td>AT3G23250</td>
+<td>21</td>
+<td>cwycaahwyhyyCACCWACcm</td>
+<td>KGGTWGGTGRRDRWDTTGRWG</td>
+<td>8.40</td>
+<td>534</td>
+</tr>
+
+<tr valign='top'>
+<td>327</td>
+<td>a.t_motifs_m327_AT3G23690</td>
+<td>AT3G23690</td>
+<td>15</td>
+<td>rwkwdgbCACGTGmk</td>
+<td>MKCACGTGVCHWMWY</td>
+<td>9.67</td>
+<td>75</td>
+</tr>
+
+<tr valign='top'>
+<td>328</td>
+<td>a.t_motifs_m328_AT3G24050</td>
+<td>AT3G24050</td>
+<td>15</td>
+<td>rTGrTGrTGrTGrTG</td>
+<td>CAYCAYCAYCAYCAY</td>
+<td>9.95</td>
+<td>224</td>
+</tr>
+
+<tr valign='top'>
+<td>329</td>
+<td>a.t_motifs_m329_AT3G24120</td>
+<td>AT3G24120</td>
+<td>8</td>
+<td>rGAATmTd</td>
+<td>HAKATTCY</td>
+<td>7.18</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>330</td>
+<td>a.t_motifs_m330_AT3G24520</td>
+<td>AT3G24520</td>
+<td>11</td>
+<td>CTAGAAgcTTC</td>
+<td>GAAGCTTCTAG</td>
+<td>10.96</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>331</td>
+<td>a.t_motifs_m331_AT3G24650</td>
+<td>AT3G24650</td>
+<td>9</td>
+<td>ytGCATGCa</td>
+<td>TGCATGCAR</td>
+<td>7.13</td>
+<td>100</td>
+</tr>
+
+<tr valign='top'>
+<td>332</td>
+<td>a.t_motifs_m332_AT3G25730</td>
+<td>AT3G25730</td>
+<td>8</td>
+<td>rCAACAkA</td>
+<td>TMTGTTGY</td>
+<td>9.33</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>333</td>
+<td>a.t_motifs_m333_AT3G25990</td>
+<td>AT3G25990</td>
+<td>21</td>
+<td>AACCATGGTTAAawywtaacm</td>
+<td>KGTTAWRWTTTAACCATGGTT</td>
+<td>15.86</td>
+<td>78</td>
+</tr>
+
+<tr valign='top'>
+<td>334</td>
+<td>a.t_motifs_m334_AT3G26620</td>
+<td>AT3G26620</td>
+<td>15</td>
+<td>rGCGkawTtymCGCy</td>
+<td>RGCGKRAAWTMCGCY</td>
+<td>8.20</td>
+<td>588</td>
+</tr>
+
+<tr valign='top'>
+<td>335</td>
+<td>a.t_motifs_m335_AT3G26790</td>
+<td>AT3G26790</td>
+<td>15</td>
+<td>ahatrCATGCAwrya</td>
+<td>TRYWTGCATGYATDT</td>
+<td>10.24</td>
+<td>589</td>
+</tr>
+
+<tr valign='top'>
+<td>336</td>
+<td>a.t_motifs_m336_AT3G27010</td>
+<td>AT3G27010</td>
+<td>21</td>
+<td>waaadarmwdGTGGGrCCCAC</td>
+<td>GTGGGYCCCACHWKYTHTTTW</td>
+<td>11.05</td>
+<td>590</td>
+</tr>
+
+<tr valign='top'>
+<td>337</td>
+<td>a.t_motifs_m337_AT3G27785</td>
+<td>AT3G27785</td>
+<td>17</td>
+<td>awwwyrwmCGTTACrww</td>
+<td>WWYGTAACGKWYRWWWT</td>
+<td>10.59</td>
+<td>278</td>
+</tr>
+
+<tr valign='top'>
+<td>338</td>
+<td>a.t_motifs_m338_AT3G28910</td>
+<td>AT3G28910</td>
+<td>15</td>
+<td>yymcCAACyACCamc</td>
+<td>GKTGGTRGTTGGKRR</td>
+<td>8.42</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>339</td>
+<td>a.t_motifs_m339_AT3G28920</td>
+<td>AT3G28920</td>
+<td>15</td>
+<td>wwwawthmyTAATyA</td>
+<td>TRATTARKDAWTWWW</td>
+<td>9.51</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>340</td>
+<td>a.t_motifs_m340_AT3G30210</td>
+<td>AT3G30210</td>
+<td>14</td>
+<td>wwwGKTAGGTawra</td>
+<td>TYWTACCTAMCWWW</td>
+<td>8.65</td>
+<td>573</td>
+</tr>
+
+<tr valign='top'>
+<td>341</td>
+<td>a.t_motifs_m341_AT3G30530</td>
+<td>AT3G30530</td>
+<td>12</td>
+<td>TGCTGACGTGGM</td>
+<td>KCCACGTCAGCA</td>
+<td>13.92</td>
+<td>67</td>
+</tr>
+
+<tr valign='top'>
+<td>342</td>
+<td>a.t_motifs_m342_AT3G45150</td>
+<td>AT3G45150</td>
+<td>11</td>
+<td>gTkGGGyCCAC</td>
+<td>GTGGRCCCMAC</td>
+<td>10.97</td>
+<td>80</td>
+</tr>
+
+<tr valign='top'>
+<td>343</td>
+<td>a.t_motifs_m343_AT3G45170</td>
+<td>AT3G45170</td>
+<td>15</td>
+<td>tttAGATCTrwtttt</td>
+<td>AAAAWYAGATCTAAA</td>
+<td>8.69</td>
+<td>551</td>
+</tr>
+
+<tr valign='top'>
+<td>344</td>
+<td>a.t_motifs_m344_AT3G45610</td>
+<td>AT3G45610</td>
+<td>19</td>
+<td>tywaCTTTTTsyytttttt</td>
+<td>AAAAAARRSAAAAAGTWRA</td>
+<td>9.51</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>345</td>
+<td>a.t_motifs_m345_AT3G46070</td>
+<td>AT3G46070</td>
+<td>15</td>
+<td>yywhyyTCACTcthh</td>
+<td>DDAGAGTGARRDWRR</td>
+<td>8.48</td>
+<td>202</td>
+</tr>
+
+<tr valign='top'>
+<td>346</td>
+<td>a.t_motifs_m346_AT3G46090</td>
+<td>AT3G46090</td>
+<td>13</td>
+<td>mhhbAGTGtrctg</td>
+<td>CAGYACACTVDDK</td>
+<td>5.62</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>347</td>
+<td>a.t_motifs_m347_AT3G46640</td>
+<td>AT3G46640</td>
+<td>14</td>
+<td>khaAGATwYgstka</td>
+<td>TMASCRWATCTTDM</td>
+<td>6.70</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>348</td>
+<td>a.t_motifs_m348_AT3G47500</td>
+<td>AT3G47500</td>
+<td>19</td>
+<td>aaaaargAAAAAGtraaaa</td>
+<td>TTTTYACTTTTTCYTTTTT</td>
+<td>10.03</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>349</td>
+<td>a.t_motifs_m349_AT3G47600</td>
+<td>AT3G47600</td>
+<td>19</td>
+<td>ddrdwrGTrGTTGrrrrdw</td>
+<td>WHYYYYCAACYACYWHYHH</td>
+<td>9.47</td>
+<td>567</td>
+</tr>
+
+<tr valign='top'>
+<td>350</td>
+<td>a.t_motifs_m350_AT3G47620</td>
+<td>AT3G47620</td>
+<td>20</td>
+<td>avAdAgsrkGTGGGrCCCAC</td>
+<td>GTGGGYCCCACMYSCTHTBT</td>
+<td>16.57</td>
+<td>47</td>
+</tr>
+
+<tr valign='top'>
+<td>351</td>
+<td>a.t_motifs_m351_AT3G48160</td>
+<td>AT3G48160</td>
+<td>21</td>
+<td>amwawawwTTTCCCGCCAAAA</td>
+<td>TTTTGGCGGGAAAWWTWTWKT</td>
+<td>16.79</td>
+<td>326</td>
+</tr>
+
+<tr valign='top'>
+<td>352</td>
+<td>a.t_motifs_m352_AT3G48430</td>
+<td>AT3G48430</td>
+<td>12</td>
+<td>arAAACAGAGyA</td>
+<td>TRCTCTGTTTYT</td>
+<td>11.50</td>
+<td>199</td>
+</tr>
+
+<tr valign='top'>
+<td>353</td>
+<td>a.t_motifs_m353_AT3G49530</td>
+<td>AT3G49530</td>
+<td>15</td>
+<td>CTTrsykatkAAGkA</td>
+<td>TMCTTMATMRSYAAG</td>
+<td>10.66</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>354</td>
+<td>a.t_motifs_m354_AT3G49690</td>
+<td>AT3G49690</td>
+<td>13</td>
+<td>gGGgGGTAGGTGs</td>
+<td>SCACCTACCCCCC</td>
+<td>12.69</td>
+<td>100</td>
+</tr>
+
+<tr valign='top'>
+<td>355</td>
+<td>a.t_motifs_m355_AT3G49930</td>
+<td>AT3G49930</td>
+<td>7</td>
+<td>GAAATCw</td>
+<td>WGATTTC</td>
+<td>8.24</td>
+<td>102</td>
+</tr>
+
+<tr valign='top'>
+<td>356</td>
+<td>a.t_motifs_m356_AT3G50060</td>
+<td>AT3G50060</td>
+<td>15</td>
+<td>ydrwwwwdaCsGTTA</td>
+<td>TAACSGTHWWWWYHR</td>
+<td>7.80</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>357</td>
+<td>a.t_motifs_m357_AT3G50260</td>
+<td>AT3G50260</td>
+<td>15</td>
+<td>ccaycdcCACCGmCa</td>
+<td>TGKCGGTGGHGRTGG</td>
+<td>9.34</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>358</td>
+<td>a.t_motifs_m358_AT3G50410</td>
+<td>AT3G50410</td>
+<td>21</td>
+<td>ttyyytytttttywrCTTTTt</td>
+<td>AAAAAGYWRAAAAARARRRAA</td>
+<td>9.15</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>359</td>
+<td>a.t_motifs_m359_AT3G50700</td>
+<td>AT3G50700</td>
+<td>15</td>
+<td>hRswAAAMGACAAAA</td>
+<td>TTTTGTCKTTTWSYD</td>
+<td>13.30</td>
+<td>94</td>
+</tr>
+
+<tr valign='top'>
+<td>360</td>
+<td>a.t_motifs_m360_AT3G51060</td>
+<td>AT3G51060</td>
+<td>10</td>
+<td>cCCCTAGGGb</td>
+<td>VCCCTAGGGG</td>
+<td>9.26</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>361</td>
+<td>a.t_motifs_m361_AT3G51080</td>
+<td>AT3G51080</td>
+<td>13</td>
+<td>yAGATCTAgAtyy</td>
+<td>RRATCTAGATCTR</td>
+<td>9.86</td>
+<td>417</td>
+</tr>
+
+<tr valign='top'>
+<td>362</td>
+<td>a.t_motifs_m362_AT3G52440</td>
+<td>AT3G52440</td>
+<td>11</td>
+<td>sAwAAAGkdaa</td>
+<td>TTHMCTTTWTS</td>
+<td>8.24</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>363</td>
+<td>a.t_motifs_m363_AT3G53200</td>
+<td>AT3G53200</td>
+<td>15</td>
+<td>aaaAARTTAGGTAwa</td>
+<td>TWTACCTAAYTTTTT</td>
+<td>12.72</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>364</td>
+<td>a.t_motifs_m364_AT3G54340</td>
+<td>AT3G54340</td>
+<td>15</td>
+<td>wwCCaAAArwrGaAA</td>
+<td>TTTCYWYTTTTGGWW</td>
+<td>9.97</td>
+<td>291</td>
+</tr>
+
+<tr valign='top'>
+<td>365</td>
+<td>a.t_motifs_m365_AT3G54990</td>
+<td>AT3G54990</td>
+<td>8</td>
+<td>YCTCGTAC</td>
+<td>GTACGAGR</td>
+<td>9.27</td>
+<td>147</td>
+</tr>
+
+<tr valign='top'>
+<td>366</td>
+<td>a.t_motifs_m366_AT3G55370</td>
+<td>AT3G55370</td>
+<td>21</td>
+<td>tTtwCTTTTtyyytTTttttt</td>
+<td>AAAAAAAARRRAAAAAGWAAA</td>
+<td>10.91</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>367</td>
+<td>a.t_motifs_m367_AT3G56400</td>
+<td>AT3G56400</td>
+<td>13</td>
+<td>rsCGTTGACTTTt</td>
+<td>AAAAGTCAACGSY</td>
+<td>11.36</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>368</td>
+<td>a.t_motifs_m368_AT3G56850</td>
+<td>AT3G56850</td>
+<td>15</td>
+<td>wwwggwsACGTGKCA</td>
+<td>TGMCACGTSWCCWWW</td>
+<td>11.66</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>369</td>
+<td>a.t_motifs_m369_AT3G57230</td>
+<td>AT3G57230</td>
+<td>15</td>
+<td>TTtCCwtWTTdGGwA</td>
+<td>TWCCHAAWAWGGAAA</td>
+<td>11.27</td>
+<td>418</td>
+</tr>
+
+<tr valign='top'>
+<td>370</td>
+<td>a.t_motifs_m370_AT3G57600</td>
+<td>AT3G57600</td>
+<td>11</td>
+<td>cCkCCRCCGCC</td>
+<td>GGCGGYGGMGG</td>
+<td>10.13</td>
+<td>478</td>
+</tr>
+
+<tr valign='top'>
+<td>371</td>
+<td>a.t_motifs_m371_AT3G57920</td>
+<td>AT3G57920</td>
+<td>14</td>
+<td>daatTGTACGGAmr</td>
+<td>YKTCCGTACAATTH</td>
+<td>10.33</td>
+<td>246</td>
+</tr>
+
+<tr valign='top'>
+<td>372</td>
+<td>a.t_motifs_m372_AT3G58630</td>
+<td>AT3G58630</td>
+<td>15</td>
+<td>ahwtCTCCGGCGAcr</td>
+<td>YGTCGCCGGAGAWDT</td>
+<td>9.32</td>
+<td>555</td>
+</tr>
+
+<tr valign='top'>
+<td>373</td>
+<td>a.t_motifs_m373_AT3G58780</td>
+<td>AT3G58780</td>
+<td>18</td>
+<td>wtTdCCwwwwtgGGwAar</td>
+<td>YTTWCCCAWWWWGGHAAW</td>
+<td>8.25</td>
+<td>65</td>
+</tr>
+
+<tr valign='top'>
+<td>374</td>
+<td>a.t_motifs_m374_AT3G59060</td>
+<td>AT3G59060</td>
+<td>8</td>
+<td>YCACRTGs</td>
+<td>SCAYGTGR</td>
+<td>8.95</td>
+<td>286</td>
+</tr>
+
+<tr valign='top'>
+<td>375</td>
+<td>a.t_motifs_m375_AT3G60030</td>
+<td>AT3G60030</td>
+<td>8</td>
+<td>wGTACGrh</td>
+<td>DYCGTACW</td>
+<td>5.16</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>376</td>
+<td>a.t_motifs_m376_AT3G60490</td>
+<td>AT3G60490</td>
+<td>14</td>
+<td>rwwwkTGTCGGTGr</td>
+<td>YCACCGACAMWWWY</td>
+<td>10.68</td>
+<td>585</td>
+</tr>
+
+<tr valign='top'>
+<td>377</td>
+<td>a.t_motifs_m377_AT3G60530</td>
+<td>AT3G60530</td>
+<td>15</td>
+<td>wyyyrGATCyrrwyy</td>
+<td>RRWYYRGATCYRRRW</td>
+<td>8.86</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>378</td>
+<td>a.t_motifs_m378_AT3G60580</td>
+<td>AT3G60580</td>
+<td>8</td>
+<td>wkwAGTAr</td>
+<td>YTACTWMW</td>
+<td>6.48</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>379</td>
+<td>a.t_motifs_m379_AT3G61120</td>
+<td>AT3G61120</td>
+<td>18</td>
+<td>WTwCYaAAAAwrGwAAaw</td>
+<td>WTTTWCYWTTTTTRGWAW</td>
+<td>14.00</td>
+<td>219</td>
+</tr>
+
+<tr valign='top'>
+<td>380</td>
+<td>a.t_motifs_m380_AT3G61150</td>
+<td>AT3G61150</td>
+<td>11</td>
+<td>ryAwTTAATGm</td>
+<td>KCATTAAWTRY</td>
+<td>9.82</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>381</td>
+<td>a.t_motifs_m381_AT3G61250</td>
+<td>AT3G61250</td>
+<td>15</td>
+<td>wwdwwGGTAGGTrrr</td>
+<td>YYYACCTACCWWHWW</td>
+<td>9.38</td>
+<td>571</td>
+</tr>
+
+<tr valign='top'>
+<td>382</td>
+<td>a.t_motifs_m382_AT3G61890</td>
+<td>AT3G61890</td>
+<td>10</td>
+<td>kawTgATTGr</td>
+<td>YCAATCAWTM</td>
+<td>7.27</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>383</td>
+<td>a.t_motifs_m383_AT3G61910</td>
+<td>AT3G61910</td>
+<td>13</td>
+<td>swayACGCAAysw</td>
+<td>WSRTTGCGTRTWS</td>
+<td>6.44</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>384</td>
+<td>a.t_motifs_m384_AT3G62420</td>
+<td>AT3G62420</td>
+<td>15</td>
+<td>dwwGmTGACGTGGCa</td>
+<td>TGCCACGTCAKCWWH</td>
+<td>12.33</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>385</td>
+<td>a.t_motifs_m385_AT4G00050</td>
+<td>AT4G00050</td>
+<td>8</td>
+<td>cCACGTGm</td>
+<td>KCACGTGG</td>
+<td>8.83</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>386</td>
+<td>a.t_motifs_m386_AT4G00250</td>
+<td>AT4G00250</td>
+<td>13</td>
+<td>wwycTTATCCAww</td>
+<td>WWTGGATAAGRWW</td>
+<td>9.95</td>
+<td>592</td>
+</tr>
+
+<tr valign='top'>
+<td>387</td>
+<td>a.t_motifs_m387_AT4G00270</td>
+<td>AT4G00270</td>
+<td>8</td>
+<td>mCGGCCGc</td>
+<td>GCGGCCGK</td>
+<td>7.71</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>388</td>
+<td>a.t_motifs_m388_AT4G00730</td>
+<td>AT4G00730</td>
+<td>11</td>
+<td>gCATTAAwTry</td>
+<td>RYAWTTAATGC</td>
+<td>10.14</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>389</td>
+<td>a.t_motifs_m389_AT4G01250</td>
+<td>AT4G01250</td>
+<td>13</td>
+<td>aAAAGTCAACkat</td>
+<td>ATMGTTGACTTTT</td>
+<td>10.84</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>390</td>
+<td>a.t_motifs_m390_AT4G01280</td>
+<td>AT4G01280</td>
+<td>11</td>
+<td>AGATATTTTtw</td>
+<td>WAAAAATATCT</td>
+<td>10.90</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>391</td>
+<td>a.t_motifs_m391_AT4G01500</td>
+<td>AT4G01500</td>
+<td>16</td>
+<td>yytkktCAGGTgwwwt</td>
+<td>AWWWCACCTGAMMARR</td>
+<td>7.99</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>392</td>
+<td>a.t_motifs_m392_AT4G01540</td>
+<td>AT4G01540</td>
+<td>15</td>
+<td>aCTTsttymhyAAGT</td>
+<td>ACTTRDKRAASAAGT</td>
+<td>10.75</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>393</td>
+<td>a.t_motifs_m393_AT4G01550</td>
+<td>AT4G01550</td>
+<td>15</td>
+<td>wmCTTsTtyaayAAG</td>
+<td>CTTRTTRAASAAGKW</td>
+<td>9.89</td>
+<td>587</td>
+</tr>
+
+<tr valign='top'>
+<td>394</td>
+<td>a.t_motifs_m394_AT4G01680</td>
+<td>AT4G01680</td>
+<td>14</td>
+<td>yyycAmCmACCacm</td>
+<td>KGTGGTKGKTGRRR</td>
+<td>8.82</td>
+<td>429</td>
+</tr>
+
+<tr valign='top'>
+<td>395</td>
+<td>a.t_motifs_m395_AT4G01720</td>
+<td>AT4G01720</td>
+<td>19</td>
+<td>aaywrkcGTTGACywwktt</td>
+<td>AAMWWRGTCAACGMYWRTT</td>
+<td>9.24</td>
+<td>551</td>
+</tr>
+
+<tr valign='top'>
+<td>396</td>
+<td>a.t_motifs_m396_AT4G04450</td>
+<td>AT4G04450</td>
+<td>21</td>
+<td>tttkamhyrkcGTTGACywwk</td>
+<td>MWWRGTCAACGMYRDKTMAAA</td>
+<td>9.94</td>
+<td>309</td>
+</tr>
+
+<tr valign='top'>
+<td>397</td>
+<td>a.t_motifs_m397_AT4G05100</td>
+<td>AT4G05100</td>
+<td>14</td>
+<td>yyyyACCTAmywwh</td>
+<td>DWWRKTAGGTRRRR</td>
+<td>9.21</td>
+<td>130</td>
+</tr>
+
+<tr valign='top'>
+<td>398</td>
+<td>a.t_motifs_m398_AT4G06746</td>
+<td>AT4G06746</td>
+<td>19</td>
+<td>ywyyayhwyCACCGACmww</td>
+<td>WWKGTCGGTGRWDRTRRWR</td>
+<td>10.48</td>
+<td>593</td>
+</tr>
+
+<tr valign='top'>
+<td>399</td>
+<td>a.t_motifs_m399_AT4G10350</td>
+<td>AT4G10350</td>
+<td>21</td>
+<td>grTwrCKTrwawwwcAMGyAA</td>
+<td>TTRCKTGWWWTWYAMGYWAYC</td>
+<td>11.82</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>400</td>
+<td>a.t_motifs_m400_AT4G11660</td>
+<td>AT4G11660</td>
+<td>14</td>
+<td>TTCTAGAAgcTTCt</td>
+<td>AGAAGCTTCTAGAA</td>
+<td>12.52</td>
+<td>588</td>
+</tr>
+
+<tr valign='top'>
+<td>401</td>
+<td>a.t_motifs_m401_AT4G14410</td>
+<td>AT4G14410</td>
+<td>10</td>
+<td>GGCACGTGCC</td>
+<td>GGCACGTGCC</td>
+<td>11.47</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>402</td>
+<td>a.t_motifs_m402_AT4G14770</td>
+<td>AT4G14770</td>
+<td>15</td>
+<td>wTTyaAAATTyRAAw</td>
+<td>WTTYRAATTTTRAAW</td>
+<td>12.26</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>403</td>
+<td>a.t_motifs_m403_AT4G15090</td>
+<td>AT4G15090</td>
+<td>15</td>
+<td>ayyyCACGCGCytyy</td>
+<td>RRARGCGCGTGRRRT</td>
+<td>10.38</td>
+<td>591</td>
+</tr>
+
+<tr valign='top'>
+<td>404</td>
+<td>a.t_motifs_m404_AT4G16110</td>
+<td>AT4G16110</td>
+<td>10</td>
+<td>smGwATCTtt</td>
+<td>AAAGATWCKS</td>
+<td>7.71</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>405</td>
+<td>a.t_motifs_m405_AT4G16150</td>
+<td>AT4G16150</td>
+<td>18</td>
+<td>mcGyGTrwraavCGyGTk</td>
+<td>MACRCGBTTYWYACRCGK</td>
+<td>7.86</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>406</td>
+<td>a.t_motifs_m406_AT4G16430</td>
+<td>AT4G16430</td>
+<td>8</td>
+<td>rCACGTGy</td>
+<td>RCACGTGY</td>
+<td>7.35</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>407</td>
+<td>a.t_motifs_m407_AT4G16750</td>
+<td>AT4G16750</td>
+<td>15</td>
+<td>cdycdyCrCCGaCrm</td>
+<td>KYGTCGGYGRHGRHG</td>
+<td>8.59</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>408</td>
+<td>a.t_motifs_m408_AT4G17460</td>
+<td>AT4G17460</td>
+<td>10</td>
+<td>syAATCATkr</td>
+<td>YMATGATTRS</td>
+<td>8.69</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>409</td>
+<td>a.t_motifs_m409_AT4G17490</td>
+<td>AT4G17490</td>
+<td>21</td>
+<td>ccdyckCCGCCGCCrymrcmg</td>
+<td>CKGYKRYGGCGGCGGMGRHGG</td>
+<td>11.92</td>
+<td>513</td>
+</tr>
+
+<tr valign='top'>
+<td>410</td>
+<td>a.t_motifs_m410_AT4G17785</td>
+<td>AT4G17785</td>
+<td>14</td>
+<td>wawrkTAGGTrrra</td>
+<td>TYYYACCTAMYWTW</td>
+<td>9.45</td>
+<td>585</td>
+</tr>
+
+<tr valign='top'>
+<td>411</td>
+<td>a.t_motifs_m411_AT4G17880</td>
+<td>AT4G17880</td>
+<td>8</td>
+<td>rCACGTGC</td>
+<td>GCACGTGY</td>
+<td>8.30</td>
+<td>100</td>
+</tr>
+
+<tr valign='top'>
+<td>412</td>
+<td>a.t_motifs_m412_AT4G17980</td>
+<td>AT4G17980</td>
+<td>15</td>
+<td>TrCkTGarrawsAAG</td>
+<td>CTTSWTYYTCAMGYA</td>
+<td>9.46</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>413</td>
+<td>a.t_motifs_m413_AT4G18170</td>
+<td>AT4G18170</td>
+<td>13</td>
+<td>dwckTTGACTTtt</td>
+<td>AAAAGTCAAMGWH</td>
+<td>9.30</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>414</td>
+<td>a.t_motifs_m414_AT4G18390</td>
+<td>AT4G18390</td>
+<td>10</td>
+<td>gtGGkmCCac</td>
+<td>GTGGKMCCAC</td>
+<td>5.73</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>415</td>
+<td>a.t_motifs_m415_AT4G18450</td>
+<td>AT4G18450</td>
+<td>17</td>
+<td>ryGGCGGCGGmggcggy</td>
+<td>RCCGCCKCCGCCGCCRY</td>
+<td>11.11</td>
+<td>537</td>
+</tr>
+
+<tr valign='top'>
+<td>416</td>
+<td>a.t_motifs_m416_AT4G18770</td>
+<td>AT4G18770</td>
+<td>15</td>
+<td>wwwwwGTAACGkwwr</td>
+<td>YWWMCGTTACWWWWW</td>
+<td>9.48</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>417</td>
+<td>a.t_motifs_m417_AT4G18880</td>
+<td>AT4G18880</td>
+<td>19</td>
+<td>tcwaGAAgcTTCTAGAAgm</td>
+<td>KCTTCTAGAAGCTTCTWGA</td>
+<td>11.69</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>418</td>
+<td>a.t_motifs_m418_AT4G18890</td>
+<td>AT4G18890</td>
+<td>11</td>
+<td>yrCACGTGTgr</td>
+<td>YCACACGTGYR</td>
+<td>10.15</td>
+<td>590</td>
+</tr>
+
+<tr valign='top'>
+<td>419</td>
+<td>a.t_motifs_m419_AT4G18960</td>
+<td>AT4G18960</td>
+<td>19</td>
+<td>wwyTTtCYwyTTttGGhww</td>
+<td>WWDCCAAAARWRGAAARWW</td>
+<td>9.57</td>
+<td>388</td>
+</tr>
+
+<tr valign='top'>
+<td>420</td>
+<td>a.t_motifs_m420_AT4G21030</td>
+<td>AT4G21030</td>
+<td>19</td>
+<td>aaaarAAAAAGGyaaaaaa</td>
+<td>TTTTTTRCCTTTTTYTTTT</td>
+<td>10.33</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>421</td>
+<td>a.t_motifs_m421_AT4G21040</td>
+<td>AT4G21040</td>
+<td>14</td>
+<td>wAAAGcywCTTTwt</td>
+<td>AWAAAGWRGCTTTW</td>
+<td>12.40</td>
+<td>580</td>
+</tr>
+
+<tr valign='top'>
+<td>422</td>
+<td>a.t_motifs_m422_AT4G21080</td>
+<td>AT4G21080</td>
+<td>14</td>
+<td>rawAAAGtwrcTTT</td>
+<td>AAAGYWACTTTWTY</td>
+<td>9.11</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>423</td>
+<td>a.t_motifs_m423_AT4G21330</td>
+<td>AT4G21330</td>
+<td>14</td>
+<td>mrtgArwCACGTGA</td>
+<td>TCACGTGWYTCAYK</td>
+<td>13.30</td>
+<td>11</td>
+</tr>
+
+<tr valign='top'>
+<td>424</td>
+<td>a.t_motifs_m424_AT4G22070</td>
+<td>AT4G22070</td>
+<td>19</td>
+<td>dkrwwwrmmaaRGTCAACg</td>
+<td>CGTTGACYTTKKYWWWYMH</td>
+<td>10.29</td>
+<td>251</td>
+</tr>
+
+<tr valign='top'>
+<td>425</td>
+<td>a.t_motifs_m425_AT4G23550</td>
+<td>AT4G23550</td>
+<td>11</td>
+<td>aaAAGTCAACk</td>
+<td>MGTTGACTTTT</td>
+<td>9.79</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>426</td>
+<td>a.t_motifs_m426_AT4G23750</td>
+<td>AT4G23750</td>
+<td>8</td>
+<td>sCGCCGCC</td>
+<td>GGCGGCGS</td>
+<td>8.12</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>427</td>
+<td>a.t_motifs_m427_AT4G24020</td>
+<td>AT4G24020</td>
+<td>15</td>
+<td>wwwTGrCyyTTsrrd</td>
+<td>HYYSAARRGYCAWWW</td>
+<td>7.66</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>428</td>
+<td>a.t_motifs_m428_AT4G24240</td>
+<td>AT4G24240</td>
+<td>14</td>
+<td>rkcGTTGACTTTtt</td>
+<td>AAAAAGTCAACGMY</td>
+<td>12.42</td>
+<td>594</td>
+</tr>
+
+<tr valign='top'>
+<td>429</td>
+<td>a.t_motifs_m429_AT4G24470</td>
+<td>AT4G24470</td>
+<td>15</td>
+<td>TCtyrrCCGTysrwT</td>
+<td>AWYSRACGGYYRAGA</td>
+<td>11.64</td>
+<td>593</td>
+</tr>
+
+<tr valign='top'>
+<td>430</td>
+<td>a.t_motifs_m430_AT4G25470</td>
+<td>AT4G25470</td>
+<td>15</td>
+<td>hytyyrCCGACATmr</td>
+<td>YKATGTCGGYRRARD</td>
+<td>9.52</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>431</td>
+<td>a.t_motifs_m431_AT4G25480</td>
+<td>AT4G25480</td>
+<td>14</td>
+<td>ywyyrCCGACawmr</td>
+<td>YKWTGTCGGYRRWR</td>
+<td>8.53</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>432</td>
+<td>a.t_motifs_m432_AT4G25490</td>
+<td>AT4G25490</td>
+<td>12</td>
+<td>kyyrCCGACatm</td>
+<td>KATGTCGGYRRM</td>
+<td>8.62</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>433</td>
+<td>a.t_motifs_m433_AT4G26640</td>
+<td>AT4G26640</td>
+<td>13</td>
+<td>dvCKTTGACywww</td>
+<td>WWWRGTCAAMGBH</td>
+<td>9.22</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>434</td>
+<td>a.t_motifs_m434_AT4G27950</td>
+<td>AT4G27950</td>
+<td>21</td>
+<td>cckCCGCCGCCrCcdcckCcg</td>
+<td>CGGMGGHGGYGGCGGCGGMGG</td>
+<td>11.83</td>
+<td>226</td>
+</tr>
+
+<tr valign='top'>
+<td>435</td>
+<td>a.t_motifs_m435_AT4G28110</td>
+<td>AT4G28110</td>
+<td>15</td>
+<td>dtwgttyACCTAmyt</td>
+<td>ARKTAGGTRAACWAH</td>
+<td>9.23</td>
+<td>184</td>
+</tr>
+
+<tr valign='top'>
+<td>436</td>
+<td>a.t_motifs_m436_AT4G28140</td>
+<td>AT4G28140</td>
+<td>20</td>
+<td>GdCGGyGgmgrhggyggygr</td>
+<td>YCRCCRCCDYCKCCRCCGHC</td>
+<td>8.75</td>
+<td>567</td>
+</tr>
+
+<tr valign='top'>
+<td>437</td>
+<td>a.t_motifs_m437_AT4G28500</td>
+<td>AT4G28500</td>
+<td>15</td>
+<td>CTTswtcywyAmGyw</td>
+<td>WRCKTRWRGAWSAAG</td>
+<td>8.63</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>438</td>
+<td>a.t_motifs_m438_AT4G29000</td>
+<td>AT4G29000</td>
+<td>10</td>
+<td>arTTTGAAyt</td>
+<td>ARTTCAAAYT</td>
+<td>8.48</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>439</td>
+<td>a.t_motifs_m439_AT4G29230</td>
+<td>AT4G29230</td>
+<td>15</td>
+<td>ArCkTgwwgawsAAG</td>
+<td>CTTSWTCWWCAMGYT</td>
+<td>9.60</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>440</td>
+<td>a.t_motifs_m440_AT4G30080</td>
+<td>AT4G30080</td>
+<td>21</td>
+<td>TTTACGkTTTTGGCGGrAAAA</td>
+<td>TTTTYCCGCCAAAAMCGTAAA</td>
+<td>21.91</td>
+<td>101</td>
+</tr>
+
+<tr valign='top'>
+<td>441</td>
+<td>a.t_motifs_m441_AT4G30980</td>
+<td>AT4G30980</td>
+<td>15</td>
+<td>CgTGykwbgCACGTG</td>
+<td>CACGTGCVWMRCACG</td>
+<td>11.36</td>
+<td>34</td>
+</tr>
+
+<tr valign='top'>
+<td>442</td>
+<td>a.t_motifs_m442_AT4G31060</td>
+<td>AT4G31060</td>
+<td>20</td>
+<td>cCACCGaCAmhwyyrccrmm</td>
+<td>KKYGGYRRWDKTGTCGGTGG</td>
+<td>9.86</td>
+<td>593</td>
+</tr>
+
+<tr valign='top'>
+<td>443</td>
+<td>a.t_motifs_m443_AT4G31550</td>
+<td>AT4G31550</td>
+<td>14</td>
+<td>rkcGTTGACTTTtt</td>
+<td>AAAAAGTCAACGMY</td>
+<td>10.92</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>444</td>
+<td>a.t_motifs_m444_AT4G31610</td>
+<td>AT4G31610</td>
+<td>10</td>
+<td>gCTACAhCwh</td>
+<td>DWGDTGTAGC</td>
+<td>8.85</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>445</td>
+<td>a.t_motifs_m445_AT4G31800</td>
+<td>AT4G31800</td>
+<td>11</td>
+<td>maarGTCAAsr</td>
+<td>YSTTGACYTTK</td>
+<td>8.37</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>446</td>
+<td>a.t_motifs_m446_AT4G31920</td>
+<td>AT4G31920</td>
+<td>8</td>
+<td>AGAThyks</td>
+<td>SMRDATCT</td>
+<td>6.65</td>
+<td>15</td>
+</tr>
+
+<tr valign='top'>
+<td>447</td>
+<td>a.t_motifs_m447_AT4G32730</td>
+<td>AT4G32730</td>
+<td>15</td>
+<td>wwwwwTdACCGTTrr</td>
+<td>YYAACGGTHAWWWWW</td>
+<td>9.51</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>448</td>
+<td>a.t_motifs_m448_AT4G32800</td>
+<td>AT4G32800</td>
+<td>16</td>
+<td>hdcCACCGACAmwwwy</td>
+<td>RWWWKTGTCGGTGGHD</td>
+<td>11.02</td>
+<td>591</td>
+</tr>
+
+<tr valign='top'>
+<td>449</td>
+<td>a.t_motifs_m449_AT4G32890</td>
+<td>AT4G32890</td>
+<td>11</td>
+<td>tcyAGATCTrw</td>
+<td>WYAGATCTRGA</td>
+<td>8.33</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>450</td>
+<td>a.t_motifs_m450_AT4G33280</td>
+<td>AT4G33280</td>
+<td>21</td>
+<td>TTTaykkTTTTGGCGGGAAAA</td>
+<td>TTTTCCCGCCAAAAMMRTAAA</td>
+<td>20.80</td>
+<td>242</td>
+</tr>
+
+<tr valign='top'>
+<td>451</td>
+<td>a.t_motifs_m451_AT4G34000</td>
+<td>AT4G34000</td>
+<td>8</td>
+<td>ACACGTGT</td>
+<td>ACACGTGT</td>
+<td>11.09</td>
+<td>19</td>
+</tr>
+
+<tr valign='top'>
+<td>452</td>
+<td>a.t_motifs_m452_AT4G34410</td>
+<td>AT4G34410</td>
+<td>15</td>
+<td>raaatkrCGGCGsmg</td>
+<td>CKSCGCCGYMATTTY</td>
+<td>9.71</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>453</td>
+<td>a.t_motifs_m453_AT4G34590</td>
+<td>AT4G34590</td>
+<td>15</td>
+<td>tGCCACGTCAkCwwh</td>
+<td>DWWGMTGACGTGGCA</td>
+<td>12.33</td>
+<td>591</td>
+</tr>
+
+<tr valign='top'>
+<td>454</td>
+<td>a.t_motifs_m454_AT4G35550</td>
+<td>AT4G35550</td>
+<td>10</td>
+<td>wrTCAATCAw</td>
+<td>WTGATTGAYW</td>
+<td>8.18</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>455</td>
+<td>a.t_motifs_m455_AT4G35580</td>
+<td>AT4G35580</td>
+<td>9</td>
+<td>TTAAGTAAT</td>
+<td>ATTACTTAA</td>
+<td>11.48</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>456</td>
+<td>a.t_motifs_m456_AT4G36160</td>
+<td>AT4G36160</td>
+<td>15</td>
+<td>CkTraaahwcAmGYA</td>
+<td>TRCKTGWDTTTYAMG</td>
+<td>8.98</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>457</td>
+<td>a.t_motifs_m457_AT4G36620</td>
+<td>AT4G36620</td>
+<td>11</td>
+<td>yvGATCbGATy</td>
+<td>RATCVGATCBR</td>
+<td>8.51</td>
+<td>202</td>
+</tr>
+
+<tr valign='top'>
+<td>458</td>
+<td>a.t_motifs_m458_AT4G36730</td>
+<td>AT4G36730</td>
+<td>10</td>
+<td>ysACGTGkmm</td>
+<td>KKMCACGTSR</td>
+<td>5.72</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>459</td>
+<td>a.t_motifs_m459_AT4G36740</td>
+<td>AT4G36740</td>
+<td>21</td>
+<td>wmacCAATwATTgaawhwwww</td>
+<td>WWWWDWTTCAATWATTGGTKW</td>
+<td>11.22</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>460</td>
+<td>a.t_motifs_m460_AT4G36780</td>
+<td>AT4G36780</td>
+<td>11</td>
+<td>yCaCACGTGyr</td>
+<td>YRCACGTGTGR</td>
+<td>10.77</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>461</td>
+<td>a.t_motifs_m461_AT4G36900</td>
+<td>AT4G36900</td>
+<td>10</td>
+<td>rGCGCCGCCt</td>
+<td>AGGCGGCGCY</td>
+<td>8.72</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>462</td>
+<td>a.t_motifs_m462_AT4G36930</td>
+<td>AT4G36930</td>
+<td>9</td>
+<td>csCACGTGb</td>
+<td>VCACGTGSG</td>
+<td>6.59</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>463</td>
+<td>a.t_motifs_m463_AT4G37180</td>
+<td>AT4G37180</td>
+<td>11</td>
+<td>harAAGATTCy</td>
+<td>RGAATCTTYTD</td>
+<td>8.93</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>464</td>
+<td>a.t_motifs_m464_AT4G37260</td>
+<td>AT4G37260</td>
+<td>11</td>
+<td>TAACbGwawww</td>
+<td>WWWTWCVGTTA</td>
+<td>7.93</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>465</td>
+<td>a.t_motifs_m465_AT4G37750</td>
+<td>AT4G37750</td>
+<td>21</td>
+<td>kkGCACrgwTCCCvAkGygma</td>
+<td>TKCRCMTBGGGAWCYGTGCMM</td>
+<td>13.38</td>
+<td>34</td>
+</tr>
+
+<tr valign='top'>
+<td>466</td>
+<td>a.t_motifs_m466_AT4G37790</td>
+<td>AT4G37790</td>
+<td>10</td>
+<td>myyAATCATT</td>
+<td>AATGATTRRK</td>
+<td>8.98</td>
+<td>132</td>
+</tr>
+
+<tr valign='top'>
+<td>467</td>
+<td>a.t_motifs_m467_AT4G38000</td>
+<td>AT4G38000</td>
+<td>28</td>
+<td>wtttttwtttttttttttTwwCTTTTTw</td>
+<td>WAAAAAGWWAAAAAAAAAAAAWAAAAAW</td>
+<td>12.18</td>
+<td>569</td>
+</tr>
+
+<tr valign='top'>
+<td>468</td>
+<td>a.t_motifs_m468_AT4G38620</td>
+<td>AT4G38620</td>
+<td>15</td>
+<td>wwwwwrkTwGGTrrr</td>
+<td>YYYACCWAMYWWWWW</td>
+<td>8.10</td>
+<td>572</td>
+</tr>
+
+<tr valign='top'>
+<td>469</td>
+<td>a.t_motifs_m469_AT4G38910</td>
+<td>AT4G38910</td>
+<td>30</td>
+<td>AGAGAGAGAGAGAGAGAGAGAGAGAGAGAG</td>
+<td>CTCTCTCTCTCTCTCTCTCTCTCTCTCTCT</td>
+<td>37.76</td>
+<td>102</td>
+</tr>
+
+<tr valign='top'>
+<td>470</td>
+<td>a.t_motifs_m470_AT4G40060</td>
+<td>AT4G40060</td>
+<td>8</td>
+<td>TAATmATT</td>
+<td>AATKATTA</td>
+<td>9.00</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>471</td>
+<td>a.t_motifs_m471_AT5G01380</td>
+<td>AT5G01380</td>
+<td>17</td>
+<td>rrCACGTGtwwaWwdtk</td>
+<td>MAHWWTWWACACGTGYY</td>
+<td>10.09</td>
+<td>371</td>
+</tr>
+
+<tr valign='top'>
+<td>472</td>
+<td>a.t_motifs_m472_AT5G01900</td>
+<td>AT5G01900</td>
+<td>8</td>
+<td>TRGTCAAM</td>
+<td>KTTGACYA</td>
+<td>9.12</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>473</td>
+<td>a.t_motifs_m473_AT5G02320</td>
+<td>AT5G02320</td>
+<td>15</td>
+<td>aawwwwTdRCCGTTr</td>
+<td>YAACGGYHAWWWWTT</td>
+<td>10.14</td>
+<td>566</td>
+</tr>
+
+<tr valign='top'>
+<td>474</td>
+<td>a.t_motifs_m474_AT5G02460</td>
+<td>AT5G02460</td>
+<td>21</td>
+<td>aAAAAAGwaAAaaraaaaara</td>
+<td>TYTTTTTYTTTTTWCTTTTTT</td>
+<td>10.91</td>
+<td>515</td>
+</tr>
+
+<tr valign='top'>
+<td>475</td>
+<td>a.t_motifs_m475_AT5G02840</td>
+<td>AT5G02840</td>
+<td>10</td>
+<td>AGATATTTTt</td>
+<td>AAAAATATCT</td>
+<td>11.31</td>
+<td>561</td>
+</tr>
+
+<tr valign='top'>
+<td>476</td>
+<td>a.t_motifs_m476_AT5G03150</td>
+<td>AT5G03150</td>
+<td>20</td>
+<td>wwwwtTTTTGTCkTTTTstk</td>
+<td>MASAAAAMGACAAAAAWWWW</td>
+<td>12.57</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>477</td>
+<td>a.t_motifs_m477_AT5G03790</td>
+<td>AT5G03790</td>
+<td>13</td>
+<td>yTcAATTATTGdt</td>
+<td>AHCAATAATTGAR</td>
+<td>10.82</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>478</td>
+<td>a.t_motifs_m478_AT5G04340</td>
+<td>AT5G04340</td>
+<td>10</td>
+<td>yTAACACTAm</td>
+<td>KTAGTGTTAR</td>
+<td>7.80</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>479</td>
+<td>a.t_motifs_m479_AT5G04390</td>
+<td>AT5G04390</td>
+<td>11</td>
+<td>dAGTGwwrkwr</td>
+<td>YWMYWWCACTH</td>
+<td>6.45</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>480</td>
+<td>a.t_motifs_m480_AT5G04410</td>
+<td>AT5G04410</td>
+<td>12</td>
+<td>tarCAmGcmAva</td>
+<td>TBTKGCKTGYTA</td>
+<td>6.62</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>481</td>
+<td>a.t_motifs_m481_AT5G04760</td>
+<td>AT5G04760</td>
+<td>10</td>
+<td>ydGATAAGGy</td>
+<td>RCCTTATCHR</td>
+<td>7.73</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>482</td>
+<td>a.t_motifs_m482_AT5G05090</td>
+<td>AT5G05090</td>
+<td>11</td>
+<td>ahAGAThCgra</td>
+<td>TYCGDATCTDT</td>
+<td>7.03</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>483</td>
+<td>a.t_motifs_m483_AT5G05550</td>
+<td>AT5G05550</td>
+<td>15</td>
+<td>hwtytCCGGCGayrw</td>
+<td>WYRTCGCCGGARAWD</td>
+<td>8.98</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>484</td>
+<td>a.t_motifs_m484_AT5G05790</td>
+<td>AT5G05790</td>
+<td>15</td>
+<td>awycTTATCytcwtm</td>
+<td>KAWGARGATAAGRWT</td>
+<td>9.11</td>
+<td>587</td>
+</tr>
+
+<tr valign='top'>
+<td>485</td>
+<td>a.t_motifs_m485_AT5G06100</td>
+<td>AT5G06100</td>
+<td>11</td>
+<td>aTAACyGwmwh</td>
+<td>DWKWCRGTTAT</td>
+<td>7.72</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>486</td>
+<td>a.t_motifs_m486_AT5G06839</td>
+<td>AT5G06839</td>
+<td>15</td>
+<td>ratGmTGACGTCAyy</td>
+<td>RRTGACGTCAKCATY</td>
+<td>11.03</td>
+<td>593</td>
+</tr>
+
+<tr valign='top'>
+<td>487</td>
+<td>a.t_motifs_m487_AT5G06950</td>
+<td>AT5G06950</td>
+<td>20</td>
+<td>rrTGACGTCAkCawywwykw</td>
+<td>WMRWWRWTGMTGACGTCAYY</td>
+<td>12.08</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>488</td>
+<td>a.t_motifs_m488_AT5G06960</td>
+<td>AT5G06960</td>
+<td>14</td>
+<td>drTGACGTCAkCaw</td>
+<td>WTGMTGACGTCAYH</td>
+<td>12.11</td>
+<td>588</td>
+</tr>
+
+<tr valign='top'>
+<td>489</td>
+<td>a.t_motifs_m489_AT5G07100</td>
+<td>AT5G07100</td>
+<td>13</td>
+<td>aaaAGTCAACGvy</td>
+<td>RBCGTTGACTTTT</td>
+<td>10.54</td>
+<td>84</td>
+</tr>
+
+<tr valign='top'>
+<td>490</td>
+<td>a.t_motifs_m490_AT5G07310</td>
+<td>AT5G07310</td>
+<td>15</td>
+<td>CCGCCGYcrycgCCg</td>
+<td>CGGCGRYGRCGGCGG</td>
+<td>9.79</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>491</td>
+<td>a.t_motifs_m491_AT5G07680</td>
+<td>AT5G07680</td>
+<td>21</td>
+<td>rTwrCKTGtrkaacAmGtaAh</td>
+<td>DTTACKTGTTMYACAMGYWAY</td>
+<td>12.16</td>
+<td>561</td>
+</tr>
+
+<tr valign='top'>
+<td>492</td>
+<td>a.t_motifs_m492_AT5G08070</td>
+<td>AT5G08070</td>
+<td>11</td>
+<td>GTGGTCCCCAC</td>
+<td>GTGGGGACCAC</td>
+<td>11.05</td>
+<td>108</td>
+</tr>
+
+<tr valign='top'>
+<td>493</td>
+<td>a.t_motifs_m493_AT5G08130</td>
+<td>AT5G08130</td>
+<td>14</td>
+<td>CACGTGAcwyycmc</td>
+<td>GKGRRWGTCACGTG</td>
+<td>9.88</td>
+<td>566</td>
+</tr>
+
+<tr valign='top'>
+<td>494</td>
+<td>a.t_motifs_m494_AT5G08330</td>
+<td>AT5G08330</td>
+<td>14</td>
+<td>wGTGGGmCCCAchw</td>
+<td>WDGTGGGKCCCACW</td>
+<td>10.29</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>495</td>
+<td>a.t_motifs_m495_AT5G08520</td>
+<td>AT5G08520</td>
+<td>13</td>
+<td>dwwdwrGATAAGr</td>
+<td>YCTTATCYWHWWH</td>
+<td>9.76</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>496</td>
+<td>a.t_motifs_m496_AT5G09410</td>
+<td>AT5G09410</td>
+<td>12</td>
+<td>aAarCGCGTkdr</td>
+<td>YHMACGCGYTTT</td>
+<td>8.76</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>497</td>
+<td>a.t_motifs_m497_AT5G10030</td>
+<td>AT5G10030</td>
+<td>11</td>
+<td>TgACGTCAkCa</td>
+<td>TGMTGACGTCA</td>
+<td>9.72</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>498</td>
+<td>a.t_motifs_m498_AT5G10140</td>
+<td>AT5G10140</td>
+<td>21</td>
+<td>aawwwCymAAAAwrGAAAgww</td>
+<td>WWCTTTCYWTTTTKRGWWWTT</td>
+<td>11.06</td>
+<td>275</td>
+</tr>
+
+<tr valign='top'>
+<td>499</td>
+<td>a.t_motifs_m499_AT5G10280</td>
+<td>AT5G10280</td>
+<td>10</td>
+<td>gKTAGGTrrr</td>
+<td>YYYACCTAMC</td>
+<td>7.92</td>
+<td>187</td>
+</tr>
+
+<tr valign='top'>
+<td>500</td>
+<td>a.t_motifs_m500_AT5G10510</td>
+<td>AT5G10510</td>
+<td>15</td>
+<td>ymTcGrrAwyCGtGc</td>
+<td>GCACGRWTYYCGAKR</td>
+<td>8.05</td>
+<td>531</td>
+</tr>
+
+<tr valign='top'>
+<td>501</td>
+<td>a.t_motifs_m501_AT5G11260</td>
+<td>AT5G11260</td>
+<td>15</td>
+<td>dwtGaTGACGTSgcm</td>
+<td>KGCSACGTCATCAWH</td>
+<td>10.89</td>
+<td>567</td>
+</tr>
+
+<tr valign='top'>
+<td>502</td>
+<td>a.t_motifs_m502_AT5G11510</td>
+<td>AT5G11510</td>
+<td>15</td>
+<td>wwwwaTrrCCGTTrr</td>
+<td>YYAACGGYYATWWWW</td>
+<td>9.73</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>503</td>
+<td>a.t_motifs_m503_AT5G12870</td>
+<td>AT5G12870</td>
+<td>10</td>
+<td>aGkTAGGTrr</td>
+<td>YYACCTAMCT</td>
+<td>8.27</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>504</td>
+<td>a.t_motifs_m504_AT5G13080</td>
+<td>AT5G13080</td>
+<td>13</td>
+<td>aAAAGTCAACgah</td>
+<td>DTCGTTGACTTTT</td>
+<td>10.01</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>505</td>
+<td>a.t_motifs_m505_AT5G13180</td>
+<td>AT5G13180</td>
+<td>19</td>
+<td>TTrCkTgtwwtwyACGywA</td>
+<td>TWRCGTRWAWWACAMGYAA</td>
+<td>11.48</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>506</td>
+<td>a.t_motifs_m506_AT5G13790</td>
+<td>AT5G13790</td>
+<td>19</td>
+<td>cTTTCYwtWTTkGGwAAsw</td>
+<td>WSTTWCCMAAWAWRGAAAG</td>
+<td>12.62</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>507</td>
+<td>a.t_motifs_m507_AT5G13910</td>
+<td>AT5G13910</td>
+<td>21</td>
+<td>dcCkCCGCCGycrchrccgcc</td>
+<td>GGCGGYDGYGRCGGCGGMGGH</td>
+<td>10.51</td>
+<td>490</td>
+</tr>
+
+<tr valign='top'>
+<td>508</td>
+<td>a.t_motifs_m508_AT5G14340</td>
+<td>AT5G14340</td>
+<td>13</td>
+<td>yyyACCwAmywty</td>
+<td>RAWRKTWGGTRRR</td>
+<td>9.23</td>
+<td>237</td>
+</tr>
+
+<tr valign='top'>
+<td>509</td>
+<td>a.t_motifs_m509_AT5G14960</td>
+<td>AT5G14960</td>
+<td>20</td>
+<td>wwwwdtTTTTGGCGGGAAAA</td>
+<td>TTTTCCCGCCAAAAAHWWWW</td>
+<td>16.93</td>
+<td>576</td>
+</tr>
+
+<tr valign='top'>
+<td>510</td>
+<td>a.t_motifs_m510_AT5G15800</td>
+<td>AT5G15800</td>
+<td>18</td>
+<td>hwtwCCAwWwwTrGwAak</td>
+<td>MTTWCYAWWWWTGGWAWD</td>
+<td>9.72</td>
+<td>51</td>
+</tr>
+
+<tr valign='top'>
+<td>511</td>
+<td>a.t_motifs_m511_AT5G15830</td>
+<td>AT5G15830</td>
+<td>15</td>
+<td>dwwGmTGACGTGGCa</td>
+<td>TGCCACGTCAKCWWH</td>
+<td>11.38</td>
+<td>574</td>
+</tr>
+
+<tr valign='top'>
+<td>512</td>
+<td>a.t_motifs_m512_AT5G16600</td>
+<td>AT5G16600</td>
+<td>13</td>
+<td>awrkTwGGTrarr</td>
+<td>YYTYACCWAMYWT</td>
+<td>9.63</td>
+<td>83</td>
+</tr>
+
+<tr valign='top'>
+<td>513</td>
+<td>a.t_motifs_m513_AT5G16820</td>
+<td>AT5G16820</td>
+<td>12</td>
+<td>GAAgcTTCTAGA</td>
+<td>TCTAGAAGCTTC</td>
+<td>10.24</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>514</td>
+<td>a.t_motifs_m514_AT5G17300</td>
+<td>AT5G17300</td>
+<td>14</td>
+<td>aaawAAATATCTwa</td>
+<td>TWAGATATTTWTTT</td>
+<td>10.31</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>515</td>
+<td>a.t_motifs_m515_AT5G17430</td>
+<td>AT5G17430</td>
+<td>20</td>
+<td>aadrAarArARrrArArArr</td>
+<td>YYTYTYTYYYTYTYTTYHTT</td>
+<td>11.58</td>
+<td>139</td>
+</tr>
+
+<tr valign='top'>
+<td>516</td>
+<td>a.t_motifs_m516_AT5G17800</td>
+<td>AT5G17800</td>
+<td>15</td>
+<td>wwwaaTAACGGwwwt</td>
+<td>AWWWCCGTTATTWWW</td>
+<td>8.85</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>517</td>
+<td>a.t_motifs_m517_AT5G18090</td>
+<td>AT5G18090</td>
+<td>15</td>
+<td>gawGATGAArmarad</td>
+<td>HTYTKYTTCATCWTC</td>
+<td>8.87</td>
+<td>147</td>
+</tr>
+
+<tr valign='top'>
+<td>518</td>
+<td>a.t_motifs_m518_AT5G18270</td>
+<td>AT5G18270</td>
+<td>19</td>
+<td>TwrCKTGtrrmaCAmGtwA</td>
+<td>TWACKTGTKYYACAMGYWA</td>
+<td>12.22</td>
+<td>575</td>
+</tr>
+
+<tr valign='top'>
+<td>519</td>
+<td>a.t_motifs_m519_AT5G18450</td>
+<td>AT5G18450</td>
+<td>15</td>
+<td>ggyggarGCGGYGGm</td>
+<td>KCCRCCGCYTCCRCC</td>
+<td>9.95</td>
+<td>587</td>
+</tr>
+
+<tr valign='top'>
+<td>520</td>
+<td>a.t_motifs_m520_AT5G18560</td>
+<td>AT5G18560</td>
+<td>15</td>
+<td>ccdyCkCCGCCGyyd</td>
+<td>HRRCGGCGGMGRHGG</td>
+<td>10.09</td>
+<td>478</td>
+</tr>
+
+<tr valign='top'>
+<td>521</td>
+<td>a.t_motifs_m521_AT5G18830</td>
+<td>AT5G18830</td>
+<td>10</td>
+<td>cCGTACGryv</td>
+<td>BRYCGTACGG</td>
+<td>6.00</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>522</td>
+<td>a.t_motifs_m522_AT5G19790</td>
+<td>AT5G19790</td>
+<td>15</td>
+<td>cykycdycGCCGkCk</td>
+<td>MGMCGGCGRHGRMRG</td>
+<td>8.43</td>
+<td>588</td>
+</tr>
+
+<tr valign='top'>
+<td>523</td>
+<td>a.t_motifs_m523_AT5G20240</td>
+<td>AT5G20240</td>
+<td>14</td>
+<td>mCaAAArwrGAAAr</td>
+<td>YTTTCYWYTTTTGK</td>
+<td>9.74</td>
+<td>558</td>
+</tr>
+
+<tr valign='top'>
+<td>524</td>
+<td>a.t_motifs_m524_AT5G22220</td>
+<td>AT5G22220</td>
+<td>10</td>
+<td>gsGCGCchww</td>
+<td>WWDGGCGCSC</td>
+<td>5.93</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>525</td>
+<td>a.t_motifs_m525_AT5G22570</td>
+<td>AT5G22570</td>
+<td>10</td>
+<td>sCGTTGACYr</td>
+<td>YRGTCAACGS</td>
+<td>8.48</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>526</td>
+<td>a.t_motifs_m526_AT5G22890</td>
+<td>AT5G22890</td>
+<td>18</td>
+<td>cAGATAamACCTrcmyww</td>
+<td>WWRKGYAGGTKTTATCTG</td>
+<td>10.15</td>
+<td>228</td>
+</tr>
+
+<tr valign='top'>
+<td>527</td>
+<td>a.t_motifs_m527_AT5G22990</td>
+<td>AT5G22990</td>
+<td>15</td>
+<td>wCGwcwTCGwyttcr</td>
+<td>YGAARWCGAWGWCGW</td>
+<td>7.84</td>
+<td>584</td>
+</tr>
+
+<tr valign='top'>
+<td>528</td>
+<td>a.t_motifs_m528_AT5G23280</td>
+<td>AT5G23280</td>
+<td>11</td>
+<td>GTGGGrCCCAy</td>
+<td>RTGGGYCCCAC</td>
+<td>10.76</td>
+<td>588</td>
+</tr>
+
+<tr valign='top'>
+<td>529</td>
+<td>a.t_motifs_m529_AT5G24110</td>
+<td>AT5G24110</td>
+<td>11</td>
+<td>aAAGTCAACGc</td>
+<td>GCGTTGACTTT</td>
+<td>10.71</td>
+<td>583</td>
+</tr>
+
+<tr valign='top'>
+<td>530</td>
+<td>a.t_motifs_m530_AT5G25190</td>
+<td>AT5G25190</td>
+<td>19</td>
+<td>cgghgghggCGGyGGmGgw</td>
+<td>WCCKCCRCCGCCDCCDCCG</td>
+<td>10.36</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>531</td>
+<td>a.t_motifs_m531_AT5G25390</td>
+<td>AT5G25390</td>
+<td>21</td>
+<td>wCCrCCgCCrCCdCCrCCgCc</td>
+<td>GGCGGYGGHGGYGGCGGYGGW</td>
+<td>14.17</td>
+<td>320</td>
+</tr>
+
+<tr valign='top'>
+<td>532</td>
+<td>a.t_motifs_m532_AT5G25475</td>
+<td>AT5G25475</td>
+<td>6</td>
+<td>CAAGCA</td>
+<td>TGCTTG</td>
+<td>7.99</td>
+<td>218</td>
+</tr>
+
+<tr valign='top'>
+<td>533</td>
+<td>a.t_motifs_m533_AT5G25810</td>
+<td>AT5G25810</td>
+<td>15</td>
+<td>ytyCRCCGACAmwdh</td>
+<td>DHWKTGTCGGYGRAR</td>
+<td>9.25</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>534</td>
+<td>a.t_motifs_m534_AT5G25830</td>
+<td>AT5G25830</td>
+<td>13</td>
+<td>ratyyAGATCYra</td>
+<td>TYRGATCTRRATY</td>
+<td>9.32</td>
+<td>591</td>
+</tr>
+
+<tr valign='top'>
+<td>535</td>
+<td>a.t_motifs_m535_AT5G26170</td>
+<td>AT5G26170</td>
+<td>13</td>
+<td>ykTTGACTTTTtw</td>
+<td>WAAAAAGTCAAMR</td>
+<td>10.79</td>
+<td>568</td>
+</tr>
+
+<tr valign='top'>
+<td>536</td>
+<td>a.t_motifs_m536_AT5G28300</td>
+<td>AT5G28300</td>
+<td>10</td>
+<td>crCGGTAAaw</td>
+<td>WTTTACCGYG</td>
+<td>7.81</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>537</td>
+<td>a.t_motifs_m537_AT5G28770</td>
+<td>AT5G28770</td>
+<td>12</td>
+<td>tgcTsACGTGgc</td>
+<td>GCCACGTSAGCA</td>
+<td>7.97</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>538</td>
+<td>a.t_motifs_m538_AT5G29000</td>
+<td>AT5G29000</td>
+<td>15</td>
+<td>aarGAATATTCbaww</td>
+<td>WWTVGAATATTCYTT</td>
+<td>10.61</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>539</td>
+<td>a.t_motifs_m539_AT5G37020</td>
+<td>AT5G37020</td>
+<td>9</td>
+<td>hyTGTCGgm</td>
+<td>KCCGACARD</td>
+<td>5.49</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>540</td>
+<td>a.t_motifs_m540_AT5G38800</td>
+<td>AT5G38800</td>
+<td>12</td>
+<td>kCCACGTCAGCa</td>
+<td>TGCTGACGTGGM</td>
+<td>13.48</td>
+<td>28</td>
+</tr>
+
+<tr valign='top'>
+<td>541</td>
+<td>a.t_motifs_m541_AT5G38860</td>
+<td>AT5G38860</td>
+<td>18</td>
+<td>acgTgmwwstCACGTGmc</td>
+<td>GKCACGTGASWWKCACGT</td>
+<td>11.51</td>
+<td>137</td>
+</tr>
+
+<tr valign='top'>
+<td>542</td>
+<td>a.t_motifs_m542_AT5G39610</td>
+<td>AT5G39610</td>
+<td>15</td>
+<td>CkTGtavmACAmGyw</td>
+<td>WRCKTGTKBTACAMG</td>
+<td>9.71</td>
+<td>590</td>
+</tr>
+
+<tr valign='top'>
+<td>543</td>
+<td>a.t_motifs_m543_AT5G39660</td>
+<td>AT5G39660</td>
+<td>10</td>
+<td>maWAAAGyrh</td>
+<td>DYRCTTTWTK</td>
+<td>6.38</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>544</td>
+<td>a.t_motifs_m544_AT5G39760</td>
+<td>AT5G39760</td>
+<td>22</td>
+<td>wwwhwTAATTARtwawwwawww</td>
+<td>WWWTWWWTWAYTAATTAWDWWW</td>
+<td>11.19</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>545</td>
+<td>a.t_motifs_m545_AT5G39820</td>
+<td>AT5G39820</td>
+<td>18</td>
+<td>ygCCGTrwyytycACGby</td>
+<td>RVCGTGRARRWYACGGCR</td>
+<td>9.35</td>
+<td>551</td>
+</tr>
+
+<tr valign='top'>
+<td>546</td>
+<td>a.t_motifs_m546_AT5G40330</td>
+<td>AT5G40330</td>
+<td>11</td>
+<td>dwkkTwGTTGr</td>
+<td>YCAACWAMMWH</td>
+<td>8.14</td>
+<td>207</td>
+</tr>
+
+<tr valign='top'>
+<td>547</td>
+<td>a.t_motifs_m547_AT5G41570</td>
+<td>AT5G41570</td>
+<td>14</td>
+<td>kCGTTGACTTTttt</td>
+<td>AAAAAAGTCAACGM</td>
+<td>10.59</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>548</td>
+<td>a.t_motifs_m548_AT5G42520</td>
+<td>AT5G42520</td>
+<td>21</td>
+<td>CTCTCTCTCTCTCTCTCTCTm</td>
+<td>KAGAGAGAGAGAGAGAGAGAG</td>
+<td>21.15</td>
+<td>188</td>
+</tr>
+
+<tr valign='top'>
+<td>549</td>
+<td>a.t_motifs_m549_AT5G42630</td>
+<td>AT5G42630</td>
+<td>8</td>
+<td>GAATATTC</td>
+<td>GAATATTC</td>
+<td>8.74</td>
+<td>1000</td>
+</tr>
+
+<tr valign='top'>
+<td>550</td>
+<td>a.t_motifs_m550_AT5G43410</td>
+<td>AT5G43410</td>
+<td>10</td>
+<td>smGCCGcCah</td>
+<td>DTGGCGGCKS</td>
+<td>5.51</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>551</td>
+<td>a.t_motifs_m551_AT5G43840</td>
+<td>AT5G43840</td>
+<td>16</td>
+<td>GAAgmTTCTAGAAgmw</td>
+<td>WKCTTCTAGAAKCTTC</td>
+<td>12.96</td>
+<td>580</td>
+</tr>
+
+<tr valign='top'>
+<td>552</td>
+<td>a.t_motifs_m552_AT5G44210</td>
+<td>AT5G44210</td>
+<td>21</td>
+<td>yggcggmkryGrCGGCGGmGr</td>
+<td>YCKCCGCCGYCRYMKCCGCCR</td>
+<td>11.14</td>
+<td>555</td>
+</tr>
+
+<tr valign='top'>
+<td>553</td>
+<td>a.t_motifs_m553_AT5G45300</td>
+<td>AT5G45300</td>
+<td>15</td>
+<td>yCACACGTGysaamt</td>
+<td>AKTTSRCACGTGTGR</td>
+<td>10.95</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>554</td>
+<td>a.t_motifs_m554_AT5G45580</td>
+<td>AT5G45580</td>
+<td>14</td>
+<td>aaarGAATmTTyyw</td>
+<td>WRRAAKATTCYTTT</td>
+<td>9.44</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>555</td>
+<td>a.t_motifs_m555_AT5G46350</td>
+<td>AT5G46350</td>
+<td>15</td>
+<td>raaAAAGTCAACgaw</td>
+<td>WTCGTTGACTTTTTY</td>
+<td>11.97</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>556</td>
+<td>a.t_motifs_m556_AT5G46590</td>
+<td>AT5G46590</td>
+<td>16</td>
+<td>CKTrarrawsAAGyAA</td>
+<td>TTRCTTSWTYYTYAMG</td>
+<td>10.82</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>557</td>
+<td>a.t_motifs_m557_AT5G46760</td>
+<td>AT5G46760</td>
+<td>8</td>
+<td>vCACGTGb</td>
+<td>VCACGTGB</td>
+<td>6.74</td>
+<td>100</td>
+</tr>
+
+<tr valign='top'>
+<td>558</td>
+<td>a.t_motifs_m558_AT5G46830</td>
+<td>AT5G46830</td>
+<td>12</td>
+<td>awttGTACGGAy</td>
+<td>RTCCGTACAAWT</td>
+<td>9.27</td>
+<td>589</td>
+</tr>
+
+<tr valign='top'>
+<td>559</td>
+<td>a.t_motifs_m559_AT5G47220</td>
+<td>AT5G47220</td>
+<td>21</td>
+<td>ccdccrccdcCGCCGCCrycr</td>
+<td>YGRYGGCGGCGGHGGYGGHGG</td>
+<td>10.61</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>560</td>
+<td>a.t_motifs_m560_AT5G47230</td>
+<td>AT5G47230</td>
+<td>15</td>
+<td>ccrcCgCCGCCGCCr</td>
+<td>YGGCGGCGGCGGYGG</td>
+<td>10.44</td>
+<td>580</td>
+</tr>
+
+<tr valign='top'>
+<td>561</td>
+<td>a.t_motifs_m561_AT5G47370</td>
+<td>AT5G47370</td>
+<td>11</td>
+<td>wyyAATCATtw</td>
+<td>WAATGATTRRW</td>
+<td>9.09</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>562</td>
+<td>a.t_motifs_m562_AT5G47390</td>
+<td>AT5G47390</td>
+<td>15</td>
+<td>wwwwycTTATCCAww</td>
+<td>WWTGGATAAGRWWWW</td>
+<td>9.59</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>563</td>
+<td>a.t_motifs_m563_AT5G47660</td>
+<td>AT5G47660</td>
+<td>15</td>
+<td>wwhhwTTTTwACyGy</td>
+<td>RCRGTWAAAAWDDWW</td>
+<td>9.40</td>
+<td>244</td>
+</tr>
+
+<tr valign='top'>
+<td>564</td>
+<td>a.t_motifs_m564_AT5G48560</td>
+<td>AT5G48560</td>
+<td>8</td>
+<td>GCACGTGC</td>
+<td>GCACGTGC</td>
+<td>11.09</td>
+<td>19</td>
+</tr>
+
+<tr valign='top'>
+<td>565</td>
+<td>a.t_motifs_m565_AT5G48670</td>
+<td>AT5G48670</td>
+<td>6</td>
+<td>TGGTGA</td>
+<td>TCACCA</td>
+<td>8.32</td>
+<td>54</td>
+</tr>
+
+<tr valign='top'>
+<td>566</td>
+<td>a.t_motifs_m566_AT5G49300</td>
+<td>AT5G49300</td>
+<td>27</td>
+<td>CATsATCATCATCATCATCATCATCAT</td>
+<td>ATGATGATGATGATGATGATGATSATG</td>
+<td>24.94</td>
+<td>48</td>
+</tr>
+
+<tr valign='top'>
+<td>567</td>
+<td>a.t_motifs_m567_AT5G49330</td>
+<td>AT5G49330</td>
+<td>10</td>
+<td>dRkTAGGTrs</td>
+<td>SYACCTAMYH</td>
+<td>8.43</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>568</td>
+<td>a.t_motifs_m568_AT5G50570</td>
+<td>AT5G50570</td>
+<td>11</td>
+<td>wttGTACGGwh</td>
+<td>DWCCGTACAAW</td>
+<td>8.01</td>
+<td>578</td>
+</tr>
+
+<tr valign='top'>
+<td>569</td>
+<td>a.t_motifs_m569_AT5G51190</td>
+<td>AT5G51190</td>
+<td>15</td>
+<td>ghrryGGCGGCGgmg</td>
+<td>CKCCGCCGCCRYYDC</td>
+<td>10.77</td>
+<td>586</td>
+</tr>
+
+<tr valign='top'>
+<td>570</td>
+<td>a.t_motifs_m570_AT5G51910</td>
+<td>AT5G51910</td>
+<td>10</td>
+<td>tgGGsCCCAC</td>
+<td>GTGGGSCCCA</td>
+<td>6.87</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>571</td>
+<td>a.t_motifs_m571_AT5G51990</td>
+<td>AT5G51990</td>
+<td>13</td>
+<td>ykAtGTCGGyrrm</td>
+<td>KYYRCCGACATMR</td>
+<td>8.82</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>572</td>
+<td>a.t_motifs_m572_AT5G52020</td>
+<td>AT5G52020</td>
+<td>15</td>
+<td>wwkTGTCGGCrrmrr</td>
+<td>YYKYYGCCGACAMWW</td>
+<td>8.89</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>573</td>
+<td>a.t_motifs_m573_AT5G52170</td>
+<td>AT5G52170</td>
+<td>11</td>
+<td>ryAwTTAATGh</td>
+<td>DCATTAAWTRY</td>
+<td>9.85</td>
+<td>400</td>
+</tr>
+
+<tr valign='top'>
+<td>574</td>
+<td>a.t_motifs_m574_AT5G52660</td>
+<td>AT5G52660</td>
+<td>11</td>
+<td>AGATATTTTtt</td>
+<td>AAAAAATATCT</td>
+<td>10.96</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>575</td>
+<td>a.t_motifs_m575_AT5G52830</td>
+<td>AT5G52830</td>
+<td>13</td>
+<td>akmGTTGACTTTt</td>
+<td>AAAAGTCAACKMT</td>
+<td>11.86</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>576</td>
+<td>a.t_motifs_m576_AT5G53950</td>
+<td>AT5G53950</td>
+<td>19</td>
+<td>CKTGtdrwaCAmGyaAhck</td>
+<td>MGDTTRCKTGTWYHACAMG</td>
+<td>10.71</td>
+<td>583</td>
+</tr>
+
+<tr valign='top'>
+<td>577</td>
+<td>a.t_motifs_m577_AT5G54230</td>
+<td>AT5G54230</td>
+<td>15</td>
+<td>twkyyyACCWAmyww</td>
+<td>WWRKTWGGTRRRMWA</td>
+<td>8.98</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>578</td>
+<td>a.t_motifs_m578_AT5G56110</td>
+<td>AT5G56110</td>
+<td>15</td>
+<td>wawArkTAGGTrram</td>
+<td>KTYYACCTAMYTWTW</td>
+<td>8.91</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>579</td>
+<td>a.t_motifs_m579_AT5G56270</td>
+<td>AT5G56270</td>
+<td>8</td>
+<td>bRGTCAAm</td>
+<td>KTTGACYV</td>
+<td>7.47</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>580</td>
+<td>a.t_motifs_m580_AT5G56840</td>
+<td>AT5G56840</td>
+<td>15</td>
+<td>waycTTATCCAwwww</td>
+<td>WWWWTGGATAAGRTW</td>
+<td>10.11</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>581</td>
+<td>a.t_motifs_m581_AT5G58080</td>
+<td>AT5G58080</td>
+<td>13</td>
+<td>atmwAGATAyGvt</td>
+<td>ABCRTATCTWKAT</td>
+<td>6.62</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>582</td>
+<td>a.t_motifs_m582_AT5G58620</td>
+<td>AT5G58620</td>
+<td>6</td>
+<td>TCAACA</td>
+<td>TGTTGA</td>
+<td>8.32</td>
+<td>127</td>
+</tr>
+
+<tr valign='top'>
+<td>583</td>
+<td>a.t_motifs_m583_AT5G58850</td>
+<td>AT5G58850</td>
+<td>11</td>
+<td>yrwmCGTTACr</td>
+<td>YGTAACGKWYR</td>
+<td>8.65</td>
+<td>598</td>
+</tr>
+
+<tr valign='top'>
+<td>584</td>
+<td>a.t_motifs_m584_AT5G58900</td>
+<td>AT5G58900</td>
+<td>15</td>
+<td>wwwrGATAAGrwwww</td>
+<td>WWWWYCTTATCYWWW</td>
+<td>9.56</td>
+<td>580</td>
+</tr>
+
+<tr valign='top'>
+<td>585</td>
+<td>a.t_motifs_m585_AT5G59780</td>
+<td>AT5G59780</td>
+<td>10</td>
+<td>arTTAGGTmm</td>
+<td>KKACCTAAYT</td>
+<td>8.23</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>586</td>
+<td>a.t_motifs_m586_AT5G60120</td>
+<td>AT5G60120</td>
+<td>10</td>
+<td>wAACCTAcGw</td>
+<td>WCGTAGGTTW</td>
+<td>8.71</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>587</td>
+<td>a.t_motifs_m587_AT5G60130</td>
+<td>AT5G60130</td>
+<td>19</td>
+<td>AAGcAAAwwmtAAGsAAAw</td>
+<td>WTTTSCTTAKWWTTTGCTT</td>
+<td>11.10</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>588</td>
+<td>a.t_motifs_m588_AT5G60850</td>
+<td>AT5G60850</td>
+<td>14</td>
+<td>sAAAAAGkwaawww</td>
+<td>WWWTTWMCTTTTTS</td>
+<td>8.92</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>589</td>
+<td>a.t_motifs_m589_AT5G60970</td>
+<td>AT5G60970</td>
+<td>8</td>
+<td>GGGACCAY</td>
+<td>RTGGTCCC</td>
+<td>10.53</td>
+<td>20</td>
+</tr>
+
+<tr valign='top'>
+<td>590</td>
+<td>a.t_motifs_m590_AT5G61270</td>
+<td>AT5G61270</td>
+<td>15</td>
+<td>swkrrwsCCACGTGg</td>
+<td>CCACGTGGSWYYMWS</td>
+<td>10.13</td>
+<td>112</td>
+</tr>
+
+<tr valign='top'>
+<td>591</td>
+<td>a.t_motifs_m591_AT5G61600</td>
+<td>AT5G61600</td>
+<td>19</td>
+<td>crccryckcCGCCGCCryy</td>
+<td>RRYGGCGGCGGMGRYGGYG</td>
+<td>10.67</td>
+<td>557</td>
+</tr>
+
+<tr valign='top'>
+<td>592</td>
+<td>a.t_motifs_m592_AT5G61620</td>
+<td>AT5G61620</td>
+<td>15</td>
+<td>wwwwTGGATAArrww</td>
+<td>WWYYTTATCCAWWWW</td>
+<td>9.62</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>593</td>
+<td>a.t_motifs_m593_AT5G61850</td>
+<td>AT5G61850</td>
+<td>19</td>
+<td>yATkrACCGsCGGTymATr</td>
+<td>YATKRACCGSCGGTYMATR</td>
+<td>12.46</td>
+<td>405</td>
+</tr>
+
+<tr valign='top'>
+<td>594</td>
+<td>a.t_motifs_m594_AT5G62000</td>
+<td>AT5G62000</td>
+<td>10</td>
+<td>wdsmGACAar</td>
+<td>YTTGTCKSHW</td>
+<td>6.41</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>595</td>
+<td>a.t_motifs_m595_AT5G62020</td>
+<td>AT5G62020</td>
+<td>12</td>
+<td>GAAgcTTCyAGA</td>
+<td>TCTRGAAGCTTC</td>
+<td>10.17</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>596</td>
+<td>a.t_motifs_m596_AT5G62165</td>
+<td>AT5G62165</td>
+<td>7</td>
+<td>CATCATy</td>
+<td>RATGATG</td>
+<td>8.23</td>
+<td>146</td>
+</tr>
+
+<tr valign='top'>
+<td>597</td>
+<td>a.t_motifs_m597_AT5G62320</td>
+<td>AT5G62320</td>
+<td>13</td>
+<td>hyyyACCwAmyyh</td>
+<td>DRRKTWGGTRRRD</td>
+<td>8.39</td>
+<td>585</td>
+</tr>
+
+<tr valign='top'>
+<td>598</td>
+<td>a.t_motifs_m598_AT5G62380</td>
+<td>AT5G62380</td>
+<td>21</td>
+<td>TTGCKTgwwwttyAmGywWyc</td>
+<td>GRWWRCKTRAAWWWCAMGCAA</td>
+<td>11.69</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>599</td>
+<td>a.t_motifs_m599_AT5G62470</td>
+<td>AT5G62470</td>
+<td>18</td>
+<td>wdwdkTrGkTGGtrGtTr</td>
+<td>YAACYACCAMCYAMHWHW</td>
+<td>9.09</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>600</td>
+<td>a.t_motifs_m600_AT5G62940</td>
+<td>AT5G62940</td>
+<td>21</td>
+<td>raaaaaarrAAAAAGtwrawa</td>
+<td>TWTYWACTTTTTYYTTTTTTY</td>
+<td>9.97</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>601</td>
+<td>a.t_motifs_m601_AT5G63090</td>
+<td>AT5G63090</td>
+<td>21</td>
+<td>tCCkCCGccdyckCCGCCGcm</td>
+<td>KGCGGCGGMGRHGGCGGMGGA</td>
+<td>11.34</td>
+<td>573</td>
+</tr>
+
+<tr valign='top'>
+<td>602</td>
+<td>a.t_motifs_m602_AT5G63260</td>
+<td>AT5G63260</td>
+<td>11</td>
+<td>sAWAAAGKdra</td>
+<td>TYHMCTTTWTS</td>
+<td>8.41</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>603</td>
+<td>a.t_motifs_m603_AT5G64060</td>
+<td>AT5G64060</td>
+<td>21</td>
+<td>grwAACTTGbkgwrCAAGthA</td>
+<td>TDACTTGYWCMVCAAGTTWYC</td>
+<td>13.10</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>604</td>
+<td>a.t_motifs_m604_AT5G64220</td>
+<td>AT5G64220</td>
+<td>9</td>
+<td>wadsCGyGT</td>
+<td>ACRCGSHTW</td>
+<td>6.09</td>
+<td>21</td>
+</tr>
+
+<tr valign='top'>
+<td>605</td>
+<td>a.t_motifs_m605_AT5G64750</td>
+<td>AT5G64750</td>
+<td>19</td>
+<td>ggcgradrtkrCGGCGGmG</td>
+<td>CKCCGCCGYMAYHTYCGCC</td>
+<td>10.03</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>606</td>
+<td>a.t_motifs_m606_AT5G65130</td>
+<td>AT5G65130</td>
+<td>15</td>
+<td>ccrcCdCCrCCGCCa</td>
+<td>TGGCGGYGGHGGYGG</td>
+<td>10.24</td>
+<td>578</td>
+</tr>
+
+<tr valign='top'>
+<td>607</td>
+<td>a.t_motifs_m607_AT5G65210</td>
+<td>AT5G65210</td>
+<td>15</td>
+<td>dwtGmTGACGTCAyy</td>
+<td>RRTGACGTCAKCAWH</td>
+<td>11.76</td>
+<td>595</td>
+</tr>
+
+<tr valign='top'>
+<td>608</td>
+<td>a.t_motifs_m608_AT5G65310</td>
+<td>AT5G65310</td>
+<td>11</td>
+<td>yyAATmATTra</td>
+<td>TYAATKATTRR</td>
+<td>9.15</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>609</td>
+<td>a.t_motifs_m609_AT5G65410</td>
+<td>AT5G65410</td>
+<td>15</td>
+<td>tmayTAATyAhgwww</td>
+<td>WWWCDTRATTARTKA</td>
+<td>9.04</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>610</td>
+<td>a.t_motifs_m610_AT5G65510</td>
+<td>AT5G65510</td>
+<td>11</td>
+<td>CGrwTyyCgAG</td>
+<td>CTCGRRAWYCG</td>
+<td>7.23</td>
+<td>539</td>
+</tr>
+
+<tr valign='top'>
+<td>611</td>
+<td>a.t_motifs_m611_AT5G66300</td>
+<td>AT5G66300</td>
+<td>16</td>
+<td>CkTraarwwsAAGCAA</td>
+<td>TTGCTTSWWYTTYAMG</td>
+<td>10.65</td>
+<td>588</td>
+</tr>
+
+<tr valign='top'>
+<td>612</td>
+<td>a.t_motifs_m612_AT5G66700</td>
+<td>AT5G66700</td>
+<td>11</td>
+<td>mcAATAATTgw</td>
+<td>WCAATTATTGK</td>
+<td>10.13</td>
+<td>599</td>
+</tr>
+
+<tr valign='top'>
+<td>613</td>
+<td>a.t_motifs_m613_AT5G66730</td>
+<td>AT5G66730</td>
+<td>17</td>
+<td>hasAAAAmGACAAAAaw</td>
+<td>WTTTTTGTCKTTTTSTD</td>
+<td>12.82</td>
+<td>586</td>
+</tr>
+
+<tr valign='top'>
+<td>614</td>
+<td>a.t_motifs_m614_AT5G66940</td>
+<td>AT5G66940</td>
+<td>29</td>
+<td>wttttttttytTTTtaCTTTTtttttttw</td>
+<td>WAAAAAAAAAAAGTAAAAARAAAAAAAAW</td>
+<td>11.61</td>
+<td>597</td>
+</tr>
+
+<tr valign='top'>
+<td>615</td>
+<td>a.t_motifs_m615_AT5G67000</td>
+<td>AT5G67000</td>
+<td>15</td>
+<td>ykdwyrCGGCkGhkg</td>
+<td>CMDCMGCCGYRWHMR</td>
+<td>8.04</td>
+<td>138</td>
+</tr>
+
+<tr valign='top'>
+<td>616</td>
+<td>a.t_motifs_m616_AT5G67190</td>
+<td>AT5G67190</td>
+<td>15</td>
+<td>ycrycdyCACCGmCa</td>
+<td>TGKCGGTGRHGRYGR</td>
+<td>9.40</td>
+<td>600</td>
+</tr>
+
+<tr valign='top'>
+<td>617</td>
+<td>a.t_motifs_m617_AT5G67300</td>
+<td>AT5G67300</td>
+<td>19</td>
+<td>dwdwCvGTTwwwwCvGTTr</td>
+<td>YAACBGWWWWAACBGWHWH</td>
+<td>10.64</td>
+<td>478</td>
+</tr>
+
+<tr valign='top'>
+<td>618</td>
+<td>a.t_motifs_m618_AT5G67450</td>
+<td>AT5G67450</td>
+<td>11</td>
+<td>wgwGwsAGTGw</td>
+<td>WCACTSWCWCW</td>
+<td>6.96</td>
+<td>596</td>
+</tr>
+
+<tr valign='top'>
+<td>619</td>
+<td>a.t_motifs_m619_AT5G67580</td>
+<td>AT5G67580</td>
+<td>19</td>
+<td>awwwhtwwrCCCTAAwtwy</td>
+<td>RWAWTTAGGGYWWADWWWT</td>
+<td>10.97</td>
+<td>572</td>
+</tr>
+
+</table>
+
+<pre>
+</pre>
+</BODY></HTML>

@@ -1,0 +1,17 @@
+{
+"name": "",
+"children":[
+{
+ "label": "a.t_motifs_m593_AT5G61850",
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m593_AT5G61850_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m593_AT5G61850_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m593_AT5G61850_logo.png",
+ "name" : "AT5G61850",
+ "ic" : "12.46",
+ "size" : 19,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "YATKRACCGSCGGTYMATR"
+}
+]
+}

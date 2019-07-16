@@ -1,0 +1,141 @@
+{
+"name": "",
+"children":[
+ {
+ "consensus" : "CATsATCmTCATCaTCaTCaTCaTCAT",
+ "branch" : 5,
+ "id" : "cluster_17_node_5",
+ "ic" : "19.45",
+ "size" : 27,
+ "name" : "cluster_17",
+ "image" : "matrix-clustering_aligned_logos/cluster_17_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_17_logo_rc.png",
+
+ "children": [
+ {
+ "label": "a.t_motifs_m143_AT1G72050", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m143_AT1G72050_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m143_AT1G72050_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m143_AT1G72050_logo.png",
+ "name" : "AT1G72050",
+ "ic" : "11.89",
+ "size" : 27,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "GAGGAGGAGGAGGAGGARG"
+},
+{
+ "consensus" : "CATsATCATCATCATCATCATCATCAT",
+ "branch" : 4,
+ "id" : "cluster_17_node_4",
+ "ic" : "23.54",
+ "size" : 27,
+ "name" : "cluster_17_node_4_5motifs",
+ "image" : "matrix-clustering_aligned_logos/cluster_17_node_4_5motifs_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_17_node_4_5motifs_logo_rc.png",
+
+ "children": [
+ {
+ "consensus" : "CATCATCATCATCATCATC",
+ "branch" : 3,
+ "id" : "cluster_17_node_3",
+ "ic" : "16.79",
+ "size" : 27,
+ "name" : "",
+ "image" : ".",
+ "image_rc" : ".",
+
+ "children": [
+ {
+ "consensus" : "TCATCATCATCATCAy",
+ "branch" : 2,
+ "id" : "cluster_17_node_2",
+ "ic" : "14.82",
+ "size" : 27,
+ "name" : "cluster_17_node_2_2motifs",
+ "image" : "matrix-clustering_aligned_logos/cluster_17_node_2_2motifs_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_17_node_2_2motifs_logo_rc.png",
+
+ "children": [
+ {
+ "label": "a.t_motifs_m318_AT3G21175", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m318_AT3G21175_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m318_AT3G21175_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m318_AT3G21175_logo.png",
+ "name" : "AT3G21175",
+ "ic" : "17.29",
+ "size" : 27,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "TGATGATGATGATGA"
+},
+{
+ "label": "a.t_motifs_m328_AT3G24050", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m328_AT3G24050_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m328_AT3G24050_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m328_AT3G24050_logo.png",
+ "name" : "AT3G24050",
+ "ic" : "9.95",
+ "size" : 27,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "CAYCAYCAYCAYCAY"
+} 
+] 
+},
+{
+ "consensus" : "CATCATCATCATCATCATC",
+ "branch" : 1,
+ "id" : "cluster_17_node_1",
+ "ic" : "16.80",
+ "size" : 27,
+ "name" : "cluster_17_node_1_2motifs",
+ "image" : "matrix-clustering_aligned_logos/cluster_17_node_1_2motifs_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/cluster_17_node_1_2motifs_logo_rc.png",
+
+ "children": [
+ {
+ "label": "a.t_motifs_m99_AT1G51600", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m99_AT1G51600_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m99_AT1G51600_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m99_AT1G51600_logo.png",
+ "name" : "AT1G51600",
+ "ic" : "18.20",
+ "size" : 27,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "GATGATGATGATGATGATG"
+},
+{
+ "label": "a.t_motifs_m281_AT3G06740", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m281_AT3G06740_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m281_AT3G06740_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m281_AT3G06740_logo.png",
+ "name" : "AT3G06740",
+ "ic" : "16.53",
+ "size" : 27,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "GATGATGATGATGATGATS"
+} 
+] 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m566_AT5G49300", 
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m566_AT5G49300_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m566_AT5G49300_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m566_AT5G49300_logo.png",
+ "name" : "AT5G49300",
+ "ic" : "24.94",
+ "size" : 27,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "ATGATGATGATGATGATGATGATSATG"
+} 
+] 
+} 
+] 
+} 
+]}

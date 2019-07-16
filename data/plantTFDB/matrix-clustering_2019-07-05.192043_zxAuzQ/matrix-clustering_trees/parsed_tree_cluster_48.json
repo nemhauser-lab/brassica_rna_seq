@@ -1,0 +1,17 @@
+{
+"name": "",
+"children":[
+{
+ "label": "a.t_motifs_m148_AT1G74480",
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m148_AT1G74480_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m148_AT1G74480_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m148_AT1G74480_logo.png",
+ "name" : "AT1G74480",
+ "ic" : "10.95",
+ "size" : 19,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "RRGGAAGAYGAARMGTCRC"
+}
+]
+}

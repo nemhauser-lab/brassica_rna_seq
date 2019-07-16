@@ -1,0 +1,23 @@
+MEME version 4.4
+
+ALPHABET= ACGT
+
+strands: + -
+
+Background letter frequencies (from file `../../promoter_background/Ath.bg'):
+A 0.33230 C 0.16770 G 0.16770 T 0.33230 
+
+MOTIF AT1G06160 MP00023
+
+letter-probability matrix: alength= 4 w= 8 nsites= 20 E= 0
+  0.346006	  0.461214	  0.192396	  0.000384	
+  0.000250	  0.000250	  0.999251	  0.000250	
+  0.000244	  0.999269	  0.000244	  0.000244	
+  0.122076	  0.877437	  0.000244	  0.000244	
+  0.024610	  0.000244	  0.974903	  0.000244	
+  0.000244	  0.950536	  0.048977	  0.000244	
+  0.000244	  0.999269	  0.000244	  0.000244	
+  0.241391	  0.103650	  0.482438	  0.172521	
+
+URL http://planttfdb.cbi.pku.edu.cn/tf.php?sp=Ath&did=AT1G06160.1#bind_motif
+

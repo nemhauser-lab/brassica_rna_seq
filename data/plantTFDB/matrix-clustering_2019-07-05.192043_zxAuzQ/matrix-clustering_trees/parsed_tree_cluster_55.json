@@ -1,0 +1,17 @@
+{
+"name": "",
+"children":[
+{
+ "label": "a.t_motifs_m352_AT3G48430",
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m352_AT3G48430_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m352_AT3G48430_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m352_AT3G48430_logo.png",
+ "name" : "AT3G48430",
+ "ic" : "11.50",
+ "size" : 12,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "TRCTCTGTTTYT"
+}
+]
+}

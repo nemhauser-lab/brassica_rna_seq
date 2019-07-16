@@ -1,0 +1,4 @@
+;level	cluster	node
+1	a.t_motifs_m42_AT1G19790,a.t_motifs_m220_AT2G33550,a.t_motifs_m145_AT1G72740,a.t_motifs_m619_AT5G67580	node_3
+2	a.t_motifs_m220_AT2G33550,a.t_motifs_m145_AT1G72740,a.t_motifs_m619_AT5G67580	node_2
+3	a.t_motifs_m145_AT1G72740,a.t_motifs_m619_AT5G67580	node_1

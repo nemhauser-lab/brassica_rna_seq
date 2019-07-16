@@ -1,0 +1,23 @@
+MEME version 4.4
+
+ALPHABET= ACGT
+
+strands: + -
+
+Background letter frequencies (from uniform background):
+A 0.25000 C 0.25000 G 0.25000 T 0.25000 
+
+MOTIF MP00666 GSVIVG01007522001
+
+letter-probability matrix: alength= 4 w= 8 nsites= 20 E= 0
+  0.001656	  0.001656	  0.995033	  0.001656	
+  0.001656	  0.001656	  0.001656	  0.995033	
+  0.001656	  0.001656	  0.001656	  0.995033	
+  0.995033	  0.001656	  0.001656	  0.001656	
+  0.995033	  0.001656	  0.001656	  0.001656	
+  0.001656	  0.995033	  0.001656	  0.001656	
+  0.001656	  0.663907	  0.001656	  0.332781	
+  0.497525	  0.250000	  0.250000	  0.002475	
+
+URL http://planttfdb.cbi.pku.edu.cn/tf.php?sp=Vvi&did=GSVIVT01007522001#bind_motif
+

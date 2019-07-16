@@ -1,0 +1,23 @@
+MEME version 4.4
+
+ALPHABET= ACGT
+
+strands: + -
+
+Background letter frequencies (from uniform background):
+A 0.25000 C 0.25000 G 0.25000 T 0.25000 
+
+MOTIF MP00638 Lj0g3v0004489
+
+letter-probability matrix: alength= 4 w= 8 nsites= 20 E= 0
+  0.001420	  0.001420	  0.995739	  0.001420	
+  0.001420	  0.001420	  0.995739	  0.001420	
+  0.143466	  0.143466	  0.569602	  0.143466	
+  0.001420	  0.995739	  0.001420	  0.001420	
+  0.001420	  0.995739	  0.001420	  0.001420	
+  0.001420	  0.995739	  0.001420	  0.001420	
+  0.995033	  0.001656	  0.001656	  0.001656	
+  0.002475	  0.992574	  0.002475	  0.002475	
+
+URL http://planttfdb.cbi.pku.edu.cn/tf.php?sp=Lja&did=Lj0g3v0004489.1#bind_motif
+

@@ -1,0 +1,10 @@
+merged_ID	child_1	child_2
+node_1	a.t_motifs_m390_AT4G01280	a.t_motifs_m574_AT5G52660
+node_2	a.t_motifs_m1_AT1G01060	a.t_motifs_m475_AT5G02840
+node_3	a.t_motifs_m287_AT3G10113	a.t_motifs_m514_AT5G17300
+node_4	a.t_motifs_m284_AT3G09600	node_1
+node_5	node_2	node_4
+node_6	a.t_motifs_m35_AT1G18330	node_3
+node_7	node_5	node_6
+node_8	a.t_motifs_m264_AT2G46830	node_7
+node_9	a.t_motifs_m27_AT1G13260	node_8

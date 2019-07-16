@@ -1,0 +1,4 @@
+;level	cluster	node
+1	a.t_motifs_m500_AT5G10510,a.t_motifs_m317_AT3G20840,a.t_motifs_m465_AT4G37750,a.t_motifs_m610_AT5G65510	node_3
+2	a.t_motifs_m500_AT5G10510,a.t_motifs_m317_AT3G20840,a.t_motifs_m465_AT4G37750	node_2
+3	a.t_motifs_m500_AT5G10510,a.t_motifs_m317_AT3G20840	node_1

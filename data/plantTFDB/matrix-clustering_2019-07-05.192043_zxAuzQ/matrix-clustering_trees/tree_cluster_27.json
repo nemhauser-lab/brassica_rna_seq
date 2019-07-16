@@ -1,0 +1,63 @@
+{
+"name": "",
+"children":[
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "label": "a.t_motifs_m279_AT3G04070", 
+},
+{
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "label": "a.t_motifs_m103_AT1G52890", 
+},
+{
+ "label": "a.t_motifs_m133_AT1G69490", 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m141_AT1G71930", 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m383_AT3G61910", 
+} 
+] 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m480_AT5G04410", 
+} 
+] 
+},
+{
+ "children": [
+ {
+ "label": "a.t_motifs_m244_AT2G42400", 
+},
+{
+ "label": "a.t_motifs_m72_AT1G32770", 
+} 
+] 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m113_AT1G61110", 
+} 
+] 
+} 
+]}

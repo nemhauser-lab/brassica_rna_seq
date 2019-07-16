@@ -70,6 +70,9 @@ fname <- paste("all_genes_promoters_",
                "k.fasta", sep="")
 writeXStringSet(ourPromoterDSS, file.path(dirPath, fname))
 
+# ==============================================================================
+# Misc. stuff
+
 # to read in a fasta:
 dirPath <- file.path(rootDir, "data", "Brapa2.5")
 Promoters <- readDNAStringSet(file.path(dirPath, "all_genes_promoters_1k.fasta"))

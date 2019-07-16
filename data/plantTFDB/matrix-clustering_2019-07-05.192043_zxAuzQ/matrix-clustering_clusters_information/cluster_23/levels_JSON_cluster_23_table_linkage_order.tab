@@ -1,0 +1,17 @@
+merged_ID	child_1	child_2
+node_1	a.t_motifs_m129_AT1G69010	a.t_motifs_m441_AT4G30980
+node_2	a.t_motifs_m110_AT1G59640	a.t_motifs_m23_AT1G10120
+node_3	a.t_motifs_m493_AT5G08130	node_1
+node_4	a.t_motifs_m202_AT2G22750	a.t_motifs_m471_AT5G01380
+node_5	a.t_motifs_m194_AT2G20180	a.t_motifs_m590_AT5G61270
+node_6	a.t_motifs_m323_AT3G23210	node_2
+node_7	a.t_motifs_m327_AT3G23690	node_5
+node_8	a.t_motifs_m541_AT5G38860	node_3
+node_9	a.t_motifs_m86_AT1G45249	a.t_motifs_m94_AT1G49720
+node_10	node_7	node_8
+node_11	a.t_motifs_m152_AT1G75080	a.t_motifs_m553_AT5G45300
+node_12	node_4	node_10
+node_13	a.t_motifs_m423_AT4G21330	node_12
+node_14	node_11	node_13
+node_15	node_6	node_9
+node_16	node_14	node_15

@@ -1,0 +1,112 @@
+{
+"name": "",
+"children":[
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "label": "a.t_motifs_m120_AT1G66420", 
+},
+{
+ "label": "a.t_motifs_m230_AT2G38090", 
+} 
+] 
+},
+{
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "label": "a.t_motifs_m592_AT5G61620", 
+},
+{
+ "label": "a.t_motifs_m580_AT5G56840", 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m291_AT3G10580", 
+} 
+] 
+},
+{
+ "children": [
+ {
+ "label": "a.t_motifs_m294_AT3G11280", 
+},
+{
+ "label": "a.t_motifs_m484_AT5G05790", 
+} 
+] 
+} 
+] 
+},
+{
+ "children": [
+ {
+ "label": "a.t_motifs_m386_AT4G00250", 
+},
+{
+ "label": "a.t_motifs_m38_AT1G19000", 
+} 
+] 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m495_AT5G08520", 
+} 
+] 
+},
+{
+ "children": [
+ {
+ "label": "a.t_motifs_m91_AT1G49010", 
+},
+{
+ "children": [
+ {
+ "label": "a.t_motifs_m562_AT5G47390", 
+},
+{
+ "label": "a.t_motifs_m584_AT5G58900", 
+} 
+] 
+} 
+] 
+} 
+] 
+},
+{
+ "children": [
+ {
+ "children": [
+ {
+ "label": "a.t_motifs_m138_AT1G70000", 
+},
+{
+ "label": "a.t_motifs_m150_AT1G74840", 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m481_AT5G04760", 
+} 
+] 
+} 
+] 
+} 
+] 
+} 
+]}

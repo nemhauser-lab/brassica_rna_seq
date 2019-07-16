@@ -1,0 +1,17 @@
+{
+"name": "",
+"children":[
+{
+ "label": "a.t_motifs_m429_AT4G24470",
+
+ "image" : "matrix-clustering_aligned_logos/a.t_motifs_m429_AT4G24470_logo.png",
+ "image_rc" : "matrix-clustering_aligned_logos/a.t_motifs_m429_AT4G24470_logo_rc.png",
+ "url" : "matrix-clustering_aligned_logos/a.t_motifs_m429_AT4G24470_logo.png",
+ "name" : "AT4G24470",
+ "ic" : "11.64",
+ "size" : 15,
+ "title" : "a.t_motifs",
+ "consensus_rc" : "AWYSRACGGYYRAGA"
+}
+]
+}

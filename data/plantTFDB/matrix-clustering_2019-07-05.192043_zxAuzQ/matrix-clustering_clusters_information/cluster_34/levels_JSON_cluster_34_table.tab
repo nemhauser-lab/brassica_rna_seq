@@ -1,0 +1,4 @@
+;level	cluster	node
+1	a.t_motifs_m302_AT3G13040,a.t_motifs_m241_AT2G41835,a.t_motifs_m19_AT1G09030,a.t_motifs_m355_AT3G49930	node_3
+2	a.t_motifs_m302_AT3G13040,a.t_motifs_m241_AT2G41835,a.t_motifs_m19_AT1G09030	node_2
+3	a.t_motifs_m241_AT2G41835,a.t_motifs_m19_AT1G09030	node_1

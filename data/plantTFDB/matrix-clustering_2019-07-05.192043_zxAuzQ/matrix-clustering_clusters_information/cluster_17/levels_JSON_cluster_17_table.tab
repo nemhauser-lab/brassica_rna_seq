@@ -1,0 +1,6 @@
+;level	cluster	node
+1	a.t_motifs_m143_AT1G72050,a.t_motifs_m318_AT3G21175,a.t_motifs_m328_AT3G24050,a.t_motifs_m99_AT1G51600,a.t_motifs_m281_AT3G06740,a.t_motifs_m566_AT5G49300	node_5
+2	a.t_motifs_m318_AT3G21175,a.t_motifs_m328_AT3G24050,a.t_motifs_m99_AT1G51600,a.t_motifs_m281_AT3G06740,a.t_motifs_m566_AT5G49300	node_4
+3	a.t_motifs_m318_AT3G21175,a.t_motifs_m328_AT3G24050,a.t_motifs_m99_AT1G51600,a.t_motifs_m281_AT3G06740	node_3
+4	a.t_motifs_m318_AT3G21175,a.t_motifs_m328_AT3G24050	node_2
+5	a.t_motifs_m99_AT1G51600,a.t_motifs_m281_AT3G06740	node_1

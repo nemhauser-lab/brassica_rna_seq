@@ -1,0 +1,42 @@
+{
+"name": "",
+"children":[
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "children": [
+ {
+ "label": "a.t_motifs_m402_AT4G14770", 
+},
+{
+ "label": "a.t_motifs_m193_AT2G20110", 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m321_AT3G22780", 
+} 
+] 
+},
+{
+ "label": "a.t_motifs_m228_AT2G36610", 
+} 
+] 
+},
+{
+ "children": [
+ {
+ "label": "a.t_motifs_m320_AT3G22760", 
+},
+{
+ "label": "a.t_motifs_m438_AT4G29000", 
+} 
+] 
+} 
+] 
+} 
+]}
