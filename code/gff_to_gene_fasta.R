@@ -7,7 +7,7 @@ library(BSgenome)
 rootDir <- find_root(is_rstudio_project)
 dirPath <- file.path(rootDir, "data", "Brapa2.5")
 
-genomeFile <- file.path(dirPath, "BrapaV2.5_Chr.fa")
+genomeFile <- file.path(dirPath, "BrapaV2.5_Chr.fa.gz")
 BrapaGenome <- readDNAStringSet(genomeFile)
 gffFile <- file.path(dirPath, "BrapaV2.5_Chr.gene.gff")
 gffData <- ape::read.gff(gffFile)

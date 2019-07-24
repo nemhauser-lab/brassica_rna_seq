@@ -1,5 +1,16 @@
 # generate some tables for the paper.
 
+library(openxlsx)
+library(edgeR)
+library(ggplot2)
+library(gplots)
+library(plotly)
+library(stats)
+library(VennDiagram)
+library(stringr)
+library(rprojroot)
+library(Biostrings)
+
 
 rootDir <- find_root(is_rstudio_project)
 resultsFoldeToRead <- file.path(rootDir, "results", "analysis_output_20190510")
@@ -137,7 +148,7 @@ fileLists <- list("RvD_up"=Files[1:3], "RvD_down"=Files[4:6],
 
 
 
-
+# make chloroplast only files
 for (i in 1:4){
   # make blank DF
   outputTable <- data.frame()
@@ -167,32 +178,39 @@ for (i in 1:4){
   write.table(outputTable, fileOutName, sep=",", row.names=FALSE)
 }
 
-# for (i in 1:length(Files)){
-#   file <- Files[i]
-#   rawTable <- read.table(file, header=TRUE, sep=",", row.names=1)
-#   # subset to chloroplast genes
-#   tempTable <- subset(rawTable, A._thaliana_best_hit %in% chloroplastGenes,
-#                       select=c("Gene_ID",
-#                                "logFC_WT", "logFC_phyB",
-#                                "logCPM_WT", "logCPM_phyB",
-#                                "PValue_WT", "PValue_phyB",
-#                                "FDR_WT", "FDR_phyB",
-#                                "A._thaliana_best_hit", "Symbol", "Description"))
-#
-#   # add average cpm values for all time points
-#   tempTable <- addAvgCpm(tempTable, DGEdata)
-#
-#   # save table
-#   fname <- sub("\\.csv", "_chloroplast_related.csv", sub(".*\\/", "", Files[i]))
-#   fileOutName <- file.path(outputDir, fname)
-#   write.table(tempTable, fileOutName, sep=",", row.names=FALSE)
-#
-#
-# }
-#
 
 
+# make all sig genes files
+for (i in 1:4){
+  # make blank DF
+  outputTable <- data.frame()
+  for(j in 1:3){
+    file <- fileLists[[i]][j]
+    rawTable <- read.table(file, header=TRUE, sep=",", row.names=1)
+    # subset to chloroplast genes
+    tempTable <- rawTable
+    tempTable$sig_conditions <- sub("^.*?_", "", names(fileLists[[i]][j]))
+    tempTable$"GO:0009507_Chloroplast" <- "-"
+    tempTable[tempTable$A._thaliana_best_hit %in% chloroplastGenes, "GO:0009507_Chloroplast"] <- "yes"
+    tempTable <- subset(tempTable,
+                        select=c("Gene_ID",
+                                 "logFC_WT", "logFC_phyB",
+                                 "logCPM_WT", "logCPM_phyB",
+                                 "PValue_WT", "PValue_phyB",
+                                 "FDR_WT", "FDR_phyB",
+                                 "sig_conditions", "GO:0009507_Chloroplast",
+                                 "A._thaliana_best_hit", "Symbol", "Description"))
 
+    # append new stuff to DF
+    outputTable <- rbind(outputTable, tempTable)
+  }
+  # add average cpm values for all time points
+  outputTable <- addAvgCpm(outputTable, DGEdata)
+  # save DF
+  fname <- paste(names(fileLists[i]), "_significant_genes.csv", sep="")
+  fileOutName <- file.path(outputDir, fname)
+  write.table(outputTable, fileOutName, sep=",", row.names=FALSE)
+}
 
 
 

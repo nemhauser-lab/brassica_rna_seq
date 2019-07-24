@@ -59,7 +59,8 @@ colnames(df)[1] <- "Gene_ID"
 AtBlastGeneInfo <- df
 
 # Generate file structure to save results in
-resultsPath <- makeResultsFolder(file.path(rootDir, "results"))
+resultsPath <- makeResultsFolder(file.path(rootDir, "results", "local"))
+
 
 ```
 
