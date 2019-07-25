@@ -1,53 +1,38 @@
 ---
-title: "Generation of DEG lists with revised methods"
-output: html_notebook
-output: 
+title: "Differential gene expression analysis, Brassica Rapa leaf response to darkness and re-illumination"
+output:
   html_notebook:
+    number_sections: yes
     theme: united
+    toc: yes
+    toc_depth: 2
+  pdf_document:
     toc: yes
 ---
 
 
-```{r setup, include=FALSE}
-
-library(openxlsx)
-library(edgeR)
-library(ggplot2)
-library(gplots)
-library(plotly)
-library(stats)
-library(VennDiagram)
-library(stringr)
-library(rprojroot)
-library(Biostrings)
-
-rootDir <- find_root(is_rstudio_project)
-# dirPath <- file.path(rootDir, "results", "analysis_v3_output")
-# old dirPath:  "C:/Users/Morgan/Documents/Lab Stuff/RNA seq/My_results/analysis_v3_output"
-# file.exists(dirPath)
-
-```
-
-## Description
-
-### v3 Description Dec. 5, 2018
-
-V3 of this analysis code is intended to be the final major revision, updates to this revision from v2 focus on naming comparisions and files more consistently, saving all results we need to a hierarchical folder system, and clean up of un-needed code chunks. 
+# Description
 
 
-### v2 notes
-With Feedback from a meeting on Oct. 26, 2018, this analysis is updated to use more consistent parameters for defining sets of differentially expressed genes (DEGs).
 
-The key updates are:
-* Use more stringent filter for genes based on level of expression
-* use wound control to eliminate genes before analysis to help FDR when identifying genes between D and R conditions
-* Use a reasonable FDR cutouff
-* use a consistent fold change filter
-
-## Setup:
-
+# Setup:
 
 ```{r}
+# load libraries
+suppressPackageStartupMessages(library(openxlsx))
+suppressPackageStartupMessages(library(edgeR))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(gplots))
+suppressPackageStartupMessages(library(plotly))
+suppressPackageStartupMessages(library(stats))
+suppressPackageStartupMessages(library(VennDiagram))
+suppressPackageStartupMessages(library(stringr))
+suppressPackageStartupMessages(library(rprojroot))
+suppressPackageStartupMessages(library(Biostrings))
+
+# find root directory of R project
+rootDir <- find_root(is_rstudio_project)
+
 #load utility functions
 source(file.path(rootDir, "code", "utilities.R"))
 
@@ -65,35 +50,33 @@ resultsPath <- makeResultsFolder(file.path(rootDir, "results", "local"))
 ```
 
 
-## Loading the data
-
-The code below for loading the data is largely unchanged from previous .Rmd docs.
-With the exception that a more stringent filter is being used to filter out genes with low expression
-
-The filter criteria is to remove rows(genes) that have less than 3 samples having above 100 counts.
+# Loading the data
 
 ```{r}
 
+# load the raw transcript counts
 countsFile <- file.path(rootDir, "data", "raw_counts.csv")
 counts <- read.csv(countsFile, row.names="X")
 # rename S (for sensence) to D (for dark-treatment)
 colnames(counts) <- sub("_S", "_D", colnames(counts))
 
-group <- gsub("_\\d_", ".", colnames(counts))
 
 # create the DGEList object edgeR uses
+group <- gsub("_\\d_", ".", colnames(counts))
+
 DGEdata <- DGEList(counts=counts, group=group)
 
 # filter out rows with fewer than 3 samples that have more than 10 counts/million
 keep <- rowSums(cpm(DGEdata) > 10) >= 3
 DGEdata <- DGEdata[keep, , keep.lib.sizes=FALSE]
 
-# woundDGEdata <- DGEdata[, c(1:8,17:22)]
-woundDGEdata <- DGEdata[, c(1:8,13:16,17:22,26:28)] # Excludes D timepoint
+# creae woundDGEdata excluding D timepoints
+woundDGEdatab <- DGEdata[, !grepl("\\.D", group)]
 
 ```
 
-### add Blast info to all genes & load promoters FASTA
+## Add BLAST info to all genes & load promoters FASTA
+
 ```{r}
 
 allGeneIDs <- row.names(DGEdata)
@@ -137,8 +120,10 @@ names(allPromoters2) <- paste(names(allPromoters),
 
 
 
+# Set up linear model
  
-### Design: ~gt + gt:trt  
+## Design: ~gt + gt:trt  
+
 ```{r}
 
 sampleCond <- data.frame(limma::strsplit2(colnames(counts), "_"))
@@ -164,7 +149,9 @@ colnames(design)[colnames(design) == "24"] <- "T24"
 
 ```
 
-### Wound design:
+
+## Wound control design:
+
 ```{r}
 
 sampleCond <- data.frame(limma::strsplit2(colnames(woundDGEdata$counts), "_"))
@@ -191,7 +178,8 @@ colnames(woundDesign)[colnames(woundDesign) == "24"] <- "T24"
 ```
 
 
-### Contrasts
+
+## Contrasts
 
 ```{r}
 fullContrasts <- makeContrasts("WT.24_vs_WT.P" = WT.24,
@@ -221,7 +209,8 @@ fullContrasts <- makeContrasts("WT.24_vs_WT.P" = WT.24,
 ```
 
 
-### linear model fit
+
+## linear model fit
 
 ```{r}
 
@@ -242,12 +231,8 @@ LmFit <- glmQLFit(DGEdata, design)
 
 
 
-# Analysis
 
-
-
-
-## Wound Control
+# Wound Control Analysis
 
 ### phyB.(24-P) vs WT.(24-P)
 
@@ -402,11 +387,9 @@ WT_DvP_results <- timepointAnalysis(folder, cont, conds, FDRmax, logFCmin)
 head(WT_DvP_results$DEGs, 20)
 # save the complete results from this for comparison with Law et al. 2018 results
 format(Sys.time(), "%Y%m%d")
-
-fname <- file.path(rootDir, "results", paste(cont, "_all_genes_", 
+fname <- file.path(rootDir, resultsPath, paste(cont, "_all_genes_", 
                                              format(Sys.time(), "%Y%m%d"), 
                                              ".csv", sep=""))
-
 write.csv(WT_DvP_results$allGenes, fname)
 
 ```
@@ -493,7 +476,8 @@ head(phyB_RvP_results$DEGs, 20)
 
 # genotype X timepoint contrasts
 
-### genotype X timepoint function
+
+## genotype X timepoint function
 
 ```{r}
 genoXtimepointAnalysis <- function(folder, count, conds, FDRmax, logFCmin){
@@ -515,7 +499,7 @@ genoXtimepointAnalysis <- function(folder, count, conds, FDRmax, logFCmin){
 ```
 
 
-### phyB D-P vs WT D-P
+## phyB D-P vs WT D-P
 
 ```{r}
 # --- inputs --- #
@@ -528,7 +512,7 @@ logFCmin <- 0
 DvP_results <- genoXtimepointAnalysis(folder, count, conds, FDRmax, logFCmin)
 ```
 
-### phyB R-D vs WT R-D
+## phyB R-D vs WT R-D
 
 ```{r}
 # --- inputs --- #
@@ -542,7 +526,7 @@ RvD_results <- genoXtimepointAnalysis(folder, count, conds, FDRmax, logFCmin)
 ```
 
 
-### phyB R-P vs WT R-P
+## phyB R-P vs WT R-P
 
 ```{r}
 # --- inputs --- #
@@ -557,7 +541,8 @@ RvP_results <- genoXtimepointAnalysis(folder, count, conds, FDRmax, logFCmin)
 
 # VENN DIAGRAMS
 
-### Venn diagram of D vs. P
+## Venn diagram of D vs. P
+
 
 ```{r}
 # --- inputs --- #
@@ -674,8 +659,7 @@ dev.off()
 ```
 
 
-
-### venn diagarm R vs. D
+## venn diagarm R vs. D
 
 ```{r}
 # --- inputs --- #
@@ -787,7 +771,7 @@ dev.off()
 
 
 
-### venn diagarm R vs. P
+## venn diagarm R vs. P
 
 ```{r}
 # --- inputs --- #
@@ -917,9 +901,9 @@ genotypeAtTPAnalysis <- function(folder, cont, conds, FDRmax, logFCmin, data) {
 }
 ```
 
-### phyB.P vs WT.P
+## phyB.P vs WT.P
 
-Note: we're using woundDGEdata here
+Note: we're using woundDGEdata here due to D being absent from this contrast
 
 ```{r echo=FALSE}
 # --- inputs --- #
@@ -934,7 +918,7 @@ p_results <- genotypeAtTPAnalysis(folder, cont, conds, FDRmax, logFCmin, data)
 ```
 
 
-### phyB.24 vs WT.24
+## phyB.24 vs WT.24
 
 Note: we're using woundDGEdata here
 
@@ -951,7 +935,7 @@ t.24_results <- genotypeAtTPAnalysis(folder, cont, conds, FDRmax, logFCmin, data
 ```
 
 
-### phyB.D vs WT.D
+## phyB.D vs WT.D
 
 ```{r echo=FALSE}
 # --- inputs --- #
@@ -966,7 +950,7 @@ D_results <- genotypeAtTPAnalysis(folder, cont, conds, FDRmax, logFCmin, data)
 ```
 
 
-### phyB.R vs WT.R
+## phyB.R vs WT.R
 
 Note: we're using woundDGEdata here
 
@@ -986,7 +970,7 @@ R_results <- genotypeAtTPAnalysis(folder, cont, conds, FDRmax, logFCmin, data)
 
 # GT at all time points at once
 
-### phyB vs WT at P,S,R
+## phyB vs WT at P,S,R
 
 ```{r}
 # --- inputs --- #
@@ -1039,7 +1023,7 @@ nVenn(list("DvsP (WT+phyB)"=row.names(DEGsDvP), "D (WTvs.phyB)"=row.names(DEGsD)
 
 ```
 
-# PCA
+# Principal Component Analysis
 
 ```{r}
 
@@ -1164,7 +1148,7 @@ plot(x=1:length(pca$sdev), y=pca$sdev)
 ```
 
 
-# create 
+# Create some plots for the paper
 
 ```{r}
 
@@ -1249,8 +1233,8 @@ for (i in 1:nrow(plotGenes2)){
 
 ```
 
+# Session Info
 
-## Session Info
 ```{r}
 sessionInfo()
 ```
