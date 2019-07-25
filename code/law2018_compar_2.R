@@ -78,7 +78,7 @@ sum(res$adj.P.Val <= 0.01) # should get 3819 DEGs
 #===============================================================================
 
 # WT D vs P
-DvP_DF <- read.table(file.path(rootDir, "results", "WT.D_vs_WT.P_all_genes_20190516.csv"),
+DvP_DF <- read.table(file.path(rootDir, "results/local", "WT.D_vs_WT.P_all_genes_20190516.csv"),
                      row.names=1, header=TRUE, sep=",", stringsAsFactors=FALSE)
 
 # load arabidopsis blast results for Brassica genes
@@ -209,7 +209,7 @@ title(list("Non-unique A.t homologs of Brassica genes", font=1, cex=2),  line=-1
 
 
 ################################################################################
-# MISC. JUNK
+# MISC.
 
 temp <- aaply(t(vennDF), .margins=2,  paste, collapse="", .expand=FALSE)
 
