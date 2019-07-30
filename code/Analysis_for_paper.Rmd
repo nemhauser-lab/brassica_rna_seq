@@ -71,7 +71,7 @@ keep <- rowSums(cpm(DGEdata) > 10) >= 3
 DGEdata <- DGEdata[keep, , keep.lib.sizes=FALSE]
 
 # creae woundDGEdata excluding D timepoints
-woundDGEdatab <- DGEdata[, !grepl("\\.D", group)]
+woundDGEdata <- DGEdata[, !grepl("\\.D", group)]
 
 ```
 
@@ -387,7 +387,7 @@ WT_DvP_results <- timepointAnalysis(folder, cont, conds, FDRmax, logFCmin)
 head(WT_DvP_results$DEGs, 20)
 # save the complete results from this for comparison with Law et al. 2018 results
 format(Sys.time(), "%Y%m%d")
-fname <- file.path(rootDir, resultsPath, paste(cont, "_all_genes_", 
+fname <- file.path(resultsPath, paste(cont, "_all_genes_", 
                                              format(Sys.time(), "%Y%m%d"), 
                                              ".csv", sep=""))
 write.csv(WT_DvP_results$allGenes, fname)
