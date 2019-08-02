@@ -6,6 +6,7 @@ library(rprojroot)
 library(plyr)
 library(stringr)
 library(tibble)
+library(ggplot2)
 
 rootDir <- find_root(is_rstudio_project)
 resultsFoldeToRead <- file.path(rootDir, "results", "analysis_output_20190510")
@@ -139,7 +140,7 @@ makeResTable <- function(Files, chloroplastGenes, motif){
     promoterAnnos <- str_split(names(promoters), " \\| ", simplify=TRUE)
     promoters2 <- promoters[!(promoterAnnos[,2] %in% chloroplastGenes)]
     promoterStrs <- as.character(promoters2)
-    counts <- str_count(promoterStrs, "CACGTG")
+    counts <- str_count(promoterStrs, motif)
     row <- data.frame(
       "name" = names(Files)[i],
       "nGenes" = length(counts),
@@ -151,22 +152,52 @@ makeResTable <- function(Files, chloroplastGenes, motif){
     )
     resTable <- rbind(resTable, row)
   }
+  for (i in 1:length(Files)){
+    file <- Files[i]
+    promoters <- readDNAStringSet(file)
+    promoterAnnos <- str_split(names(promoters), " \\| ", simplify=TRUE)
+    promoters2 <- promoters
+    promoterStrs <- as.character(promoters2)
+    counts <- str_count(promoterStrs, motif)
+    row <- data.frame(
+      "name" = names(Files)[i],
+      "nGenes" = length(counts),
+      "genes_w_motif" = sum(counts != 0),
+      "Motifs" = sum(counts),
+      "percent_w_motif" = sum(counts != 0)/length(counts),
+      "ave_motif_per_gene" = sum(counts)/sum(counts != 0),
+      "subset" = "All"
+    )
+    resTable <- rbind(resTable, row)
+  }
+
   return(resTable)
 }
 
 plotBars <- function(resTable, title){
   resTable$genes_wo_motif <- resTable$nGenes-resTable$genes_w_motif
-  resTable <- tidyr::separate(resTable, name, into=c("category", "sign"), sep="_")
+  resTable <- tidyr::separate(resTable, name, into=c("contrast", "category", "sign"), sep="_| ")
+  resTable$category <- paste0(resTable$category, "\nsignificant")
   resTable[resTable$sign=="down", "percent_w_motif"] <- -resTable[resTable$sign=="down", "percent_w_motif"]
+  resTable$subset <- factor(resTable$subset, c("Non-Chloroplast", "Chloroplast", "All") )
   ggplot(resTable, aes(fill=subset, x=category, y=percent_w_motif*100)) +
     geom_bar(stat="identity", position="dodge", colour="black") +
     geom_text(aes(x=category, y=(1-2*(sign=="down"))*abs(percent_w_motif*50),
                   label=paste0(abs(round(percent_w_motif*100)),
                                "%\n(", abs(genes_w_motif), " / ",
                                nGenes, " genes)") ),
-              position=position_dodge(width=1)) +
-    coord_flip() +  scale_fill_manual(values=c("#99e354", "#54e3dc")) +
-    labs(title=title, y="% of genes with motif (negative = down expressed)", x="significance category")
+              position=position_dodge(width=1)) +  #
+    coord_flip() +  scale_fill_manual(values=c("#54e3dc", "#99e354", "#ced8d9")) +
+    labs(title=title, y="% of genes with motif", x="significance category") +
+    theme(
+      panel.background = element_blank(),
+      plot.title = element_text(face="bold", size=20),
+      axis.title.y = element_blank(),
+      axis.text.y = element_text(face="bold", size=15),
+      axis.line.x = element_line(colour = "black"),
+      axis.title.x =  element_text(face="bold", size=15),
+      axis.text.x =  element_text(size=15)
+    )
 }
 
 rawCount <- function(file, motif){
@@ -177,6 +208,7 @@ rawCount <- function(file, motif){
   output <- tidyr::separate(output, gene_info,
                             into=c("gene_ID", "At_homolog", "short_name", "desription"),
                             sep=" \\| ")
+  return(output)
 }
 
 
@@ -191,16 +223,14 @@ motifs <- tribble(~name, ~pattern,
 
 for (i in 1:nrow(motifs)){
   motif <- motifs[i, ]
+  # RvD bar-plot
   resTable <- makeResTable(RvD_files, chloroplastGenes, motif$pattern)
   p <- plotBars(resTable, paste0(motif$name, " motif in RvD differentially regulated genes"))
-  saveFile <- file.path(rootDir, "results/local/motif_enrichment", paste0(motif$name, "_RvD_barplot.svg"))
+  saveFile <- file.path(rootDir, "results/local/motif_enrichment/plots", paste0(motif$name, "_RvD_barplot.svg"))
   ggsave(saveFile, p, device=svg)
-
+  # DvP bar-plot
   resTable <- makeResTable(DvP_files, chloroplastGenes, motif$pattern)
   p <- plotBars(resTable, paste0(motif$name, " motif in DvP differentially regulated genes"))
-  saveFile <- file.path(rootDir, "results/local/motif_enrichment", paste0(motif$name, "_DvP_barplot.svg"))
+  saveFile <- file.path(rootDir, "results/local/motif_enrichment/plots", paste0(motif$name, "_DvP_barplot.svg"))
   ggsave(saveFile, p, device=svg)
 }
-
-  saveFile <- file.path(rootDir, "results/local/motif_enrichment", paste0(motif$name, "_RvD_barplot.svg"))
-  ggsave(saveFile, p, device=svg)
